@@ -2,9 +2,10 @@ import register from "../model/register.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
+
 export const registeruser = async (req, res) => {
     try {
-        const { name, email, Password } = req.body;
+        const { name, email, Password, role } = req.body;
 
         if (!name || !email || !Password) {
             return res.status(400).json({ message: 'all fields are required' });
@@ -22,10 +23,13 @@ export const registeruser = async (req, res) => {
             name,
             email,
             Password: hashedPassword,
+            role: role ||  'student', // Default role set to 'student'
         });
         await saveuser.save();
-        return res.status(200).json({ message: 'user registered successfully'
-            ,User: saveuser });
+        const token =generateToken(saveuser);
+        return res.status(200).json({ message: 'user registered successfully', token, User: saveuser });
+        
+
     } catch (error) {
         console.error('Error registering user:', error);
         return res.status(500).json({ message: 'Internal server error' });
@@ -44,9 +48,10 @@ export const registeruser = async (req, res) => {
     const payload = {
         id: user._id,
         email: user.email,
+        role: user.role, // Include role in the token payload
     };
-    const secretKey = 'your_secret_key';
-    const options = { expiresIn: '1h' };
+    const secretKey = process.env.JWT_SECRET || 'your_secret_key'; // Use environment variable for secret key
+    const options = { expiresIn: '1h' }; // Extend token expiration time to 1 hour
     return jwt.sign(payload, secretKey, options);
 };
 
@@ -73,6 +78,7 @@ export const login = async (req, res) => {
         console.error('Error logging in:', error);
         return res.status(500).json({ message: 'Internal server error' });
     }};
+
 
 export const updateuser = async (req, res) => {
     try {
@@ -139,3 +145,6 @@ export const updateuser = async (req, res) => {
                     console.error('Error deleting user:', error);
                     return res.status(500).json({ message: 'Internal server error' });
                 }};
+
+
+
