@@ -1,10 +1,12 @@
 {
   "name": "backend-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "School Management System API",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon backend/index.js"
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "seed": "node seed.js"
   },
   "type": "module",
   "keywords": [],
@@ -15,7 +17,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "git": "^0.1.5",
+    "express-validator": "^7.2.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.2.1",
     "nodemailer": "^8.0.1"

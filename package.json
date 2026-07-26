@@ -1,0 +1,15 @@
+{
+  "name": "backend-server-workspace",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "backend",
+    "Frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm --prefix backend run dev\" \"npm --prefix Frontend run dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.0"
+  }
+}

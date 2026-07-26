@@ -1,57 +1,49 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-
-const registerSchema = new mongoose.Schema({
-    name: { 
-        type: String,
-        required: true,
+const registerSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
     },
     email: {
-        type: String,
-        required: true,
-        unique: true,
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
     },
     Password: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     role: {
-        type: String,
-        required: true,
-        enum: ['admin', 'teacher', 'student'],
-        default: 'student', // Default role set to 'student'
+      type: String,
+      enum: ["admin", "teacher", "student"],
+      default: "student",
+      required: true,
     },
-    // Additional fields for Student
-    grade: {
-        type: String,
-        required: false,
+    bio: {
+      type: String,
+      default: "",
     },
-    studentId: {
-        type: String,
-        required: false,
-        unique: true,
-        sparse: true, // Allows null values for unique index
-    },
-    // Additional fields for Teacher
     subject: {
-        type: String,
-        required: false,
+      type: String,
+      default: "",
     },
-    teacherId: {
-        type: String,
-        required: false,
-        unique: true,
-        sparse: true,
+    experience: {
+      type: String,
+      default: "",
     },
-    // Additional fields for Admin
-    adminLevel: {
-        type: String,
-        enum: ['super', 'regular'],
-        default: 'regular',
-        required: false,
+    phone: {
+      type: String,
+      default: "",
     },
-}, { timestamps: true });
+  },
+  { timestamps: true }
+);
 
-const register = mongoose.model('register', registerSchema);
+const register = mongoose.model("register", registerSchema);
 
 export default register;

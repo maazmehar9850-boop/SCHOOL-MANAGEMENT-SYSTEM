@@ -182,3 +182,135 @@
     border-right-color: var(--border);
   }
 }
+
+.auth-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100svh - 40px);
+  padding: 20px;
+  background: linear-gradient(180deg, #f8f6ff 0%, #ffffff 100%);
+}
+
+.auth-card {
+  width: min(100%, 420px);
+  padding: 32px 28px;
+  border-radius: 24px;
+  background: white;
+  box-shadow: 0 22px 60px rgba(79, 70, 229, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.08);
+}
+
+.auth-card h2 {
+  margin-bottom: 24px;
+  font-size: 28px;
+  text-align: left;
+  color: rgb(144, 129, 178);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+}
+
+.auth-form input,
+.auth-form select {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid #d7d6de;
+  font-size: 16px;
+  color: black;
+  background: #fbfbff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-form input:focus,
+.auth-form select:focus {
+  outline: none;
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
+}
+
+.auth-form button {
+  margin-top: 8px;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 14px;
+  background: #7c3aed;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.auth-form button:hover {
+  background: #5b21b6;
+  transform: translateY(-1px);
+}
+
+.auth-button {
+  width: 100%;
+  text-align: center;
+  background: #7c3aed;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.auth-button:hover {
+  background: #5b21b6;
+  transform: translateY(-1px);
+}
+
+.auth-footer {
+  margin-top: 18px;
+  font-size: 15px;
+  color: var(--text);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-footer a,
+.auth-link-button {
+  color: #7c3aed;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-link-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  width: fit-content;
+  border-radius: 12px;
+  background: #eff4ff;
+  border: 1px solid rgba(124, 58, 237, 0.18);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.auth-link-button:hover {
+  background: #ede6ff;
+  transform: translateY(-1px);
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .auth-card {
+    padding: 24px 20px;
+  }
+}
