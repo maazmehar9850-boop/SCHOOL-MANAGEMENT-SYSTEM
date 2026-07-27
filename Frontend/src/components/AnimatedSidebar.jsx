@@ -42,7 +42,10 @@ function AnimatedSidebar({ role }) {
     { to: "/courses", label: "Courses", icon: BookOpen },
     { to: "/enrollments", label: "Enrollments", icon: Link2 },
     { to: "/assignments", label: "Assignments", icon: ClipboardList },
-    { to: "/add-student", label: "Add Student", icon: UserPlus },
+    { to: "/teacher-tools", label: "Syllabus & Dates", icon: Library },
+    { to: "/admin-attendance", label: "Attendance", icon: CalendarCheck },
+    { to: "/admin-marks", label: "Marks / Results", icon: ClipboardList },
+    { to: "/resources", label: "Resources", icon: BookOpen },
     { to: "/add-teacher", label: "Add Teacher", icon: UserPlus },
     { to: "/add-course", label: "Add Course", icon: BookOpen },
   ];
@@ -50,6 +53,8 @@ function AnimatedSidebar({ role }) {
   const teacherLinks = [
     { to: "/teacher-dashboard", label: "Dashboard", icon: LayoutDashboard },
     { to: "/my-students", label: "My Students", icon: Users },
+    { to: "/add-student", label: "Add Student", icon: UserPlus },
+    { to: "/courses", label: "Courses", icon: BookOpen },
     { to: "/attendance", label: "Attendance", icon: CalendarCheck },
     { to: "/marks", label: "Marks", icon: ClipboardList },
     { to: "/assignments", label: "Assignments", icon: FileText },
@@ -61,6 +66,7 @@ function AnimatedSidebar({ role }) {
   const studentLinks = [
     { to: "/student-home", label: "Dashboard", icon: LayoutDashboard },
     { to: "/student-profile", label: "My Profile", icon: User },
+    { to: "/courses", label: "Courses", icon: BookOpen },
     { to: "/student-attendance", label: "Attendance", icon: CalendarCheck },
     { to: "/student-results", label: "Results", icon: FileText },
     { to: "/student-subjects", label: "Subjects", icon: BookOpen },

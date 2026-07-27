@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { Search, ChevronLeft, ChevronRight, ArrowUpDown } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowUpDown } from "lucide-react";
+import SearchField from "./SearchField";
 
 function DataTable({
   columns = [],
@@ -7,11 +8,17 @@ function DataTable({
   searchKeys = [],
   pageSize = 8,
   emptyMessage = "No records found",
+  searchPlaceholder = "Search by name, email, or keyword…",
 }) {
   const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
   const [page, setPage] = useState(1);
+
+  const resolvedKeys = useMemo(() => {
+    if (searchKeys.length) return searchKeys;
+    return columns.filter((c) => c.sortable !== false && !c.render).map((c) => c.key);
+  }, [searchKeys, columns]);
 
   const getValue = (row, key) => {
     if (!key.includes(".")) return row[key];
@@ -24,14 +31,18 @@ function DataTable({
     if (query.trim()) {
       const q = query.toLowerCase();
       rows = rows.filter((row) =>
-        searchKeys.some((key) => String(getValue(row, key) ?? "").toLowerCase().includes(q))
+        resolvedKeys.some((key) =>
+          String(getValue(row, key) ?? "")
+            .toLowerCase()
+            .includes(q)
+        )
       );
     }
 
     if (sortKey) {
       rows.sort((a, b) => {
-        const av = a[sortKey] ?? "";
-        const bv = b[sortKey] ?? "";
+        const av = getValue(a, sortKey) ?? "";
+        const bv = getValue(b, sortKey) ?? "";
         if (av < bv) return sortDir === "asc" ? -1 : 1;
         if (av > bv) return sortDir === "asc" ? 1 : -1;
         return 0;
@@ -39,7 +50,7 @@ function DataTable({
     }
 
     return rows;
-  }, [data, query, searchKeys, sortKey, sortDir]);
+  }, [data, query, resolvedKeys, sortKey, sortDir]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const currentPage = Math.min(page, totalPages);
@@ -56,18 +67,14 @@ function DataTable({
 
   return (
     <div className="space-y-4">
-      <div className="relative max-w-sm">
-        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-        <input
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setPage(1);
-          }}
-          placeholder="Search records..."
-          className="input-glass !rounded-xl pl-10 text-sm"
-        />
-      </div>
+      <SearchField
+        value={query}
+        onChange={(value) => {
+          setQuery(value);
+          setPage(1);
+        }}
+        placeholder={searchPlaceholder}
+      />
 
       <div className="pro-table-wrap overflow-x-auto">
         <table className="min-w-full text-left text-sm">
@@ -106,7 +113,7 @@ function DataTable({
                 >
                   {columns.map((col) => (
                     <td key={col.key} className="px-4 py-3.5 text-slate-700">
-                      {col.render ? col.render(row) : row[col.key]}
+                      {col.render ? col.render(row) : getValue(row, col.key)}
                     </td>
                   ))}
                 </tr>
@@ -119,6 +126,7 @@ function DataTable({
       <div className="flex items-center justify-between gap-3 text-xs text-slate-500">
         <span>
           {filtered.length} result{filtered.length === 1 ? "" : "s"}
+          {query.trim() ? ` for “${query.trim()}”` : ""}
         </span>
         <div className="flex items-center gap-2">
           <button
@@ -126,6 +134,7 @@ function DataTable({
             disabled={currentPage <= 1}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             className="rounded-lg border border-white/50 bg-white/70 p-1.5 transition hover:bg-white disabled:opacity-35"
+            aria-label="Previous page"
           >
             <ChevronLeft size={15} />
           </button>
@@ -137,6 +146,7 @@ function DataTable({
             disabled={currentPage >= totalPages}
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             className="rounded-lg border border-white/50 bg-white/70 p-1.5 transition hover:bg-white disabled:opacity-35"
+            aria-label="Next page"
           >
             <ChevronRight size={15} />
           </button>

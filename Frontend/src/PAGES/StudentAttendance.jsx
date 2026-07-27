@@ -1,13 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import API from "../api";
 import PageLayout from "../components/PageLayout";
-import GlassCard from "../components/GlassCard";
+import PageContentCard from "../components/PageContentCard";
 import DataTable from "../components/DataTable";
-import GradientButton from "../components/GradientButton";
+import SaveAsPdfButton from "../components/SaveAsPdfButton";
 import Skeleton from "../components/Skeleton";
+import { StatPill, StatusBadge } from "../components/SheetUI";
+import { saveAsPdf, tableHtml } from "../utils/saveAsPdf";
 
 function StudentAttendance() {
+  const role = localStorage.getItem("role") || "student";
+  const isAdmin = role === "admin";
   const [attendance, setAttendance] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -15,7 +19,7 @@ function StudentAttendance() {
     const load = async () => {
       try {
         const res = await API.get("/attendance");
-        setAttendance(res.data);
+        setAttendance(Array.isArray(res.data) ? res.data : []);
       } catch {
         toast.error("Failed to load attendance");
       } finally {
@@ -25,69 +29,96 @@ function StudentAttendance() {
     load();
   }, []);
 
-  const printAttendance = () => {
-    const html = `
-      <html><head><title>Attendance</title>
-      <style>body{font-family:Arial;padding:24px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:10px}th{background:#0f172a;color:#fff}</style>
-      </head><body><h1>Attendance Report</h1>
-      <table><thead><tr><th>Course</th><th>Date</th><th>Status</th><th>Teacher</th></tr></thead>
-      <tbody>${attendance
-        .map(
-          (i) =>
-            `<tr><td>${i.course}</td><td>${i.date}</td><td>${i.status}</td><td>${i.teacher || "-"}</td></tr>`
-        )
-        .join("")}</tbody></table></body></html>`;
-    const w = window.open("", "_blank");
-    w.document.write(html);
-    w.document.close();
-    w.print();
-  };
+  const presentCount = attendance.filter((a) => a.status === "Present").length;
+  const absentCount = attendance.length - presentCount;
+  const rate = attendance.length
+    ? Math.round((presentCount / attendance.length) * 100)
+    : 0;
 
-  const columns = [
-    { key: "course", label: "Course" },
-    { key: "date", label: "Date" },
-    {
-      key: "status",
-      label: "Status",
-      render: (row) => (
-        <span
-          className={`rounded-full px-3 py-1 text-xs font-semibold ${
-            row.status === "Present"
-              ? "bg-emerald-100 text-emerald-700"
-              : "bg-rose-100 text-rose-700"
-          }`}
-        >
-          {row.status}
-        </span>
-      ),
-    },
-    { key: "teacher", label: "Teacher" },
-  ];
+  const columns = useMemo(() => {
+    const base = [
+      { key: "course", label: "Course" },
+      { key: "date", label: "Date" },
+      {
+        key: "status",
+        label: "Status",
+        render: (row) => <StatusBadge status={row.status} />,
+      },
+      { key: "teacher", label: "Teacher" },
+    ];
+    if (isAdmin) {
+      return [{ key: "studentName", label: "Student" }, ...base];
+    }
+    return base;
+  }, [isAdmin]);
+
+  const exportPdf = () => {
+    const rows = attendance.map((i) =>
+      isAdmin
+        ? [i.studentName, i.course, i.date, i.status, i.teacher || "-"]
+        : [i.course, i.date, i.status, i.teacher || "-"]
+    );
+    const headers = isAdmin
+      ? ["Student", "Course", "Date", "Status", "Teacher"]
+      : ["Course", "Date", "Status", "Teacher"];
+    saveAsPdf(
+      isAdmin ? "All Attendance Records" : "My Attendance Sheet",
+      tableHtml(headers, rows),
+      {
+        subtitle: isAdmin
+          ? "School-wide attendance records"
+          : "Student attendance record",
+      }
+    );
+  };
 
   return (
     <PageLayout
-      role="student"
-      variant="student"
-      title="My Attendance"
-      subtitle="Records filtered to your account"
+      role={isAdmin ? "admin" : "student"}
+      variant={isAdmin ? "admin" : "student"}
+      title={isAdmin ? "Attendance Records" : "My Attendance"}
+      subtitle={
+        isAdmin
+          ? "Official attendance register for all students"
+          : "Records marked by your teachers for enrolled courses"
+      }
     >
-      <GlassCard className="flex items-center justify-between gap-4 p-5" hover={false}>
-        <p className="text-sm text-slate-600">{attendance.length} records</p>
-        <GradientButton onClick={printAttendance}>Print report</GradientButton>
-      </GlassCard>
+      <PageContentCard
+        title="Attendance overview"
+        subtitle={
+          isAdmin
+            ? "Filter, review, and export attendance sheets"
+            : "Your presence across all allotted subjects"
+        }
+        action={<SaveAsPdfButton onClick={exportPdf} disabled={!attendance.length} />}
+      >
+        <div className="mb-5 flex flex-wrap gap-2">
+          <StatPill label="Total records" value={attendance.length} tone="brand" />
+          <StatPill label="Present" value={presentCount} tone="success" />
+          <StatPill label="Absent" value={absentCount} tone="danger" />
+          {!isAdmin && <StatPill label="Attendance %" value={`${rate}%`} tone="info" />}
+        </div>
 
-      <GlassCard className="p-6" hover={false}>
         {loading ? (
-          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-64 w-full rounded-2xl" />
         ) : (
           <DataTable
             columns={columns}
             data={attendance}
-            searchKeys={["course", "date", "status", "teacher"]}
-            emptyMessage="No attendance records found."
+            searchKeys={
+              isAdmin
+                ? ["studentName", "course", "date", "status", "teacher"]
+                : ["course", "date", "status", "teacher"]
+            }
+            emptyMessage={
+              isAdmin
+                ? "No attendance records found."
+                : "No attendance records yet for your courses."
+            }
+            searchPlaceholder="Search attendance records…"
           />
         )}
-      </GlassCard>
+      </PageContentCard>
     </PageLayout>
   );
 }

@@ -55,7 +55,7 @@ function StudentSubjects() {
       role="student"
       variant="courses"
       title="My Subjects"
-      subtitle="Courses you are enrolled in"
+      subtitle="Courses added by your teacher — only enrolled subjects appear here"
     >
       <GlassCard className="p-6" hover={false}>
         {loading ? (

@@ -1,195 +1,355 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import toast from "react-hot-toast";
 import API from "../api";
 import PageLayout from "../components/PageLayout";
-import toast from "react-hot-toast";
+import PageContentCard from "../components/PageContentCard";
+import SaveAsPdfButton from "../components/SaveAsPdfButton";
+import SearchField from "../components/SearchField";
+import GradientButton from "../components/GradientButton";
+import { SheetMeta, StatPill, StatusBadge } from "../components/SheetUI";
+import { saveAsPdf, tableHtml } from "../utils/saveAsPdf";
+
+const today = () => new Date().toISOString().slice(0, 10);
+const currentMonth = () => today().slice(0, 7);
 
 function TeacherAttendance() {
-  const [attendance, setAttendance] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useState([]);
+  const [courseId, setCourseId] = useState("");
+  const [month, setMonth] = useState(currentMonth());
+  const [date, setDate] = useState(today());
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [query, setQuery] = useState("");
   const teacher = localStorage.getItem("name") || "Teacher";
 
-  const parseCsv = (csvText) => {
-    const rows = csvText.trim().split(/\r?\n/);
-    const headers = rows.shift().split(",").map((h) => h.trim());
-    return rows.map((row) => {
-      const values = row.split(",").map((value) => value.trim());
-      return headers.reduce((obj, header, index) => {
-        obj[header] = values[index] || "";
-        return obj;
-      }, {});
-    });
-  };
-
-  const handleUpload = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const csvData = parseCsv(e.target.result);
-      setAttendance(csvData.map((item, index) => ({
-        _id: item._id || `upload-${index}`,
-        studentName: item.studentName || item.StudentName || item.Name || "",
-        course: item.course || item.Course || "",
-        date: item.date || item.Date || "",
-        status: item.status || item.Status || "Present",
-      })));
-    };
-    reader.readAsText(file);
-  };
+  const selectedCourse = useMemo(
+    () => courses.find((c) => c._id === courseId) || null,
+    [courses, courseId]
+  );
 
   useEffect(() => {
-    fetchAttendance();
+    const loadCourses = async () => {
+      try {
+        const { data } = await API.get("/courses");
+        const list = Array.isArray(data) ? data : [];
+        setCourses(list);
+        if (list.length) setCourseId(list[0]._id);
+      } catch {
+        toast.error("Failed to load your courses");
+      }
+    };
+    loadCourses();
   }, []);
 
-  const fetchAttendance = async () => {
+  const loadRoster = useCallback(async () => {
+    if (!courseId || !date) return;
+    setLoading(true);
     try {
-      const res = await API.get("/attendance");
-      setAttendance(res.data);
-    } catch (err) {
-      console.error(err);
+      const [enrollRes, attRes] = await Promise.all([
+        API.get("/enrollments", { params: { courseId } }),
+        API.get("/attendance", { params: { courseId, date } }),
+      ]);
+
+      const enrollments = Array.isArray(enrollRes.data) ? enrollRes.data : [];
+      const existing = Array.isArray(attRes.data) ? attRes.data : [];
+      const byStudent = new Map(
+        existing.map((a) => [String(a.studentId || a.studentName), a])
+      );
+
+      const merged = enrollments
+        .filter((e) => e.studentId)
+        .map((e) => {
+          const sid = String(e.studentId._id);
+          const prev = byStudent.get(sid);
+          return {
+            key: sid,
+            studentId: sid,
+            studentName: e.studentId.name,
+            email: e.studentId.email || "",
+            phone: e.studentId.phone || "",
+            course: selectedCourse?.courseName || e.courseId?.courseName || "",
+            courseId,
+            date,
+            status: prev?.status || "Present",
+            _id: prev?._id || null,
+          };
+        });
+
+      setRows(merged);
+      if (!merged.length) {
+        toast("No enrolled students for this course yet.", { icon: "ℹ️" });
+      }
+    } catch {
+      toast.error("Failed to load attendance roster");
+      setRows([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [courseId, date, selectedCourse]);
 
-  const toggleAttendance = (id) => {
-    setAttendance((items) =>
-      items.map((item) =>
-        item._id === id
-          ? { ...item, status: item.status === "Present" ? "Absent" : "Present" }
-          : item
-      )
-    );
-  };
+  useEffect(() => {
+    loadRoster();
+  }, [loadRoster]);
 
-  const saveAttendance = async () => {
-    try {
-      await Promise.all(
-        attendance.map(async (item) => {
-          const payload = {
-            studentName: item.studentName,
-            course: item.course,
-            date: item.date,
-            status: item.status,
-            teacher,
-          };
-          if (item._id && !String(item._id).startsWith("upload-")) {
-            await API.put(`/attendance/${item._id}`, payload);
-          } else {
-            await API.post("/attendance", payload);
-          }
-        })
-      );
-      toast.success("Attendance updated successfully");
-      fetchAttendance();
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to save attendance");
+  const handleMonthChange = (value) => {
+    setMonth(value);
+    if (!value) return;
+    const [y, m] = value.split("-").map(Number);
+    const [dy, dm, dd] = date.split("-").map(Number);
+    if (dy !== y || dm !== m) {
+      const lastDay = new Date(y, m, 0).getDate();
+      const day = Math.min(dd || 1, lastDay);
+      setDate(`${value}-${String(day).padStart(2, "0")}`);
     }
   };
 
-  const printAttendance = () => {
-    const html = `
-      <html>
-        <head>
-          <title>Attendance Report</title>
-          <style>
-            body { font-family: Arial, sans-serif; padding: 24px; }
-            h1 { color: #0f172a; }
-            table { width: 100%; border-collapse: collapse; margin-top: 18px; }
-            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-            th { background: #0f172a; color: white; }
-            tr:nth-child(even) { background: #f8fafc; }
-          </style>
-        </head>
-        <body>
-          <h1>Attendance Report</h1>
-          <table>
-            <thead>
-              <tr><th>Student</th><th>Course</th><th>Date</th><th>Status</th></tr>
-            </thead>
-            <tbody>
-              ${attendance.map((item) => `<tr><td>${item.studentName}</td><td>${item.course}</td><td>${item.date}</td><td>${item.status}</td></tr>`).join('')}
-            </tbody>
-          </table>
-        </body>
-      </html>
-    `;
-    const w = window.open("", "_blank");
-    w.document.write(html);
-    w.document.close();
-    w.print();
+  const handleDateChange = (value) => {
+    setDate(value);
+    if (value) setMonth(value.slice(0, 7));
   };
 
+  const monthBounds = useMemo(() => {
+    if (!month) return { min: "", max: "" };
+    const [y, m] = month.split("-").map(Number);
+    const lastDay = new Date(y, m, 0).getDate();
+    return {
+      min: `${month}-01`,
+      max: `${month}-${String(lastDay).padStart(2, "0")}`,
+    };
+  }, [month]);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter((row) =>
+      [row.studentName, row.email, row.phone, row.status]
+        .filter(Boolean)
+        .some((v) => String(v).toLowerCase().includes(q))
+    );
+  }, [rows, query]);
+
+  const setStatus = (studentId, status) => {
+    setRows((prev) =>
+      prev.map((r) => (r.studentId === studentId ? { ...r, status } : r))
+    );
+  };
+
+  const markAll = (status) => {
+    setRows((prev) => prev.map((r) => ({ ...r, status })));
+  };
+
+  const saveAttendance = async () => {
+    if (!courseId || !date) {
+      toast.error("Select a course and date");
+      return;
+    }
+    if (!rows.length) {
+      toast.error("No students to save");
+      return;
+    }
+    setSaving(true);
+    try {
+      await API.post("/attendance/bulk", {
+        courseId,
+        date,
+        records: rows.map((r) => ({
+          studentId: r.studentId,
+          studentName: r.studentName,
+          status: r.status,
+        })),
+      });
+      toast.success("Attendance saved to database");
+      loadRoster();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Unable to save attendance");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const exportPdf = () => {
+    const courseName = selectedCourse?.courseName || "";
+    const pdfRows = filtered.map((item) => [
+      item.studentName,
+      item.email,
+      courseName,
+      item.date,
+      item.status,
+    ]);
+    saveAsPdf(
+      "Attendance Sheet",
+      tableHtml(["Student", "Email", "Course", "Date", "Status"], pdfRows),
+      { subtitle: `Teacher: ${teacher} · ${date}` }
+    );
+  };
+
+  const presentCount = rows.filter((r) => r.status === "Present").length;
+  const absentCount = rows.length - presentCount;
+
   return (
-    <PageLayout role="teacher" variant="teacher" title="Attendance" subtitle="Record and print class attendance">
-            <div className="space-y-6">
-              <div className="glass-panel rounded-3xl p-8">
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <h1 className="text-3xl font-semibold text-slate-900">Attendance</h1>
-                    <p className="mt-2 text-slate-600">Record and print class attendance in one place.</p>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <span className="rounded-3xl bg-sky-600 px-4 py-3 text-white shadow-lg">Teacher: {teacher}</span>
-                    <button onClick={printAttendance} className="rounded-3xl bg-slate-950 px-5 py-3 text-white hover:bg-slate-800">Print</button>
-                  </div>
-                </div>
-                <div className="mt-6 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100">
-                    Upload CSV
-                    <input type="file" accept=".csv" onChange={handleUpload} className="hidden" />
-                  </label>
-                  <p className="text-sm text-slate-500 max-w-xl">
-                    Upload a CSV with columns: <strong>studentName, course, date, status</strong>. The sheet will populate the attendance table for save and print.
-                  </p>
-                </div>
+    <PageLayout
+      role="teacher"
+      variant="teacher"
+      title="Attendance Sheet"
+      subtitle="Daily class register — mark present or absent and export as PDF"
+    >
+      <div className="space-y-6">
+        <PageContentCard padding={false} className="overflow-hidden">
+          <div className="inst-sheet p-6 md:p-8">
+            <div className="sheet-toolbar">
+              <div className="sheet-toolbar__fields">
+                <label>
+                  <span className="form-label">Course</span>
+                  <select
+                    value={courseId}
+                    onChange={(e) => setCourseId(e.target.value)}
+                    className="input-glass"
+                  >
+                    {courses.length === 0 && <option value="">No courses assigned</option>}
+                    {courses.map((c) => (
+                      <option key={c._id} value={c._id}>
+                        {c.courseName} ({c.courseCode})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  <span className="form-label">Month</span>
+                  <input
+                    type="month"
+                    value={month}
+                    onChange={(e) => handleMonthChange(e.target.value)}
+                    className="input-glass"
+                  />
+                </label>
+                <label>
+                  <span className="form-label">Date</span>
+                  <input
+                    type="date"
+                    value={date}
+                    min={monthBounds.min}
+                    max={monthBounds.max}
+                    onChange={(e) => handleDateChange(e.target.value)}
+                    className="input-glass"
+                  />
+                </label>
               </div>
-
-              <div className="glass-panel space-y-4 rounded-3xl p-6">
-                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                  <h2 className="text-xl font-semibold text-slate-900">Attendance Register</h2>
-                  <button onClick={saveAttendance} className="rounded-3xl bg-sky-600 px-5 py-3 text-white hover:bg-sky-700">Save Changes</button>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="min-w-full text-left">
-                    <thead className="bg-indigo-950/90 text-white">
-                      <tr>
-                        <th className="px-6 py-4">Student</th>
-                        <th className="px-6 py-4">Course</th>
-                        <th className="px-6 py-4">Date</th>
-                        <th className="px-6 py-4">Status</th>
-                        <th className="px-6 py-4">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {loading ? (
-                        <tr><td colSpan="5" className="px-6 py-8 text-center text-slate-500">Loading attendance...</td></tr>
-                      ) : attendance.length === 0 ? (
-                        <tr><td colSpan="5" className="px-6 py-8 text-center text-slate-500">No attendance records available.</td></tr>
-                      ) : (
-                        attendance.map((record) => (
-                          <tr key={record._id} className="border-b border-white/40 last:border-b-0 hover:bg-white/50 transition">
-                            <td className="px-6 py-4 font-medium text-slate-700">{record.studentName}</td>
-                            <td className="px-6 py-4">{record.course}</td>
-                            <td className="px-6 py-4">{record.date}</td>
-                            <td className="px-6 py-4">
-                              <span className={`inline-flex rounded-full px-3 py-1 text-sm font-semibold ${record.status === "Present" ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}>
-                                {record.status}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4">
-                              <button onClick={() => toggleAttendance(record._id)} className="rounded-3xl bg-slate-950 px-4 py-2 text-sm text-white hover:bg-slate-800">Toggle</button>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+              <div className="sheet-toolbar__actions">
+                <SaveAsPdfButton onClick={exportPdf} variant="primary" disabled={!filtered.length} />
+                <GradientButton onClick={saveAttendance} disabled={saving || !rows.length}>
+                  {saving ? "Saving…" : "Save attendance"}
+                </GradientButton>
               </div>
             </div>
+
+            <SheetMeta
+              items={[
+                { label: "Teacher", value: teacher },
+                { label: "Course", value: selectedCourse?.courseName || "—" },
+                { label: "Month", value: month || "—" },
+                { label: "Date", value: date },
+                { label: "Class", value: selectedCourse?.className || "—" },
+              ]}
+            />
+
+            <div className="record-summary-bar">
+              <div>
+                <h2 className="sheet-section-title">Class register</h2>
+                <p className="sheet-section-subtitle">
+                  Roster from enrollments. Students see records in their attendance portal.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <StatPill label="Enrolled" value={rows.length} tone="brand" />
+                <StatPill label="Present" value={presentCount} tone="success" />
+                <StatPill label="Absent" value={absentCount} tone="danger" />
+              </div>
+            </div>
+
+            <div className="mb-4 flex flex-wrap gap-2">
+              <button type="button" onClick={() => markAll("Present")} className="btn-chip btn-chip--present">
+                Mark all present
+              </button>
+              <button type="button" onClick={() => markAll("Absent")} className="btn-chip btn-chip--absent">
+                Mark all absent
+              </button>
+            </div>
+
+            <SearchField
+              value={query}
+              onChange={setQuery}
+              placeholder="Search enrolled students by name, email, or phone…"
+            />
+
+            <div className="inst-table-wrap mt-4">
+              <table className="inst-table">
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Mark attendance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <tr>
+                      <td colSpan={4} className="inst-table__empty">
+                        Loading enrolled students…
+                      </td>
+                    </tr>
+                  ) : filtered.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="inst-table__empty">
+                        {rows.length === 0
+                          ? "No students enrolled in this course."
+                          : "No students match your search."}
+                      </td>
+                    </tr>
+                  ) : (
+                    filtered.map((record) => (
+                      <tr key={record.key}>
+                        <td>{record.studentName}</td>
+                        <td>{record.email || "—"}</td>
+                        <td>
+                          <StatusBadge status={record.status} />
+                        </td>
+                        <td>
+                          <div className="flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setStatus(record.studentId, "Present")}
+                              className={`btn-chip ${
+                                record.status === "Present"
+                                  ? "btn-chip--present"
+                                  : "btn-chip--neutral"
+                              }`}
+                            >
+                              Present
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setStatus(record.studentId, "Absent")}
+                              className={`btn-chip ${
+                                record.status === "Absent"
+                                  ? "btn-chip--absent"
+                                  : "btn-chip--neutral"
+                              }`}
+                            >
+                              Absent
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </PageContentCard>
+      </div>
     </PageLayout>
   );
 }

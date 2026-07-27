@@ -40,16 +40,20 @@ function Teachers() {
 
   const updateTeacher = async () => {
     try {
-      await API.put(`/update/${editingTeacher._id}`, {
+      const payload = {
         name: editingTeacher.name,
         email: editingTeacher.email,
         subject: editingTeacher.subject,
-      });
+      };
+      if (editingTeacher.Password?.trim()) {
+        payload.Password = editingTeacher.Password;
+      }
+      await API.put(`/update/${editingTeacher._id}`, payload);
       toast.success("Teacher updated");
       setEditingTeacher(null);
       fetchTeachers();
-    } catch {
-      toast.error("Update failed");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Update failed");
     }
   };
 
@@ -66,7 +70,12 @@ function Teachers() {
           <button
             type="button"
             className="rounded-xl bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700"
-            onClick={() => setEditingTeacher(row)}
+            onClick={() =>
+              setEditingTeacher({
+                ...row,
+                Password: "",
+              })
+            }
           >
             Edit
           </button>
@@ -111,6 +120,14 @@ function Teachers() {
               placeholder="Subject"
               value={editingTeacher.subject || ""}
               onChange={(e) => setEditingTeacher({ ...editingTeacher, subject: e.target.value })}
+            />
+            <input
+              type="password"
+              className="input-glass"
+              placeholder="New password (leave blank to keep current)"
+              value={editingTeacher.Password || ""}
+              onChange={(e) => setEditingTeacher({ ...editingTeacher, Password: e.target.value })}
+              minLength={6}
             />
             <div className="flex gap-3">
               <GradientButton onClick={updateTeacher}>Save</GradientButton>

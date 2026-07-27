@@ -29,4 +29,15 @@ API.interceptors.response.use(
   }
 );
 
+const API_ORIGIN = (import.meta.env.VITE_API_URL || "http://localhost:3030/api/v1").replace(
+  /\/api\/v1\/?$/,
+  ""
+);
+
+export const fileUrl = (path) => {
+  if (!path) return "";
+  if (path.startsWith("http")) return path;
+  return `${API_ORIGIN}${path.startsWith("/") ? path : `/${path}`}`;
+};
+
 export default API;

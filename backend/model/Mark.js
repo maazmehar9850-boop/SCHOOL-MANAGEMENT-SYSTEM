@@ -15,6 +15,13 @@ const markSchema = new mongoose.Schema({
   },
   subject: { type: String, required: true },
   score: { type: Number, required: true },
+  maxScore: { type: Number, default: 100 },
+  feedback: { type: String, default: "" },
+  assignmentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Assignment",
+    default: null,
+  },
   teacher: { type: String, required: true },
   teacherId: {
     type: mongoose.Schema.Types.ObjectId,

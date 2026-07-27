@@ -1,13 +1,23 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Plus, Pencil, Trash2 } from "lucide-react";
-import API from "../api";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Upload,
+  Eye,
+  FileText,
+  Image as ImageIcon,
+  CheckCircle2,
+} from "lucide-react";
+import API, { fileUrl } from "../api";
 import PageLayout from "../components/PageLayout";
 import GlassCard from "../components/GlassCard";
 import GradientButton from "../components/GradientButton";
 import DataTable from "../components/DataTable";
 import Modal from "../components/Modal";
 import FormField from "../components/FormField";
+import SearchField from "../components/SearchField";
 import { TableSkeleton } from "../components/Skeleton";
 
 const emptyForm = {
@@ -19,7 +29,11 @@ const emptyForm = {
 
 function Assignments() {
   const role = localStorage.getItem("role") || "student";
-  const canManage = role === "teacher" || role === "admin";
+  const isTeacher = role === "teacher";
+  const isAdmin = role === "admin";
+  const canManage = isTeacher;
+  const canViewOverview = isTeacher || isAdmin;
+  const isStudent = role === "student";
 
   const [items, setItems] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -28,6 +42,18 @@ function Assignments() {
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+
+  const [submitOpen, setSubmitOpen] = useState(false);
+  const [activeAssignment, setActiveAssignment] = useState(null);
+  const [file, setFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+
+  const [subsOpen, setSubsOpen] = useState(false);
+  const [roster, setRoster] = useState([]);
+  const [subsLoading, setSubsLoading] = useState(false);
+  const [rosterQuery, setRosterQuery] = useState("");
+  const [gradeForm, setGradeForm] = useState({ id: null, score: "", feedback: "" });
+  const [grading, setGrading] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -114,6 +140,85 @@ function Assignments() {
     }
   };
 
+  const openSubmit = (row) => {
+    setActiveAssignment(row);
+    setFile(null);
+    setSubmitOpen(true);
+  };
+
+  const uploadSubmission = async (e) => {
+    e.preventDefault();
+    if (!file) {
+      toast.error("Choose a PDF or image file");
+      return;
+    }
+    setUploading(true);
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      await API.post(`/assignments/${activeAssignment._id}/submit`, body, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      toast.success("Submission uploaded");
+      setSubmitOpen(false);
+      load();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const openSubmissions = async (row) => {
+    setActiveAssignment(row);
+    setSubsOpen(true);
+    setSubsLoading(true);
+    setRosterQuery("");
+    setGradeForm({ id: null, score: "", feedback: "" });
+    try {
+      const res = await API.get(`/assignments/${row._id}/submissions`);
+      const data = res.data;
+      if (Array.isArray(data)) {
+        setRoster(
+          data.map((s) => ({
+            studentId: s.studentId,
+            studentName: s.studentId?.name || s.studentName,
+            email: s.studentId?.email || "",
+            status: s.status === "graded" ? "graded" : "submitted",
+            submission: s,
+          }))
+        );
+      } else {
+        setRoster(data.roster || []);
+      }
+    } catch {
+      toast.error("Failed to load class roster");
+      setRoster([]);
+    } finally {
+      setSubsLoading(false);
+    }
+  };
+
+  const saveGrade = async (e) => {
+    e.preventDefault();
+    if (!gradeForm.id) return;
+    setGrading(true);
+    try {
+      await API.put(`/submissions/${gradeForm.id}/grade`, {
+        score: Number(gradeForm.score),
+        feedback: gradeForm.feedback,
+      });
+      toast.success("Graded — marks synced to results");
+      await openSubmissions(activeAssignment);
+      setGradeForm({ id: null, score: "", feedback: "" });
+      load();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Grading failed");
+    } finally {
+      setGrading(false);
+    }
+  };
+
   const columns = [
     { key: "title", label: "Title" },
     {
@@ -127,33 +232,104 @@ function Assignments() {
       render: (row) =>
         row.dueDate ? new Date(row.dueDate).toLocaleDateString() : "—",
     },
-    {
-      key: "teacher",
-      label: "Teacher",
-      render: (row) => row.teacher || "—",
-    },
   ];
 
-  if (canManage) {
+  if (isStudent) {
+    columns.push({
+      key: "status",
+      label: "Status",
+      render: (row) => {
+        const sub = row.mySubmission;
+        if (!sub) {
+          return (
+            <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700">
+              Pending
+            </span>
+          );
+        }
+        if (sub.status === "graded") {
+          return (
+            <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+              Graded · {sub.score}
+            </span>
+          );
+        }
+        return (
+          <span className="rounded-full bg-sky-100 px-2.5 py-1 text-xs font-semibold text-sky-700">
+            Submitted
+          </span>
+        );
+      },
+    });
     columns.push({
       key: "actions",
       label: "Actions",
+      sortable: false,
       render: (row) => (
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => openEdit(row)}
-            className="rounded-xl bg-indigo-50 p-2 text-indigo-600 hover:bg-indigo-100"
+            onClick={() => openSubmit(row)}
+            className="inline-flex items-center gap-1 rounded-xl bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100"
           >
-            <Pencil size={16} />
+            <Upload size={14} />
+            {row.mySubmission ? "Update file" : "Upload"}
           </button>
+          {row.mySubmission?.fileUrl && (
+            <a
+              href={fileUrl(row.mySubmission.fileUrl)}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 rounded-xl bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200"
+            >
+              <Eye size={14} />
+              View
+            </a>
+          )}
+        </div>
+      ),
+    });
+  }
+
+  if (canViewOverview) {
+    columns.push({
+      key: "subs",
+      label: "Progress",
+      render: (row) =>
+        `${row.submissionCount || 0}/${row.enrolledCount || 0} submitted · ${row.gradedCount || 0} graded`,
+    });
+    columns.push({
+      key: "actions",
+      label: "Actions",
+      sortable: false,
+      render: (row) => (
+        <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => remove(row._id)}
-            className="rounded-xl bg-rose-50 p-2 text-rose-600 hover:bg-rose-100"
+            onClick={() => openSubmissions(row)}
+            className="inline-flex items-center gap-1 rounded-xl bg-cyan-50 px-3 py-1.5 text-xs font-semibold text-cyan-800 hover:bg-cyan-100"
           >
-            <Trash2 size={16} />
+            <Eye size={14} />
+            {isAdmin ? "View" : "Review"}
           </button>
+          {canManage && (
+            <>
+              <button
+                type="button"
+                onClick={() => openEdit(row)}
+                className="rounded-xl bg-indigo-50 p-2 text-indigo-600 hover:bg-indigo-100"
+              >
+                <Pencil size={16} />
+              </button>
+              <button
+                type="button"
+                onClick={() => remove(row._id)}
+                className="rounded-xl bg-rose-50 p-2 text-rose-600 hover:bg-rose-100"
+              >
+                <Trash2 size={16} />
+              </button>
+            </>
+          )}
         </div>
       ),
     });
@@ -168,16 +344,18 @@ function Assignments() {
       variant={variant}
       title="Assignments"
       subtitle={
-        canManage
-          ? "Create and manage course assignments"
-          : "Assignments for your enrolled courses"
+        isTeacher
+          ? "Create assignments, review submissions, and grade work"
+          : isAdmin
+            ? "View school-wide assignments and submission progress"
+            : "View course assignments and upload PDF or image submissions"
       }
     >
       <GlassCard className="p-5 md:p-6" hover={false}>
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-bold text-slate-900">
-              {canManage ? "All assignments" : "My assignments"}
+              {canViewOverview ? "Course assignments" : "My assignments"}
             </h2>
             <p className="text-sm text-slate-600">
               {items.length} assignment{items.length === 1 ? "" : "s"}
@@ -194,7 +372,12 @@ function Assignments() {
         {loading ? (
           <TableSkeleton rows={5} />
         ) : (
-          <DataTable columns={columns} data={items} searchKeys={["title", "course"]} />
+          <DataTable
+            columns={columns}
+            data={items}
+            searchKeys={["title", "course", "description"]}
+            emptyMessage="No assignments yet."
+          />
         )}
       </GlassCard>
 
@@ -204,13 +387,7 @@ function Assignments() {
         title={editingId ? "Edit assignment" : "New assignment"}
       >
         <form onSubmit={save} className="space-y-4">
-          <FormField
-            label="Title"
-            name="title"
-            value={form.title}
-            onChange={handleChange}
-            required
-          />
+          <FormField label="Title" name="title" value={form.title} onChange={handleChange} required />
           <FormField
             label="Description"
             name="description"
@@ -250,6 +427,209 @@ function Assignments() {
             </GradientButton>
           </div>
         </form>
+      </Modal>
+
+      <Modal
+        open={submitOpen}
+        onClose={() => setSubmitOpen(false)}
+        title={activeAssignment ? `Submit: ${activeAssignment.title}` : "Submit"}
+      >
+        <form onSubmit={uploadSubmission} className="space-y-4">
+          <p className="text-sm text-slate-600">
+            Upload a <strong>PDF</strong> or <strong>image</strong> (JPG / PNG / WEBP), max 10MB.
+            You can update before the deadline.
+          </p>
+          <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-indigo-200 bg-indigo-50/50 px-4 py-8 text-center hover:bg-indigo-50">
+            <Upload className="text-indigo-600" size={28} />
+            <span className="text-sm font-semibold text-slate-800">
+              {file ? file.name : "Choose file"}
+            </span>
+            <input
+              type="file"
+              accept=".pdf,image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={(e) => setFile(e.target.files?.[0] || null)}
+            />
+          </label>
+          <div className="flex justify-end gap-3">
+            <GradientButton variant="secondary" type="button" onClick={() => setSubmitOpen(false)}>
+              Cancel
+            </GradientButton>
+            <GradientButton type="submit" disabled={uploading}>
+              {uploading ? "Uploading..." : "Upload submission"}
+            </GradientButton>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal
+        open={subsOpen}
+        onClose={() => setSubsOpen(false)}
+        title={
+          activeAssignment
+            ? `Class roster · ${activeAssignment.title}`
+            : "Class roster"
+        }
+        size="lg"
+      >
+        {subsLoading ? (
+          <TableSkeleton rows={4} />
+        ) : (
+          <div className="space-y-4">
+            <p className="text-sm text-slate-600">
+              {isAdmin
+                ? "All students enrolled in this course and their submission status."
+                : "All students enrolled in this course. Grade work after they upload a submission."}
+            </p>
+            <SearchField
+              value={rosterQuery}
+              onChange={setRosterQuery}
+              placeholder="Search students by name or email…"
+            />
+            {roster.length === 0 ? (
+              <p className="py-8 text-center text-slate-500">
+                No enrolled students for this assignment&apos;s course.
+              </p>
+            ) : (
+              roster
+                .filter((s) => {
+                  const q = rosterQuery.trim().toLowerCase();
+                  if (!q) return true;
+                  return [s.studentName, s.email, s.status]
+                    .filter(Boolean)
+                    .some((v) => String(v).toLowerCase().includes(q));
+                })
+                .map((s) => {
+                  const sub = s.submission;
+                  const key = s.studentId?._id || s.studentId || s.email || s.studentName;
+                  return (
+                    <div
+                      key={key}
+                      className="rounded-2xl border border-slate-200/80 bg-white/70 p-4"
+                    >
+                      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                        <div>
+                          <p className="font-semibold text-slate-900">
+                            {s.studentName || s.studentId?.name}
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            {s.email || s.studentId?.email || "—"}
+                          </p>
+                          <p className="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-600">
+                            <span
+                              className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${
+                                s.status === "graded"
+                                  ? "bg-emerald-100 text-emerald-700"
+                                  : s.status === "submitted"
+                                    ? "bg-sky-100 text-sky-700"
+                                    : "bg-amber-100 text-amber-700"
+                              }`}
+                            >
+                              {s.status === "not_submitted"
+                                ? "Not submitted"
+                                : s.status}
+                            </span>
+                            {sub && (
+                              <>
+                                {sub.type === "pdf" ? (
+                                  <FileText size={16} />
+                                ) : (
+                                  <ImageIcon size={16} />
+                                )}
+                                {sub.fileName || "File"}
+                                {sub.score != null && (
+                                  <span className="inline-flex items-center gap-1 text-emerald-700">
+                                    <CheckCircle2 size={14} />
+                                    {sub.score}/100
+                                  </span>
+                                )}
+                              </>
+                            )}
+                          </p>
+                          {sub?.feedback && (
+                            <p className="mt-1 text-sm text-slate-500">
+                              Feedback: {sub.feedback}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {sub?.fileUrl ? (
+                            <>
+                              <a
+                                href={fileUrl(sub.fileUrl)}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="rounded-xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white"
+                              >
+                                Preview / Download
+                              </a>
+                              {canManage && (
+                                <button
+                                  type="button"
+                                  className="rounded-xl bg-indigo-600 px-3 py-2 text-xs font-semibold text-white"
+                                  onClick={() =>
+                                    setGradeForm({
+                                      id: sub._id,
+                                      score: sub.score ?? "",
+                                      feedback: sub.feedback || "",
+                                    })
+                                  }
+                                >
+                                  Grade
+                                </button>
+                              )}
+                            </>
+                          ) : (
+                            <span className="rounded-xl bg-slate-100 px-3 py-2 text-xs font-medium text-slate-500">
+                              Waiting for upload
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+            )}
+
+            {canManage && gradeForm.id && (
+              <form
+                onSubmit={saveGrade}
+                className="rounded-2xl border border-indigo-100 bg-indigo-50/60 p-4 space-y-3"
+              >
+                <p className="text-sm font-semibold text-slate-800">Grade submission</p>
+                <FormField
+                  label="Score (0–100)"
+                  name="score"
+                  type="number"
+                  value={gradeForm.score}
+                  onChange={(e) => setGradeForm({ ...gradeForm, score: e.target.value })}
+                  required
+                />
+                <FormField
+                  label="Feedback"
+                  name="feedback"
+                  as="textarea"
+                  value={gradeForm.feedback}
+                  onChange={(e) =>
+                    setGradeForm({ ...gradeForm, feedback: e.target.value })
+                  }
+                />
+                <div className="flex gap-2">
+                  <GradientButton type="submit" disabled={grading}>
+                    {grading ? "Saving..." : "Save grade"}
+                  </GradientButton>
+                  <GradientButton
+                    variant="secondary"
+                    type="button"
+                    onClick={() => setGradeForm({ id: null, score: "", feedback: "" })}
+                  >
+                    Cancel
+                  </GradientButton>
+                </div>
+              </form>
+            )}
+          </div>
+        )}
       </Modal>
     </PageLayout>
   );

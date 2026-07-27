@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   GraduationCap,
@@ -12,6 +13,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import GradientButton from "../components/GradientButton";
+import API from "../api";
 
 import imgHero from "../assets/landing/landing-hero.png";
 import imgFeatures from "../assets/landing/landing-features.png";
@@ -74,13 +76,6 @@ const roles = [
   },
 ];
 
-const stats = [
-  { value: "2,500+", label: "Students managed" },
-  { value: "180+", label: "Teachers onboarded" },
-  { value: "95%", label: "Attendance accuracy" },
-  { value: "40+", label: "Courses active" },
-];
-
 const fadeUp = {
   initial: { opacity: 0, y: 28 },
   whileInView: { opacity: 1, y: 0 },
@@ -113,6 +108,44 @@ function SectionScene({ image, overlay = "default", children, className = "", id
 }
 
 function Landing() {
+  const [live, setLive] = useState({
+    students: 0,
+    teachers: 0,
+    courses: 0,
+    enrollments: 0,
+    attendanceAccuracy: 0,
+    avgMarks: 0,
+    assignments: 0,
+  });
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await API.get("/public/stats");
+        setLive(res.data);
+      } catch {
+        /* API offline */
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  const stats = [
+    { value: String(live.students), label: "Students in database" },
+    { value: String(live.teachers), label: "Teachers onboarded" },
+    { value: `${live.attendanceAccuracy}%`, label: "Attendance accuracy" },
+    { value: String(live.courses), label: "Active courses" },
+  ];
+
+  const previewCards = [
+    { label: "Students", value: statsLoading ? "—" : String(live.students), hint: "Live from MongoDB" },
+    { label: "Attendance", value: statsLoading ? "—" : `${live.attendanceAccuracy}%`, hint: "Present rate across records" },
+    { label: "Avg. Marks", value: statsLoading ? "—" : String(live.avgMarks), hint: "Across published results" },
+  ];
+
   return (
     <div className="page-shell bg-[#050a12] text-white">
       {/* Nav floats over hero */}
@@ -135,12 +168,10 @@ function Landing() {
             className="flex items-center gap-3"
           >
             <Link to="/login">
-              <GradientButton variant="ghost" className="!py-2.5 !px-4">
+              <GradientButton className="!py-2.5 !px-5">
                 Login
+                <ArrowRight size={16} />
               </GradientButton>
-            </Link>
-            <Link to="/register" className="hidden sm:inline-flex">
-              <GradientButton className="!py-2.5 !px-4">Get Started</GradientButton>
             </Link>
           </motion.div>
         </div>
@@ -178,11 +209,6 @@ function Landing() {
                 <GradientButton className="!px-7 !py-3.5">
                   Login
                   <ArrowRight size={16} />
-                </GradientButton>
-              </Link>
-              <Link to="/register">
-                <GradientButton variant="secondary" className="!px-7 !py-3.5">
-                  Get Started
                 </GradientButton>
               </Link>
             </div>
@@ -294,11 +320,7 @@ function Landing() {
           </motion.div>
 
           <div className="grid gap-5 md:grid-cols-3">
-            {[
-              { label: "Students", value: "1,248", hint: "Active enrollments" },
-              { label: "Attendance", value: "92%", hint: "This term average" },
-              { label: "Avg. Marks", value: "78", hint: "Across published results" },
-            ].map((card, i) => (
+            {previewCards.map((card, i) => (
               <motion.div
                 key={card.label}
                 {...fadeUp}
@@ -346,7 +368,7 @@ function Landing() {
                 transition={{ ...fadeUp.transition, delay: i * 0.05 }}
               >
                 <p className="font-display text-4xl font-extrabold text-white md:text-5xl">
-                  {s.value}
+                  {statsLoading ? "—" : s.value}
                 </p>
                 <p className="mt-2 text-sm text-slate-300">{s.label}</p>
               </motion.div>
@@ -380,11 +402,9 @@ function Landing() {
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link to="/login">
-                <GradientButton className="!py-2.5">Login</GradientButton>
-              </Link>
-              <Link to="/register">
-                <GradientButton variant="secondary" className="!py-2.5">
-                  Get Started
+                <GradientButton className="!py-2.5">
+                  Login
+                  <ArrowRight size={14} />
                 </GradientButton>
               </Link>
             </div>
@@ -403,11 +423,6 @@ function Landing() {
                 <li>
                   <Link to="/login" className="transition hover:text-white">
                     Login
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/register" className="transition hover:text-white">
-                    Register
                   </Link>
                 </li>
               </ul>

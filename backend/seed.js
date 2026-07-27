@@ -18,10 +18,21 @@ const seed = async () => {
     await Promise.all([
       Register.deleteMany({
         email: {
-          $in: ["admin@gmail.com", "teacher@gmail.com", "student@gmail.com"],
+          $in: [
+            "admin@gmail.com",
+            "teacher@gmail.com",
+            "student@gmail.com",
+            "sara.student@gmail.com",
+            "bilal.student@gmail.com",
+            "zara.student@gmail.com",
+          ],
         },
       }),
       Course.deleteMany({ courseCode: { $in: ["MATH101", "ENG201", "SCI301"] } }),
+      Enrollment.deleteMany({}),
+      Attendance.deleteMany({}),
+      Mark.deleteMany({}),
+      Assignment.deleteMany({}),
     ]);
 
     const password = await bcrypt.hash("123456", 10);
@@ -53,6 +64,33 @@ const seed = async () => {
       bio: "Curious learner and football enthusiast.",
       phone: "0300-4445566",
     });
+
+    const extraStudents = await Register.insertMany([
+      {
+        name: "Sara Malik",
+        email: "sara.student@gmail.com",
+        Password: password,
+        role: "student",
+        phone: "0300-7778899",
+        bio: "Loves science experiments.",
+      },
+      {
+        name: "Bilal Khan",
+        email: "bilal.student@gmail.com",
+        Password: password,
+        role: "student",
+        phone: "0301-2223344",
+        bio: "Enjoys reading and debate.",
+      },
+      {
+        name: "Zara Hussain",
+        email: "zara.student@gmail.com",
+        Password: password,
+        role: "student",
+        phone: "0302-5556677",
+        bio: "Aspiring engineer.",
+      },
+    ]);
 
     const math = await Course.create({
       courseName: "Mathematics",
@@ -97,31 +135,30 @@ const seed = async () => {
       { studentId: student._id, courseId: math._id },
       { studentId: student._id, courseId: english._id },
       { studentId: student._id, courseId: science._id },
+      { studentId: extraStudents[0]._id, courseId: math._id },
+      { studentId: extraStudents[0]._id, courseId: english._id },
+      { studentId: extraStudents[1]._id, courseId: english._id },
+      { studentId: extraStudents[1]._id, courseId: math._id },
+      { studentId: extraStudents[2]._id, courseId: science._id },
+      { studentId: extraStudents[2]._id, courseId: math._id },
     ]);
 
     const today = new Date().toISOString().slice(0, 10);
-    await Attendance.insertMany([
-      {
-        studentName: student.name,
-        studentId: student._id,
+    const attendanceRows = [];
+    const mathStudents = [student, extraStudents[0], extraStudents[1], extraStudents[2]];
+    for (const s of mathStudents) {
+      attendanceRows.push({
+        studentName: s.name,
+        studentId: s._id,
         course: math.courseName,
         courseId: math._id,
         date: today,
         status: "Present",
         teacher: teacher.name,
         teacherId: teacher._id,
-      },
-      {
-        studentName: student.name,
-        studentId: student._id,
-        course: english.courseName,
-        courseId: english._id,
-        date: today,
-        status: "Present",
-        teacher: teacher.name,
-        teacherId: teacher._id,
-      },
-    ]);
+      });
+    }
+    await Attendance.insertMany(attendanceRows);
 
     await Mark.insertMany([
       {
@@ -131,6 +168,7 @@ const seed = async () => {
         courseId: math._id,
         subject: "Algebra",
         score: 88,
+        feedback: "Strong work on factoring.",
         teacher: teacher.name,
         teacherId: teacher._id,
       },
@@ -141,6 +179,7 @@ const seed = async () => {
         courseId: english._id,
         subject: "Essay Writing",
         score: 92,
+        feedback: "Excellent structure and clarity.",
         teacher: teacher.name,
         teacherId: teacher._id,
       },

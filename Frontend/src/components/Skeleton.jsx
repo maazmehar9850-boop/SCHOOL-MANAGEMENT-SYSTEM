@@ -4,9 +4,9 @@ function Skeleton({ className = "h-24 w-full" }) {
 
 export function StatSkeleton() {
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {[1, 2, 3, 4].map((i) => (
-        <Skeleton key={i} className="h-28 w-full rounded-3xl" />
+        <Skeleton key={i} className="h-[7.75rem] w-full rounded-2xl" />
       ))}
     </div>
   );

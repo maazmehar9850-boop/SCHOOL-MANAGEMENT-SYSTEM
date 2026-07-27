@@ -1,79 +1,257 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import { Users, Mail, BookOpen, UserPlus, Pencil, Trash2 } from "lucide-react";
 import API from "../api";
 import PageLayout from "../components/PageLayout";
-import GlassCard from "../components/GlassCard";
+import PageContentCard from "../components/PageContentCard";
 import DataTable from "../components/DataTable";
 import StatCard from "../components/StatCard";
-import { Users } from "lucide-react";
+import GradientButton from "../components/GradientButton";
+import Modal from "../components/Modal";
 import Skeleton, { StatSkeleton } from "../components/Skeleton";
 
 function MyStudents() {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  const loadStudents = async () => {
+    try {
+      const res = await API.get("/my-students");
+      setStudents(Array.isArray(res.data) ? res.data : []);
+    } catch {
+      toast.error("Failed to load your students");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await API.get("/my-students");
-        setStudents(res.data);
-      } catch {
-        toast.error("Failed to load assigned students");
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
+    loadStudents();
   }, []);
 
-  const rows = students.map((s) => ({
-    ...s,
-    coursesLabel: (s.courses || []).map((c) => c.courseName).join(", ") || "Not assigned",
-  }));
+  const openEdit = (row) => {
+    setEditing({
+      _id: row._id,
+      name: row.name || "",
+      email: row.email || "",
+      phone: row.phone || "",
+      Password: "",
+    });
+  };
+
+  const saveStudent = async (e) => {
+    e.preventDefault();
+    if (!editing?._id) return;
+    setSaving(true);
+    try {
+      const payload = {
+        name: editing.name,
+        email: editing.email,
+        phone: editing.phone,
+      };
+      if (editing.Password?.trim()) {
+        payload.Password = editing.Password;
+      }
+      await API.put(`/teachers/students/${editing._id}`, payload);
+      toast.success("Student updated");
+      setEditing(null);
+      setLoading(true);
+      loadStudents();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Update failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteStudent = async (row) => {
+    if (
+      !window.confirm(
+        `Delete ${row.name}? This removes their account, enrollments, and marks permanently.`
+      )
+    ) {
+      return;
+    }
+    try {
+      await API.delete(`/teachers/students/${row._id}`);
+      toast.success("Student deleted");
+      setStudents((prev) => prev.filter((s) => s._id !== row._id));
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Delete failed");
+    }
+  };
 
   const columns = [
     { key: "name", label: "Name" },
     { key: "email", label: "Email" },
-    { key: "coursesLabel", label: "Courses" },
     {
-      key: "status",
-      label: "Status",
+      key: "phone",
+      label: "Phone",
+      render: (row) => row.phone || "—",
+    },
+    {
+      key: "courses",
+      label: "Your courses",
       sortable: false,
-      render: () => (
-        <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-          Active
-        </span>
+      render: (row) =>
+        Array.isArray(row.courses) && row.courses.length
+          ? row.courses.map((c) => c.courseName || c).join(", ")
+          : "—",
+    },
+    {
+      key: "actions",
+      label: "Actions",
+      sortable: false,
+      render: (row) => (
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            className="rounded-xl bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700"
+            onClick={() => openEdit(row)}
+          >
+            <span className="inline-flex items-center gap-1">
+              <Pencil size={12} />
+              Edit
+            </span>
+          </button>
+          <button
+            type="button"
+            className="rounded-xl bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700"
+            onClick={() => deleteStudent(row)}
+          >
+            <span className="inline-flex items-center gap-1">
+              <Trash2 size={12} />
+              Delete
+            </span>
+          </button>
+        </div>
       ),
     },
   ];
+
+  const courseCount = students.reduce(
+    (n, s) => n + (Array.isArray(s.courses) ? s.courses.length : 0),
+    0
+  );
 
   return (
     <PageLayout
       role="teacher"
       variant="teacher"
       title="My Students"
-      subtitle="Only students enrolled in your courses"
+      subtitle="Manage students enrolled in your courses — update email, password, or remove accounts"
     >
       {loading ? (
         <StatSkeleton />
       ) : (
         <div className="grid gap-4 md:grid-cols-3">
-          <StatCard title="Assigned students" value={students.length} icon={Users} />
+          <StatCard title="My students" value={students.length} icon={Users} />
+          <StatCard
+            title="With email"
+            value={students.filter((s) => s.email).length}
+            icon={Mail}
+            accent="from-sky-500 to-blue-600"
+            delay={0.05}
+          />
+          <StatCard
+            title="Course seats"
+            value={courseCount}
+            icon={BookOpen}
+            accent="from-emerald-500 to-teal-600"
+            delay={0.1}
+          />
         </div>
       )}
 
-      <GlassCard className="p-6" hover={false}>
+      <PageContentCard
+        title="Student roster"
+        subtitle="Edit email and password or delete students from your roster"
+        action={
+          <Link to="/add-student">
+            <GradientButton>
+              <UserPlus size={16} />
+              Add student
+            </GradientButton>
+          </Link>
+        }
+      >
         {loading ? (
-          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-64 w-full rounded-2xl" />
         ) : (
           <DataTable
             columns={columns}
-            data={rows}
-            searchKeys={["name", "email", "coursesLabel"]}
-            emptyMessage="No students assigned yet. Enroll students into your courses."
+            data={students}
+            searchKeys={["name", "email", "phone"]}
+            searchPlaceholder="Search your students…"
+            emptyMessage="No students in your courses yet. Click Add student to begin."
           />
         )}
-      </GlassCard>
+      </PageContentCard>
+
+      <Modal
+        open={!!editing}
+        onClose={() => setEditing(null)}
+        title="Edit student"
+        size="md"
+      >
+        {editing && (
+          <form onSubmit={saveStudent} className="space-y-4">
+            <label className="block">
+              <span className="form-label">Name</span>
+              <input
+                className="input-glass mt-1"
+                value={editing.name}
+                onChange={(e) => setEditing({ ...editing, name: e.target.value })}
+                required
+              />
+            </label>
+            <label className="block">
+              <span className="form-label">Email</span>
+              <input
+                type="email"
+                className="input-glass mt-1"
+                value={editing.email}
+                onChange={(e) => setEditing({ ...editing, email: e.target.value })}
+                required
+              />
+            </label>
+            <label className="block">
+              <span className="form-label">Phone</span>
+              <input
+                className="input-glass mt-1"
+                value={editing.phone}
+                onChange={(e) => setEditing({ ...editing, phone: e.target.value })}
+              />
+            </label>
+            <label className="block">
+              <span className="form-label">New password</span>
+              <input
+                type="password"
+                className="input-glass mt-1"
+                placeholder="Leave blank to keep current password"
+                value={editing.Password}
+                onChange={(e) => setEditing({ ...editing, Password: e.target.value })}
+                minLength={6}
+              />
+            </label>
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setEditing(null)}
+                className="rounded-2xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700"
+              >
+                Cancel
+              </button>
+              <GradientButton type="submit" disabled={saving}>
+                {saving ? "Saving…" : "Save changes"}
+              </GradientButton>
+            </div>
+          </form>
+        )}
+      </Modal>
     </PageLayout>
   );
 }

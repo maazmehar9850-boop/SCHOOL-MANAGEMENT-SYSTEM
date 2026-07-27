@@ -1,5 +1,15 @@
 import mongoose from "mongoose";
 
+const materialSchema = new mongoose.Schema(
+  {
+    type: { type: String, enum: ["video", "pdf"], required: true },
+    title: { type: String, default: "" },
+    fileUrl: { type: String, required: true },
+    fileName: { type: String, default: "" },
+  },
+  { _id: true }
+);
+
 const courseSchema = new mongoose.Schema(
   {
     courseName: {
@@ -53,6 +63,18 @@ const courseSchema = new mongoose.Schema(
       type: String,
       enum: ["Active", "Inactive"],
       default: "Active",
+    },
+    videoUrl: {
+      type: String,
+      default: "",
+    },
+    pdfUrl: {
+      type: String,
+      default: "",
+    },
+    materials: {
+      type: [materialSchema],
+      default: [],
     },
   },
   { timestamps: true }

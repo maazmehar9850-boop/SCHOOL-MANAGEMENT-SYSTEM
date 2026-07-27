@@ -16,7 +16,7 @@ function Register() {
     name: "",
     email: "",
     Password: "",
-    role: "student",
+    role: "teacher",
   });
 
   const handleChange = (e) => {
@@ -61,7 +61,9 @@ function Register() {
             <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
               Create account
             </h1>
-            <p className="mt-2 text-slate-600">Join SchoolMS as a student or teacher</p>
+            <p className="mt-2 text-slate-600">
+              Teacher accounts only — students are added by their subject teacher
+            </p>
           </motion.div>
 
           <form onSubmit={registerUser} className="space-y-4">
@@ -114,11 +116,13 @@ function Register() {
               value={form.role}
               onChange={handleChange}
               required
-              options={[
-                { value: "student", label: "Student" },
-                { value: "teacher", label: "Teacher" },
-              ]}
+              options={[{ value: "teacher", label: "Teacher" }]}
             />
+
+            <p className="text-xs text-slate-500">
+              Need a student account? Ask your subject teacher to add you to their
+              course.
+            </p>
 
             <GradientButton type="submit" className="w-full" disabled={loading}>
               {loading ? "Creating account..." : "Get Started"}

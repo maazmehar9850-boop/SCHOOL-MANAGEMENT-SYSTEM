@@ -59,7 +59,7 @@ function App() {
       <Route
         path="/add-student"
         element={
-          <ProtectedRoute roles={["admin"]}>
+          <ProtectedRoute roles={["teacher"]}>
             <AddStudent />
           </ProtectedRoute>
         }
@@ -100,7 +100,7 @@ function App() {
       <Route
         path="/teacher-tools"
         element={
-          <ProtectedRoute roles={["teacher"]}>
+          <ProtectedRoute roles={["teacher", "admin"]}>
             <TeacherTools />
           </ProtectedRoute>
         }
@@ -151,6 +151,22 @@ function App() {
         element={
           <ProtectedRoute roles={["student"]}>
             <StudentProfile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin-attendance"
+        element={
+          <ProtectedRoute roles={["admin"]}>
+            <StudentAttendance />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin-marks"
+        element={
+          <ProtectedRoute roles={["admin"]}>
+            <StudentResults />
           </ProtectedRoute>
         }
       />

@@ -19,8 +19,9 @@ export const signupValidation = [
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters"),
   body("role")
-    .isIn(["teacher", "student"])
-    .withMessage("Role must be teacher or student"),
+    .optional()
+    .isIn(["teacher"])
+    .withMessage("Public signup is for teachers only; students are added by teachers"),
 ];
 
 export const loginValidation = [
@@ -38,6 +39,30 @@ export const updateMeValidation = [
   body("bio").optional().isString(),
   body("subject").optional().isString(),
   body("experience").optional().isString(),
+  body("phone").optional().isString(),
+];
+
+export const updateUserValidation = [
+  body("name").optional().trim().notEmpty().withMessage("Name cannot be empty"),
+  body("email").optional().isEmail().withMessage("Valid email is required").normalizeEmail(),
+  body("Password")
+    .optional({ values: "falsy" })
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters"),
+  body("role").optional().isIn(["admin", "teacher"]).withMessage("Invalid role"),
+  body("bio").optional().isString(),
+  body("subject").optional().isString(),
+  body("experience").optional().isString(),
+  body("phone").optional().isString(),
+];
+
+export const updateStudentByTeacherValidation = [
+  body("name").optional().trim().notEmpty().withMessage("Name cannot be empty"),
+  body("email").optional().isEmail().withMessage("Valid email is required").normalizeEmail(),
+  body("Password")
+    .optional({ values: "falsy" })
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters"),
   body("phone").optional().isString(),
 ];
 

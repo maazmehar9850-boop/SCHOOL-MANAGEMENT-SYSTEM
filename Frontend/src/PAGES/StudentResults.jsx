@@ -1,14 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import API from "../api";
 import PageLayout from "../components/PageLayout";
-import GlassCard from "../components/GlassCard";
+import PageContentCard from "../components/PageContentCard";
 import DataTable from "../components/DataTable";
-import GradientButton from "../components/GradientButton";
+import SaveAsPdfButton from "../components/SaveAsPdfButton";
 import Skeleton from "../components/Skeleton";
+import { StatPill } from "../components/SheetUI";
+import { saveAsPdf, tableHtml } from "../utils/saveAsPdf";
 
 function StudentResults() {
   const role = localStorage.getItem("role") || "student";
+  const isAdmin = role === "admin";
+  const isStudent = role === "student";
   const [marks, setMarks] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -16,7 +20,7 @@ function StudentResults() {
     const load = async () => {
       try {
         const res = await API.get("/marks");
-        setMarks(res.data);
+        setMarks(Array.isArray(res.data) ? res.data : []);
       } catch {
         toast.error("Failed to load results");
       } finally {
@@ -26,59 +30,105 @@ function StudentResults() {
     load();
   }, []);
 
-  const printReport = () => {
-    const html = `
-      <html><head><title>Results</title>
-      <style>body{font-family:Arial;padding:24px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:10px}th{background:#0f172a;color:#fff}</style>
-      </head><body><h1>Result Report</h1>
-      <table><thead><tr><th>Student</th><th>Course</th><th>Subject</th><th>Score</th></tr></thead>
-      <tbody>${marks
-        .map(
-          (i) =>
-            `<tr><td>${i.studentName}</td><td>${i.course}</td><td>${i.subject}</td><td>${i.score}</td></tr>`
-        )
-        .join("")}</tbody></table></body></html>`;
-    const w = window.open("", "_blank");
-    w.document.write(html);
-    w.document.close();
-    w.print();
-  };
+  const average = marks.length
+    ? Math.round(
+        marks.reduce((sum, m) => {
+          const max = Number(m.maxScore) || 100;
+          return sum + (Number(m.score || 0) / max) * 100;
+        }, 0) / marks.length
+      )
+    : 0;
 
-  const columns = [
-    { key: "studentName", label: "Student" },
-    { key: "course", label: "Course" },
-    { key: "subject", label: "Subject" },
-    { key: "score", label: "Score" },
-  ];
+  const columns = useMemo(
+    () => [
+      ...(role !== "student" ? [{ key: "studentName", label: "Student" }] : []),
+      { key: "course", label: "Course" },
+      { key: "subject", label: "Subject" },
+      {
+        key: "score",
+        label: "Marks",
+        render: (row) => (
+          <span className="font-display text-base font-bold text-indigo-700">
+            {row.score}
+            {row.maxScore != null ? ` / ${row.maxScore}` : ""}
+          </span>
+        ),
+      },
+      {
+        key: "feedback",
+        label: "Feedback",
+        render: (row) => row.feedback || "—",
+      },
+      ...(role !== "student" ? [{ key: "teacher", label: "Teacher" }] : []),
+    ],
+    [role]
+  );
+
+  const exportPdf = () => {
+    const rows = marks.map((i) => [
+      ...(role !== "student" ? [i.studentName] : []),
+      i.course,
+      i.subject,
+      i.score,
+      i.maxScore ?? 100,
+      i.feedback || "—",
+      ...(role !== "student" ? [i.teacher || "—"] : []),
+    ]);
+    const headers = [
+      ...(role !== "student" ? ["Student"] : []),
+      "Course",
+      "Subject",
+      "Obtained",
+      "Total",
+      "Feedback",
+      ...(role !== "student" ? ["Teacher"] : []),
+    ];
+    saveAsPdf(
+      isAdmin ? "All Marks Sheet" : "Results Report",
+      tableHtml(headers, rows),
+      { subtitle: "Academic grades and teacher feedback" }
+    );
+  };
 
   return (
     <PageLayout
-      role={role === "admin" ? "admin" : role === "teacher" ? "teacher" : "student"}
-      variant="student"
-      title="Results"
+      role={isAdmin ? "admin" : isStudent ? "student" : "teacher"}
+      variant={isAdmin ? "admin" : "student"}
+      title={isAdmin ? "All Marks / Results" : "Results"}
       subtitle={
-        role === "student"
-          ? "Your marks only — scoped by the API"
-          : "Marks list for your access level"
+        isStudent
+          ? "Your marks only — save a PDF copy anytime"
+          : isAdmin
+            ? "School-wide marks sheet — print or save as PDF"
+            : "Marks for your allotted subjects"
       }
     >
-      <GlassCard className="flex items-center justify-between gap-4 p-5" hover={false}>
-        <p className="text-sm text-slate-600">{marks.length} scores</p>
-        <GradientButton onClick={printReport}>Print report</GradientButton>
-      </GlassCard>
+      <PageContentCard
+        title="Marks sheet"
+        subtitle={
+          isStudent
+            ? "Scores published by your subject teachers"
+            : "Complete academic performance records"
+        }
+        action={<SaveAsPdfButton onClick={exportPdf} disabled={!marks.length} />}
+      >
+        <div className="mb-5 flex flex-wrap gap-2">
+          <StatPill label="Total scores" value={marks.length} tone="brand" />
+          <StatPill label="Average %" value={average} tone="success" />
+        </div>
 
-      <GlassCard className="p-6" hover={false}>
         {loading ? (
-          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-64 w-full rounded-2xl" />
         ) : (
           <DataTable
             columns={columns}
             data={marks}
-            searchKeys={["studentName", "course", "subject"]}
+            searchKeys={["studentName", "course", "subject", "teacher", "feedback"]}
             emptyMessage="No marks found."
+            searchPlaceholder="Search marks by student, course, or subject…"
           />
         )}
-      </GlassCard>
+      </PageContentCard>
     </PageLayout>
   );
 }

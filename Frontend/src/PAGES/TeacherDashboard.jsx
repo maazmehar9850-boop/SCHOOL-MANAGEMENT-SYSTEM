@@ -1,11 +1,21 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Users, CalendarCheck, BookOpen, Layers } from "lucide-react";
+import {
+  Users,
+  CalendarCheck,
+  BookOpen,
+  ClipboardList,
+  UserPlus,
+  Wrench,
+  Award,
+  Library,
+} from "lucide-react";
 import toast from "react-hot-toast";
 import API from "../api";
 import PageLayout from "../components/PageLayout";
 import StatCard from "../components/StatCard";
-import GlassCard from "../components/GlassCard";
+import ActionCard from "../components/ActionCard";
+import DashboardPanel from "../components/DashboardPanel";
 import GradientButton from "../components/GradientButton";
 import { StatSkeleton } from "../components/Skeleton";
 
@@ -28,75 +38,123 @@ function TeacherDashboard() {
     load();
   }, []);
 
+  const statCards = [
+    {
+      to: "/my-students",
+      title: "Assigned students",
+      value: stats?.assignedStudents ?? 0,
+      icon: Users,
+      accent: "from-sky-500 to-blue-600",
+      hint: "Learners in your courses",
+    },
+    {
+      to: "/attendance",
+      title: "Attendance rate",
+      value: `${stats?.attendanceRate ?? 0}%`,
+      icon: CalendarCheck,
+      accent: "from-emerald-500 to-teal-600",
+      hint: "Present across your classes",
+    },
+    {
+      to: "/assignments",
+      title: "Assignments",
+      value: stats?.assignments ?? 0,
+      icon: BookOpen,
+      accent: "from-amber-500 to-orange-500",
+      hint: "Active class work",
+    },
+    {
+      to: "/assignments",
+      title: "Pending reviews",
+      value: stats?.pendingSubmissions ?? 0,
+      icon: ClipboardList,
+      accent: "from-indigo-500 to-violet-600",
+      hint: "Submissions awaiting grading",
+    },
+  ];
+
   return (
     <PageLayout
       role="teacher"
       variant="teacher"
       title={`Welcome, ${name}`}
-      subtitle="Your assigned classes and student activity"
+      subtitle="Your classes, attendance, marks, and teaching tools in one workspace"
     >
       {loading ? (
         <StatSkeleton />
       ) : (
-        <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <StatCard
-            title="Assigned students"
-            value={stats?.assignedStudents ?? 0}
-            icon={Users}
-            accent="from-sky-500 to-blue-600"
-          />
-          <StatCard
-            title="Attendance %"
-            value={`${stats?.attendanceRate ?? 0}%`}
-            icon={CalendarCheck}
-            accent="from-emerald-500 to-teal-600"
-            delay={0.05}
-          />
-          <StatCard
-            title="Subjects"
-            value={stats?.subjects ?? 0}
-            icon={BookOpen}
-            accent="from-amber-500 to-orange-500"
-            delay={0.1}
-          />
-          <StatCard
-            title="Classes"
-            value={stats?.classes ?? 0}
-            icon={Layers}
-            accent="from-indigo-500 to-violet-600"
-            delay={0.15}
-          />
+        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {statCards.map((card, index) => (
+            <Link key={`${card.to}-${card.title}`} to={card.to} className="block h-full">
+              <StatCard {...card} delay={index * 0.05} interactive />
+            </Link>
+          ))}
         </section>
       )}
 
-      <GlassCard className="p-6 md:p-8" hover={false}>
-        <h2 className="text-xl font-bold text-slate-900">Quick actions</h2>
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
-          <Link to="/attendance" className="block">
-            <div className="rounded-2xl border border-white/50 bg-white/50 p-4 transition hover:bg-white/80">
-              <h3 className="font-semibold text-slate-900">Mark attendance</h3>
-              <p className="mt-1 text-sm text-slate-600">Record present / absent</p>
-            </div>
-          </Link>
-          <Link to="/marks" className="block">
-            <div className="rounded-2xl border border-white/50 bg-white/50 p-4 transition hover:bg-white/80">
-              <h3 className="font-semibold text-slate-900">Enter marks</h3>
-              <p className="mt-1 text-sm text-slate-600">Update student scores</p>
-            </div>
-          </Link>
-          <Link to="/my-students" className="block">
-            <div className="rounded-2xl border border-white/50 bg-white/50 p-4 transition hover:bg-white/80">
-              <h3 className="font-semibold text-slate-900">My students</h3>
-              <p className="mt-1 text-sm text-slate-600">View assigned learners</p>
-            </div>
-          </Link>
-        </div>
-        <div className="mt-5">
+      <DashboardPanel
+        title="Teaching shortcuts"
+        subtitle="Daily tasks for your allotted subjects — attendance, marks, and resources."
+        delay={0.08}
+        action={
           <Link to="/teacher-tools">
-            <GradientButton variant="secondary">Open teacher tools</GradientButton>
+            <GradientButton variant="secondary" className="!gap-2">
+              <Wrench size={16} />
+              Teacher tools
+            </GradientButton>
           </Link>
+        }
+      >
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ActionCard
+            to="/attendance"
+            icon={CalendarCheck}
+            title="Mark attendance"
+            description="Record present or absent for enrolled students"
+            accent="from-emerald-500 to-teal-600"
+          />
+          <ActionCard
+            to="/marks"
+            icon={Award}
+            title="Enter marks"
+            description="Save scores for your allotted subject only"
+            accent="from-indigo-500 to-violet-600"
+            delay={0.04}
+          />
+          <ActionCard
+            to="/assignments"
+            icon={ClipboardList}
+            title="Assignments"
+            description="Create work and review submissions"
+            accent="from-amber-500 to-orange-500"
+            delay={0.08}
+          />
+          <ActionCard
+            to="/my-students"
+            icon={Users}
+            title="My students"
+            description="View learners enrolled in your courses"
+            accent="from-sky-500 to-blue-600"
+            delay={0.12}
+          />
+          <ActionCard
+            to="/add-student"
+            icon={UserPlus}
+            title="Add student"
+            description="Enroll a learner in your subject"
+            accent="from-cyan-500 to-indigo-500"
+            delay={0.16}
+          />
+          <ActionCard
+            to="/resources"
+            icon={Library}
+            title="Resources"
+            description="Syllabus, date sheets, attendance & grades"
+            accent="from-rose-500 to-pink-600"
+            delay={0.2}
+          />
         </div>
-      </GlassCard>
+      </DashboardPanel>
     </PageLayout>
   );
 }
