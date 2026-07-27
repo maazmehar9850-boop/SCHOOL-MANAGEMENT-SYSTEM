@@ -17,3 +17,5 @@ Thumbs.db
 .cursor/
 coverage/
 *.local
+
+VIVA_SUMMARY.md
