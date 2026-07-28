@@ -355,6 +355,8 @@ textarea {
 }
 
 .pro-table-wrap {
+  width: 100%;
+  max-width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   border-radius: 1rem;
@@ -365,69 +367,13 @@ textarea {
 
 .pro-table {
   width: 100%;
+  min-width: 42rem;
   border-collapse: collapse;
 }
 
+.pro-table thead th,
 .pro-table tbody td {
   white-space: nowrap;
-}
-
-.mobile-data-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.mobile-data-card {
-  overflow: hidden;
-  border-radius: 1rem;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
-}
-
-.mobile-data-card--empty {
-  padding: 2.5rem 1rem;
-  text-align: center;
-  color: #64748b;
-}
-
-.mobile-data-card__field {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.85rem;
-  padding: 0.8rem 1rem;
-  border-top: 1px solid rgba(148, 163, 184, 0.14);
-}
-
-.mobile-data-card__field:first-child {
-  border-top: none;
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.04) 0%, rgba(49, 46, 129, 0.05) 100%);
-}
-
-.mobile-data-card__label {
-  flex-shrink: 0;
-  max-width: 42%;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #64748b;
-}
-
-.mobile-data-card__value {
-  min-width: 0;
-  flex: 1;
-  text-align: right;
-  font-size: 0.92rem;
-  color: #334155;
-  word-break: break-word;
-}
-
-.mobile-data-card__value .flex,
-.mobile-data-card__value .inline-flex {
-  justify-content: flex-end;
 }
 
 .pro-table-wrap thead {
@@ -460,6 +406,22 @@ textarea {
   padding-top: 0.95rem;
   padding-bottom: 0.95rem;
   vertical-align: middle;
+}
+
+@media (max-width: 767px) {
+  .pro-table-wrap thead th,
+  .pro-table-wrap tbody td {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .inst-table thead th,
+  .inst-table tbody td {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    font-size: 0.8125rem;
+  }
 }
 
 .pro-table-wrap tbody tr.row-upcoming {
@@ -726,6 +688,8 @@ textarea {
 }
 
 .inst-table-wrap {
+  width: 100%;
+  max-width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   border-radius: 1rem;
@@ -734,84 +698,9 @@ textarea {
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 }
 
-@media (max-width: 767px) {
-  .inst-table-wrap--stack {
-    overflow: visible;
-    border: none;
-    background: transparent;
-    box-shadow: none;
-  }
-
-  .inst-table-wrap--stack .inst-table {
-    display: block;
-    width: 100%;
-    min-width: 0;
-  }
-
-  .inst-table-wrap--stack .inst-table thead {
-    display: none;
-  }
-
-  .inst-table-wrap--stack .inst-table tbody {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .inst-table-wrap--stack .inst-table tbody tr {
-    display: block;
-    border: 1px solid rgba(148, 163, 184, 0.22);
-    border-radius: 1rem;
-    background: rgba(255, 255, 255, 0.82);
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
-  }
-
-  .inst-table-wrap--stack .inst-table tbody td {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 0.85rem;
-    padding: 0.8rem 1rem;
-    border-top: 1px solid rgba(148, 163, 184, 0.14);
-    white-space: normal;
-  }
-
-  .inst-table-wrap--stack .inst-table tbody td:first-child {
-    border-top: none;
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.04) 0%, rgba(49, 46, 129, 0.05) 100%);
-  }
-
-  .inst-table-wrap--stack .inst-table tbody td::before {
-    content: attr(data-label);
-    flex-shrink: 0;
-    max-width: 42%;
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #64748b;
-  }
-
-  .inst-table-wrap--stack .inst-table tbody td > .flex,
-  .inst-table-wrap--stack .inst-table tbody td > .inline-flex {
-    justify-content: flex-end;
-    flex-wrap: wrap;
-  }
-
-  .inst-table-wrap--stack .inst-table tbody td .table-input {
-    max-width: 100%;
-  }
-
-  .inst-table-wrap--stack .inst-table__empty {
-    display: block;
-    border: 1px solid rgba(148, 163, 184, 0.22);
-    border-radius: 1rem;
-    background: rgba(255, 255, 255, 0.82);
-  }
-}
-
 .inst-table {
   width: 100%;
+  min-width: 42rem;
   border-collapse: collapse;
   text-align: left;
   font-size: 0.92rem;
@@ -843,6 +732,7 @@ textarea {
   padding: 0.95rem 1.15rem;
   color: #334155;
   vertical-align: middle;
+  white-space: nowrap;
 }
 
 .inst-table tbody td:first-child {

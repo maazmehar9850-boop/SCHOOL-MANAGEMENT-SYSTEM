@@ -1,7 +1,11 @@
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, ArrowUpDown } from "lucide-react";
 import SearchField from "./SearchField";
-import MobileDataCards, { getTableValue } from "./MobileDataCards";
+
+function getValue(row, key) {
+  if (!key.includes(".")) return row[key];
+  return key.split(".").reduce((acc, part) => acc?.[part], row);
+}
 
 function DataTable({
   columns = [],
@@ -28,7 +32,7 @@ function DataTable({
       const q = query.toLowerCase();
       rows = rows.filter((row) =>
         resolvedKeys.some((key) =>
-          String(getTableValue(row, key) ?? "")
+          String(getValue(row, key) ?? "")
             .toLowerCase()
             .includes(q)
         )
@@ -37,8 +41,8 @@ function DataTable({
 
     if (sortKey) {
       rows.sort((a, b) => {
-        const av = getTableValue(a, sortKey) ?? "";
-        const bv = getTableValue(b, sortKey) ?? "";
+        const av = getValue(a, sortKey) ?? "";
+        const bv = getValue(b, sortKey) ?? "";
         if (av < bv) return sortDir === "asc" ? -1 : 1;
         if (av > bv) return sortDir === "asc" ? 1 : -1;
         return 0;
@@ -72,14 +76,8 @@ function DataTable({
         placeholder={searchPlaceholder}
       />
 
-      <MobileDataCards
-        columns={columns}
-        rows={pageRows}
-        emptyMessage={emptyMessage}
-      />
-
-      <div className="pro-table-wrap hidden md:block">
-        <table className="pro-table min-w-full text-left text-sm">
+      <div className="pro-table-wrap">
+        <table className="pro-table text-left text-sm">
           <thead className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
             <tr>
               {columns.map((col) => (
@@ -90,7 +88,7 @@ function DataTable({
                     <button
                       type="button"
                       onClick={() => toggleSort(col.key)}
-                      className="inline-flex items-center gap-1.5 transition hover:text-[#3b5bdb]"
+                      className="inline-flex items-center gap-1.5 whitespace-nowrap transition hover:text-[#3b5bdb]"
                     >
                       {col.label}
                       <ArrowUpDown size={13} className="opacity-50" />
@@ -115,7 +113,7 @@ function DataTable({
                 >
                   {columns.map((col) => (
                     <td key={col.key} className="px-4 py-3.5 text-slate-700">
-                      {col.render ? col.render(row) : getTableValue(row, col.key)}
+                      {col.render ? col.render(row) : getValue(row, col.key)}
                     </td>
                   ))}
                 </tr>
