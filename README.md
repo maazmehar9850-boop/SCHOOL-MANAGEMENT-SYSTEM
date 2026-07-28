@@ -1,246 +1,194 @@
 # School Management System
 
-A full-stack web application for managing school operations online — students, teachers, courses, attendance, marks, assignments, and academic resources in one platform.
+A modern full-stack school platform for managing students, teachers, courses, attendance, marks, assignments, and academic resources from a single dashboard.
 
-**Stack:** React (Vite) · Express · MongoDB · JWT Authentication
+## Overview
+This project combines a React frontend with an Express and MongoDB backend to support role-based workflows for admins, teachers, and students. It includes authentication, protected routes, file uploads, academic record management, PDF export, and responsive dashboards.
 
----
-
-## Features
-
-### Admin
-- Dashboard with live system statistics
-- Register and manage teachers
-- Create, update, and delete courses
-- View enrollments across the school
-- Finalize exam datesheets
-- Manage syllabus and datesheet records
-
-### Teacher
-- Dashboard for assigned students and classes
-- Add students and enroll them in own courses
-- Mark attendance (single entry + bulk save)
-- Enter and update marks (single + bulk)
-- Create, edit, and delete assignments
-- Review and grade student submissions
-- Upload syllabus, datesheets, and exam papers
-- Export attendance and marks as PDF
-
-### Student
-- Personal dashboard (attendance %, marks average, grade)
-- View enrolled subjects and courses
-- Submit assignments (PDF / image upload)
-- View attendance, results, and graded feedback
-- Access syllabus, datesheets, and papers
-- Update profile
-
-### Shared
-- Role-based authentication and protected routes
-- Modern glassmorphism UI with responsive layout
-- File uploads for assignments, courses, and resources
-- Input validation on frontend and backend
-
----
+## Highlights
+- Role-based dashboards for `admin`, `teacher`, and `student`
+- Course, syllabus, datesheet, and paper management
+- Attendance and marks management with bulk workflows
+- Assignment creation, submission, and grading
+- Password reset approval flow and profile management
+- PDF export for selected academic records
+- Responsive UI with modern motion and glass-style components
 
 ## Tech Stack
-
-| Layer | Technologies |
-|-------|--------------|
-| Frontend | React 19, Vite, Tailwind CSS, Framer Motion, React Router, Axios |
-| Backend | Node.js, Express 5, Mongoose |
+| Layer | Tools |
+|---|---|
+| Frontend | React, Vite, Tailwind CSS, Framer Motion, React Router, Axios |
+| Backend | Node.js, Express, Mongoose |
 | Database | MongoDB |
-| Auth | JWT, bcrypt |
-| Uploads | Multer |
+| Authentication | JWT, bcrypt |
 | Validation | express-validator |
-
----
+| Uploads | Multer |
 
 ## Project Structure
-
-```
+```text
 School Management System/
-├── Frontend/          # React client (Vite)
+├── Frontend/              # React client
+│   ├── public/
 │   └── src/
-│       ├── PAGES/     # Route pages (Admin, Teacher, Student)
+│       ├── PAGES/
 │       ├── components/
-│       └── api.js     # Axios instance + auth interceptor
-├── backend/           # Express REST API
-│   ├── controller/    # Business logic
-│   ├── model/         # Mongoose schemas
-│   ├── middleware/    # Auth, validation, file upload
-│   ├── routing/       # API routes
-│   └── seed.js        # Demo data seeder
-├── package.json       # Root workspace scripts
+│       └── utils/
+├── backend/               # Express API
+│   ├── api/               # Vercel serverless entry
+│   ├── config/
+│   ├── controller/
+│   ├── middleware/
+│   ├── model/
+│   ├── routing/
+│   └── utils/
+├── package.json
 └── README.md
 ```
 
----
+## Features by Role
+### Admin
+- View live dashboard statistics
+- Register and manage teachers
+- Manage courses and school-wide records
+- Review password reset requests
+- Monitor enrollments and academic readiness
 
-## Prerequisites
+### Teacher
+- Manage assigned students
+- Enroll students into courses
+- Mark attendance and enter marks
+- Create assignments and grade submissions
+- Upload course materials and resources
 
-- [Node.js](https://nodejs.org/) (v18 or higher recommended)
-- [MongoDB](https://www.mongodb.com/) (local or MongoDB Atlas)
-- npm
+### Student
+- View dashboard insights
+- Check attendance and marks
+- Access courses and resources
+- Submit assignments
+- Update profile information
 
----
-
-## Installation
-
+## Local Setup
 ### 1. Clone the repository
-
 ```bash
 git clone https://github.com/maazmehar9850-boop/SCHOOL-MANAGEMENT-SYSTEM.git
 cd SCHOOL-MANAGEMENT-SYSTEM
 ```
 
 ### 2. Install dependencies
-
 ```bash
 npm install
 ```
 
-This installs dependencies for both the backend and frontend workspaces.
-
-### 3. Configure environment variables
-
-Create `backend/.env` from the example file:
+### 3. Configure environment files
+Create real env files from the examples:
 
 ```bash
 cp backend/.env.example backend/.env
+cp Frontend/.env.example Frontend/.env
 ```
 
-Edit `backend/.env`:
+Minimum backend variables:
 
 ```env
-DATABASE_URL=mongodb://localhost:27017/
-JWT_SECRET=your_long_random_secret_key
+DATABASE_URL=your_mongodb_connection_string
+JWT_SECRET=your_long_random_secret
 PORT=3030
-CORS_ORIGIN=http://localhost:5173,http://localhost:3000
+CORS_ORIGIN=http://localhost:5173
+FRONTEND_URL=http://localhost:5173
 EMAIL_USER=
 EMAIL_PASS=
 ```
 
-Optional frontend override (`Frontend/.env`):
+Frontend variable:
 
 ```env
 VITE_API_URL=http://localhost:3030/api/v1
 ```
 
 ### 4. Seed demo data (optional)
-
 ```bash
-cd backend
-npm run seed
-cd ..
+npm --prefix backend run seed
 ```
 
-### 5. Run the application
-
-From the project root:
-
+### 5. Start the app
 ```bash
 npm run dev
 ```
 
-- **Frontend:** http://localhost:5173  
-- **Backend API:** http://localhost:3030/api/v1
+Local URLs:
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:3030/api/v1`
 
----
+## Deployment Notes
+### Frontend on Vercel
+- Root Directory: `Frontend`
+- Install Command: `npm install`
+- Build Command: `npm run build`
+- Output Directory: `dist`
 
-## Demo Accounts
+Required env:
 
-After running the seed script:
-
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | `admin@gmail.com` | `123456` |
-| Teacher | `teacher@gmail.com` | `123456` |
-| Student | `student@gmail.com` | `123456` |
-
----
-
-## API Overview
-
-Base URL: `http://localhost:3030/api/v1`
-
-| Module | Endpoints |
-|--------|-----------|
-| Auth | `/signup`, `/login`, `/register`, `/me` |
-| Users | `/students`, `/teachers`, `/update/:id`, `/delete/:id` |
-| Courses | `/courses` |
-| Enrollments | `/enrollments`, `/my-students` |
-| Attendance | `/attendance`, `/attendance/bulk` |
-| Marks | `/marks`, `/marks/bulk` |
-| Assignments | `/assignments` |
-| Submissions | `/assignments/:id/submit`, `/submissions/mine`, `/submissions/:id/grade` |
-| Resources | `/syllabus`, `/datesheet`, `/paper` |
-| Dashboard | `/dashboard/stats`, `/public/stats`, `/health` |
-
-All protected routes require:
-
+```env
+VITE_API_URL=https://your-backend-domain/api/v1
 ```
+
+### Backend on Vercel
+- Root Directory: `backend`
+- Install Command: `npm install`
+- Build Command: leave empty
+
+Required env:
+
+```env
+DATABASE_URL=your_mongodb_connection_string
+JWT_SECRET=your_long_random_secret
+CORS_ORIGIN=https://your-frontend-domain.vercel.app
+FRONTEND_URL=https://your-frontend-domain.vercel.app
+EMAIL_USER=
+EMAIL_PASS=
+```
+
+## API Modules
+Base URL:
+
+```text
+/api/v1
+```
+
+Available module groups:
+- Auth
+- Profile
+- Users
+- Dashboard
+- Courses
+- Enrollments
+- Assignments
+- Submissions
+- Attendance
+- Marks
+- Academic Resources
+- Password Reset
+
+Protected requests use:
+
+```http
 Authorization: Bearer <JWT_TOKEN>
 ```
 
----
-
-## Database Models
-
-- **User** (`register`) — admin, teacher, student
-- **Course** — subjects with assigned teacher and materials
-- **Enrollment** — student ↔ course relationship
-- **Attendance** — daily present/absent records
-- **Mark** — subject-wise scores and feedback
-- **Assignment** — tasks with due dates
-- **Submission** — student file uploads and grades
-- **Syllabus**, **Datesheet**, **Paper** — academic resources
-
----
-
 ## Security
+- Passwords are hashed with `bcrypt`
+- JWT-based authentication is used for session control
+- Role-based authorization is enforced on protected routes
+- Input validation runs on both critical auth and data flows
+- File type and size restrictions are applied to uploads
 
-- Passwords hashed with **bcrypt**
-- **JWT** token-based authentication (8-hour expiry)
-- **Role-based access control** (admin / teacher / student)
-- Request validation with **express-validator**
-- CORS and security headers configured
-- File type and size limits on uploads
-
-> **Note:** Never commit `.env` files or real secrets to Git. Use `backend/.env.example` as a template only.
-
----
-
-## Scripts
-
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start backend + frontend together |
-| `npm --prefix backend run dev` | Start backend only |
-| `npm --prefix Frontend run dev` | Start frontend only |
-| `npm --prefix backend run seed` | Load demo data |
-| `npm --prefix Frontend run build` | Build frontend for production |
-
----
-
-## Excluded from Repository
-
-The following are intentionally **not** uploaded to GitHub:
-
-- `node_modules/`
-- `.env` and secret files
-- `backend/uploads/` (user-uploaded files)
-- `Frontend/dist/` (build output)
-- `VIVA_SUMMARY.md` (local study notes)
-
----
+## Notes
+- Do not commit real `.env` files or secrets
+- Vercel file uploads are temporary unless moved to persistent storage such as S3, Cloudinary, or Vercel Blob
 
 ## Author
-
 **Maaz Mehar**  
 GitHub: [@maazmehar9850-boop](https://github.com/maazmehar9850-boop)
 
----
-
 ## License
-
-This project is for educational and portfolio purposes.
+This project is intended for educational and portfolio use.
