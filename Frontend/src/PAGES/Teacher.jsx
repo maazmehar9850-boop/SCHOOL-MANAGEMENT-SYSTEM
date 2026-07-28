@@ -6,6 +6,8 @@ import GlassCard from "../components/GlassCard";
 import DataTable from "../components/DataTable";
 import GradientButton from "../components/GradientButton";
 import Skeleton from "../components/Skeleton";
+import PasswordField from "../components/PasswordField";
+import { validatePasswordStrength } from "../utils/passwordPolicy";
 
 function Teachers() {
   const [teachers, setTeachers] = useState([]);
@@ -46,6 +48,11 @@ function Teachers() {
         subject: editingTeacher.subject,
       };
       if (editingTeacher.Password?.trim()) {
+        const passwordError = validatePasswordStrength(editingTeacher.Password);
+        if (passwordError) {
+          toast.error(passwordError);
+          return;
+        }
         payload.Password = editingTeacher.Password;
       }
       await API.put(`/update/${editingTeacher._id}`, payload);
@@ -105,29 +112,42 @@ function Teachers() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4">
           <GlassCard className="w-full max-w-md space-y-4 p-6" hover={false}>
             <h3 className="text-xl font-bold">Edit teacher</h3>
-            <input
-              className="input-glass"
-              value={editingTeacher.name || ""}
-              onChange={(e) => setEditingTeacher({ ...editingTeacher, name: e.target.value })}
-            />
-            <input
-              className="input-glass"
-              value={editingTeacher.email || ""}
-              onChange={(e) => setEditingTeacher({ ...editingTeacher, email: e.target.value })}
-            />
-            <input
-              className="input-glass"
-              placeholder="Subject"
-              value={editingTeacher.subject || ""}
-              onChange={(e) => setEditingTeacher({ ...editingTeacher, subject: e.target.value })}
-            />
-            <input
-              type="password"
-              className="input-glass"
-              placeholder="New password (leave blank to keep current)"
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-slate-700">Full name</span>
+              <input
+                className="input-glass"
+                value={editingTeacher.name || ""}
+                onChange={(e) => setEditingTeacher({ ...editingTeacher, name: e.target.value })}
+              />
+            </label>
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-slate-700">Email address</span>
+              <input
+                type="email"
+                className="input-glass"
+                value={editingTeacher.email || ""}
+                onChange={(e) => setEditingTeacher({ ...editingTeacher, email: e.target.value })}
+              />
+            </label>
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-slate-700">Subject</span>
+              <input
+                className="input-glass"
+                placeholder="e.g. Mathematics"
+                value={editingTeacher.subject || ""}
+                onChange={(e) => setEditingTeacher({ ...editingTeacher, subject: e.target.value })}
+              />
+            </label>
+            <PasswordField
+              label="New password"
+              name="Password"
               value={editingTeacher.Password || ""}
-              onChange={(e) => setEditingTeacher({ ...editingTeacher, Password: e.target.value })}
-              minLength={6}
+              onChange={(e) =>
+                setEditingTeacher({ ...editingTeacher, Password: e.target.value })
+              }
+              placeholder="Leave blank to keep current password"
+              showStrength={Boolean(editingTeacher.Password)}
+              autoComplete="new-password"
             />
             <div className="flex gap-3">
               <GradientButton onClick={updateTeacher}>Save</GradientButton>

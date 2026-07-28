@@ -2,11 +2,13 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
-import { GraduationCap, Lock, Mail, Sparkles, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Lock, Mail, Sparkles, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import API from "../api";
+import { beginAuthenticatedSession } from "../utils/auth";
 import Background from "../components/Background";
 import GlassCard from "../components/GlassCard";
 import GradientButton from "../components/GradientButton";
+import { BrandMark } from "../components/BrandLogo";
 
 const ease = [0.22, 1, 0.36, 1];
 
@@ -44,7 +46,9 @@ function Login() {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", user.role);
       localStorage.setItem("name", user.name || user.email);
+      localStorage.setItem("email", user.email || "");
       localStorage.setItem("userId", user._id);
+      beginAuthenticatedSession();
 
       toast.success(`Welcome back, ${user.name || "user"}!`);
 
@@ -122,7 +126,10 @@ function Login() {
                 Education OS
               </motion.div>
               <h2 className="font-display text-4xl font-bold leading-tight tracking-tight">
-                SchoolMS
+                <span className="mb-3 inline-flex">
+                  <BrandMark size={48} className="shadow-lg shadow-cyan-500/30" />
+                </span>
+                <span className="mt-3 block">SchoolMS</span>
               </h2>
               <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/80">
                 A calm, modern workspace for admins, teachers, and students —
@@ -180,11 +187,11 @@ function Login() {
                 className="flex flex-col items-start"
               >
                 <motion.div
-                  className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#3b5bdb] to-[#22b8cf] text-white shadow-lg md:hidden"
+                  className="mb-4 md:hidden"
                   whileHover={{ scale: 1.06, rotate: 3 }}
                   transition={{ type: "spring", stiffness: 320, damping: 18 }}
                 >
-                  <GraduationCap size={24} />
+                  <BrandMark size={48} className="shadow-lg shadow-cyan-500/25" />
                 </motion.div>
                 <h1 className="font-display text-2xl font-bold text-slate-900">Welcome back</h1>
                 <p className="mt-1.5 text-sm text-slate-500">Sign in to continue to your workspace</p>
@@ -255,7 +262,7 @@ function Login() {
                   />
                   <button
                     type="button"
-                    className="password-toggle"
+                    className="password-toggle password-toggle--accent"
                     onClick={() => setShowPassword((v) => !v)}
                     aria-label={showPassword ? "Hide password" : "Show password"}
                     title={showPassword ? "Hide password" : "Show password"}
@@ -268,6 +275,15 @@ function Login() {
                   </button>
                 </motion.div>
               </motion.label>
+
+              <motion.div variants={item} className="text-right">
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-semibold text-indigo-600 transition hover:text-indigo-800"
+                >
+                  Forgot password?
+                </Link>
+              </motion.div>
 
               <motion.div variants={item}>
                 <motion.div whileTap={{ scale: 0.98 }}>

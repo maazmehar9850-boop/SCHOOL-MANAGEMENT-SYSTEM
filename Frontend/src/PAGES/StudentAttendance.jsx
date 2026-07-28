@@ -63,11 +63,16 @@ function StudentAttendance() {
       : ["Course", "Date", "Status", "Teacher"];
     saveAsPdf(
       isAdmin ? "All Attendance Records" : "My Attendance Sheet",
-      tableHtml(headers, rows),
+      tableHtml(headers, rows, { statusColumn: isAdmin ? 3 : 2 }),
       {
+        type: "attendance",
         subtitle: isAdmin
           ? "School-wide attendance records"
           : "Student attendance record",
+        meta: {
+          Records: String(attendance.length),
+          Scope: isAdmin ? "All students" : "My courses",
+        },
       }
     );
   };

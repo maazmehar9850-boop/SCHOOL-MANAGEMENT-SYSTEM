@@ -2,12 +2,15 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { GraduationCap, Lock, Mail, User } from "lucide-react";
+import { GraduationCap, Mail, User } from "lucide-react";
 import API from "../api";
+import { beginAuthenticatedSession } from "../utils/auth";
 import Background from "../components/Background";
 import GlassCard from "../components/GlassCard";
 import GradientButton from "../components/GradientButton";
 import FormField from "../components/FormField";
+import PasswordField from "../components/PasswordField";
+import { validatePasswordStrength } from "../utils/passwordPolicy";
 
 function Register() {
   const navigate = useNavigate();
@@ -25,6 +28,11 @@ function Register() {
 
   const registerUser = async (e) => {
     e.preventDefault();
+    const passwordError = validatePasswordStrength(form.Password);
+    if (passwordError) {
+      toast.error(passwordError);
+      return;
+    }
     setLoading(true);
     try {
       const res = await API.post("/signup", form);
@@ -34,6 +42,7 @@ function Register() {
       localStorage.setItem("role", user.role);
       localStorage.setItem("name", user.name || user.email);
       localStorage.setItem("userId", user._id);
+      beginAuthenticatedSession();
 
       toast.success("Account created successfully!");
 
@@ -94,20 +103,16 @@ function Register() {
               />
             </div>
 
-            <div className="relative">
-              <Lock className="pointer-events-none absolute left-3 top-[2.65rem] h-4 w-4 text-slate-400" />
-              <FormField
-                label="Password"
-                name="Password"
-                type="password"
-                value={form.Password}
-                onChange={handleChange}
-                placeholder="At least 6 characters"
-                required
-                minLength={6}
-                className="pl-10"
-              />
-            </div>
+            <PasswordField
+              label="Password"
+              name="Password"
+              value={form.Password}
+              onChange={handleChange}
+              placeholder="Create a strong password"
+              required
+              showStrength
+              autoComplete="new-password"
+            />
 
             <FormField
               label="Role"

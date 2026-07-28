@@ -9,6 +9,7 @@ import {
   ClipboardList,
   Library,
   Activity,
+  KeyRound,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import API from "../api";
@@ -127,6 +128,14 @@ function AdminDashboard() {
             description="Manage student course enrollments"
             accent="from-cyan-500 to-indigo-500"
             delay={0.12}
+          />
+          <ActionCard
+            to="/password-resets"
+            icon={KeyRound}
+            title="Password resets"
+            description="Approve teacher & student reset requests"
+            accent="from-rose-500 to-pink-600"
+            delay={0.2}
           />
           <ActionCard
             to="/assignments"

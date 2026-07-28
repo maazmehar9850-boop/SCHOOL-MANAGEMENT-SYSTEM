@@ -16,8 +16,11 @@ import {
   Menu,
   X,
   Link2,
+  KeyRound,
 } from "lucide-react";
 import { useState } from "react";
+import { BrandMark } from "./BrandLogo";
+import { logout as signOut } from "../utils/auth";
 
 const linkClass = ({ isActive }) =>
   `group flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-[13px] font-medium tracking-tight transition-all ${
@@ -30,10 +33,7 @@ function AnimatedSidebar({ role }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
-  const logout = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
+  const logout = () => signOut(navigate);
 
   const adminLinks = [
     { to: "/admin-dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -48,6 +48,8 @@ function AnimatedSidebar({ role }) {
     { to: "/resources", label: "Resources", icon: BookOpen },
     { to: "/add-teacher", label: "Add Teacher", icon: UserPlus },
     { to: "/add-course", label: "Add Course", icon: BookOpen },
+    { to: "/password-resets", label: "Password Resets", icon: KeyRound },
+    { to: "/profile", label: "My Profile", icon: User },
   ];
 
   const teacherLinks = [
@@ -60,12 +62,12 @@ function AnimatedSidebar({ role }) {
     { to: "/assignments", label: "Assignments", icon: FileText },
     { to: "/teacher-tools", label: "Teacher Tools", icon: Wrench },
     { to: "/resources", label: "Resources", icon: Library },
-    { to: "/teacher-profile", label: "My Profile", icon: User },
+    { to: "/profile", label: "My Profile", icon: User },
   ];
 
   const studentLinks = [
     { to: "/student-home", label: "Dashboard", icon: LayoutDashboard },
-    { to: "/student-profile", label: "My Profile", icon: User },
+    { to: "/profile", label: "My Profile", icon: User },
     { to: "/courses", label: "Courses", icon: BookOpen },
     { to: "/student-attendance", label: "Attendance", icon: CalendarCheck },
     { to: "/student-results", label: "Results", icon: FileText },
@@ -81,9 +83,7 @@ function AnimatedSidebar({ role }) {
     <aside className="glass-panel-dark flex h-full w-[17.5rem] flex-col px-4 py-6 text-white md:m-3 md:h-[calc(100vh-1.5rem)] md:rounded-[1.35rem]">
       <div className="mb-7 px-2">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#3b5bdb] to-[#22b8cf] text-sm font-bold shadow-lg shadow-cyan-500/20">
-            SM
-          </div>
+          <BrandMark size={40} className="shrink-0 shadow-lg shadow-cyan-500/20" />
           <div>
             <h1 className="font-display text-lg font-bold tracking-tight">SchoolMS</h1>
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-200/70">

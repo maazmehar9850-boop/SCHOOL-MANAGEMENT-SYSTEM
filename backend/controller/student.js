@@ -5,6 +5,7 @@ import Course from "../model/Course.js";
 import Enrollment from "../model/Enrollment.js";
 import Mark from "../model/Mark.js";
 import Attendance from "../model/Attendance.js";
+import { validatePasswordStrength } from "../utils/passwordPolicy.js";
 
 const sanitizeUser = (user) => {
   const obj = user.toObject ? user.toObject() : { ...user };
@@ -18,12 +19,17 @@ const generateToken = (user) => {
     email: user.email,
     role: user.role,
     name: user.name,
+    tokenVersion: user.tokenVersion ?? 0,
   };
   const secretKey = process.env.JWT_SECRET;
   if (!secretKey) {
     throw new Error("JWT_SECRET is not configured");
   }
   return jwt.sign(payload, secretKey, { expiresIn: "8h" });
+};
+
+const revokeUserTokens = async (userId) => {
+  await register.findByIdAndUpdate(userId, { $inc: { tokenVersion: 1 } });
 };
 
 /** Teacher must have at least one active enrollment with this student */
@@ -129,10 +135,9 @@ export const addStudentByTeacher = async (req, res) => {
           message: "Name and password are required for a new student",
         });
       }
-      if (String(Password).length < 6) {
-        return res.status(400).json({
-          message: "Password must be at least 6 characters",
-        });
+      const passwordError = validatePasswordStrength(Password);
+      if (passwordError) {
+        return res.status(400).json({ message: passwordError });
       }
       const hashedPassword = await bcrypt.hash(Password, 10);
       student = await register.create({
@@ -252,6 +257,16 @@ export const login = async (req, res) => {
   }
 };
 
+export const logoutUser = async (req, res) => {
+  try {
+    await revokeUserTokens(req.user.id);
+    return res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    console.error("Error logging out:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const updateuser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -282,12 +297,13 @@ export const updateuser = async (req, res) => {
       }
     }
 
-    if (Password) {
-      updateData.Password = await bcrypt.hash(Password, 10);
-    }
-
     if (role && ["admin", "teacher"].includes(role)) {
       updateData.role = role;
+    }
+
+    if (Password) {
+      updateData.Password = await bcrypt.hash(Password, 10);
+      await revokeUserTokens(id);
     }
 
     const updatedUser = await register
@@ -320,30 +336,45 @@ export const getMe = async (req, res) => {
 export const updateMe = async (req, res) => {
   try {
     const { name, email, Password, bio, subject, experience, phone } = req.body;
+    const current = await register.findById(req.user.id);
+    if (!current) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     const updateData = {};
 
     if (name !== undefined) updateData.name = name;
-    if (email !== undefined) updateData.email = email.toLowerCase();
     if (bio !== undefined) updateData.bio = bio;
     if (subject !== undefined) updateData.subject = subject;
     if (experience !== undefined) updateData.experience = experience;
     if (phone !== undefined) updateData.phone = phone;
 
+    if (email !== undefined) {
+      const emailNorm = email.toLowerCase().trim();
+      if (emailNorm !== current.email) {
+        const taken = await register.findOne({ email: emailNorm, _id: { $ne: req.user.id } });
+        if (taken) {
+          return res.status(409).json({ message: "Email already registered" });
+        }
+      }
+      updateData.email = emailNorm;
+    }
+
     if (Password) {
       updateData.Password = await bcrypt.hash(Password, 10);
+      await revokeUserTokens(req.user.id);
     }
 
     const updatedUser = await register
       .findByIdAndUpdate(req.user.id, updateData, { new: true })
       .select("-Password");
 
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
     return res.status(200).json({ message: "Profile updated successfully", User: updatedUser });
   } catch (error) {
     console.error("Error updating profile:", error);
+    if (error.code === 11000) {
+      return res.status(409).json({ message: "Email already registered" });
+    }
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -471,6 +502,7 @@ export const updateStudentByTeacher = async (req, res) => {
     }
     if (Password) {
       updateData.Password = await bcrypt.hash(Password, 10);
+      await revokeUserTokens(student._id);
     }
 
     if (!Object.keys(updateData).length) {

@@ -197,7 +197,15 @@ function TeacherMarks() {
         ["Student", "Course", "Subject", "Obtained / Total", "Feedback"],
         pdfRows
       ),
-      { subtitle: `Teacher: ${teacher} · Subject: ${subject} · Total: ${totalMarks}` }
+      {
+        type: "marks",
+        subtitle: `Official marks register`,
+        meta: {
+          Teacher: teacher,
+          Subject: subject,
+          "Total marks": String(totalMarks),
+        },
+      }
     );
   };
 

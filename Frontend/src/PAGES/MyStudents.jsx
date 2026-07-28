@@ -10,6 +10,8 @@ import StatCard from "../components/StatCard";
 import GradientButton from "../components/GradientButton";
 import Modal from "../components/Modal";
 import Skeleton, { StatSkeleton } from "../components/Skeleton";
+import PasswordField from "../components/PasswordField";
+import { validatePasswordStrength } from "../utils/passwordPolicy";
 
 function MyStudents() {
   const [students, setStudents] = useState([]);
@@ -53,6 +55,12 @@ function MyStudents() {
         phone: editing.phone,
       };
       if (editing.Password?.trim()) {
+        const passwordError = validatePasswordStrength(editing.Password);
+        if (passwordError) {
+          toast.error(passwordError);
+          setSaving(false);
+          return;
+        }
         payload.Password = editing.Password;
       }
       await API.put(`/teachers/students/${editing._id}`, payload);
@@ -199,44 +207,47 @@ function MyStudents() {
       >
         {editing && (
           <form onSubmit={saveStudent} className="space-y-4">
-            <label className="block">
-              <span className="form-label">Name</span>
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-slate-700">
+                Full name <span className="text-rose-500">*</span>
+              </span>
               <input
-                className="input-glass mt-1"
+                className="input-glass"
                 value={editing.name}
                 onChange={(e) => setEditing({ ...editing, name: e.target.value })}
                 required
               />
             </label>
-            <label className="block">
-              <span className="form-label">Email</span>
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-slate-700">
+                Email address <span className="text-rose-500">*</span>
+              </span>
               <input
                 type="email"
-                className="input-glass mt-1"
+                className="input-glass"
                 value={editing.email}
                 onChange={(e) => setEditing({ ...editing, email: e.target.value })}
                 required
               />
             </label>
-            <label className="block">
-              <span className="form-label">Phone</span>
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-slate-700">Phone number</span>
               <input
-                className="input-glass mt-1"
+                className="input-glass"
                 value={editing.phone}
                 onChange={(e) => setEditing({ ...editing, phone: e.target.value })}
+                placeholder="Optional"
               />
             </label>
-            <label className="block">
-              <span className="form-label">New password</span>
-              <input
-                type="password"
-                className="input-glass mt-1"
-                placeholder="Leave blank to keep current password"
-                value={editing.Password}
-                onChange={(e) => setEditing({ ...editing, Password: e.target.value })}
-                minLength={6}
-              />
-            </label>
+            <PasswordField
+              label="New password"
+              name="Password"
+              value={editing.Password}
+              onChange={(e) => setEditing({ ...editing, Password: e.target.value })}
+              placeholder="Leave blank to keep current password"
+              showStrength={Boolean(editing.Password)}
+              autoComplete="new-password"
+            />
             <div className="flex justify-end gap-2 pt-2">
               <button
                 type="button"

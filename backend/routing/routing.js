@@ -6,17 +6,22 @@ import {
   registerValidation,
   signupValidation,
   loginValidation,
+  addStudentByTeacherValidation,
   updateMeValidation,
   updateUserValidation,
   updateStudentByTeacherValidation,
   courseValidation,
   enrollmentValidation,
   assignmentValidation,
+  passwordResetRequestValidation,
+  passwordResetCompleteValidation,
+  passwordResetRejectValidation,
 } from "../validators/authValidators.js";
 import {
   registeruser,
   signupUser,
   login,
+  logoutUser,
   updateuser,
   deleteone,
   getMe,
@@ -79,6 +84,14 @@ import {
   gradeSubmission,
 } from "../controller/submissionController.js";
 import { uploadSubmission, uploadCourseMedia, uploadResource } from "../middleware/upload.js";
+import {
+  requestPasswordReset,
+  getResetRequestStatus,
+  getPasswordResetRequests,
+  approvePasswordResetRequest,
+  rejectPasswordResetRequest,
+  completePasswordReset,
+} from "../controller/passwordResetController.js";
 
 const router = express.Router();
 
@@ -88,6 +101,8 @@ router.post(
   "/teachers/students",
   authenticate,
   authorizeRoles("teacher"),
+  addStudentByTeacherValidation,
+  validate,
   addStudentByTeacher
 );
 router.put(
@@ -106,6 +121,42 @@ router.delete(
 );
 router.post("/signup", signupValidation, validate, signupUser);
 router.post("/login", loginValidation, validate, login);
+router.post("/logout", authenticate, logoutUser);
+
+// Password reset (admin-approved)
+router.post(
+  "/password-reset/request",
+  passwordResetRequestValidation,
+  validate,
+  requestPasswordReset
+);
+router.get("/password-reset/status", getResetRequestStatus);
+router.post(
+  "/password-reset/complete",
+  passwordResetCompleteValidation,
+  validate,
+  completePasswordReset
+);
+router.get(
+  "/password-reset/requests",
+  authenticate,
+  authorizeRoles("admin"),
+  getPasswordResetRequests
+);
+router.post(
+  "/password-reset/requests/:id/approve",
+  authenticate,
+  authorizeRoles("admin"),
+  approvePasswordResetRequest
+);
+router.post(
+  "/password-reset/requests/:id/reject",
+  authenticate,
+  authorizeRoles("admin"),
+  passwordResetRejectValidation,
+  validate,
+  rejectPasswordResetRequest
+);
 
 // Profile
 router.get("/me", authenticate, getMe);

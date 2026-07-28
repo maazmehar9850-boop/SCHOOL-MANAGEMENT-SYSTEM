@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 64" role="img" aria-label="SchoolMS">
+  <defs>
+    <linearGradient id="mark" x1="4" y1="4" x2="52" y2="52" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3b5bdb"/>
+      <stop offset="1" stop-color="#22b8cf"/>
+    </linearGradient>
+    <linearGradient id="word" x1="76" y1="12" x2="260" y2="52" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1e3a8a"/>
+      <stop offset="1" stop-color="#0e7490"/>
+    </linearGradient>
+  </defs>
+
+  <!-- mark -->
+  <rect x="2" y="4" width="56" height="56" rx="14" fill="url(#mark)"/>
+  <path fill="#fff" d="M12 24.2 30 15l18 9.2-18 8.4-18-8.4Z"/>
+  <path fill="#fff" fill-opacity=".92" d="M42.8 25.7v7.4c0 1-5.4 3-12.8 3s-12.8-2-12.8-3v-7.4l12.8 6.1 12.8-6.1Z"/>
+  <rect x="41.6" y="25" width="2" height="10.6" rx="1" fill="#e0f7fa"/>
+  <circle cx="42.6" cy="36.4" r="1.9" fill="#e0f7fa"/>
+  <path fill="#fff" d="M15 40.2c4.2-1.9 8-2.1 15-2.1v11.2c-5.4.2-9.8.7-15 2.8V40.2Z"/>
+  <path fill="#f0f9ff" d="M45 40.2c-4.2-1.9-8-2.1-15-2.1v11.2c5.4.2 9.8.7 15 2.8V40.2Z"/>
+  <path fill="#3b5bdb" fill-opacity=".35" d="M29.3 38.1h1.4v13.3h-1.4z"/>
+
+  <!-- wordmark -->
+  <text
+    x="74"
+    y="40"
+    fill="url(#word)"
+    font-family="Outfit, DM Sans, Arial, sans-serif"
+    font-size="28"
+    font-weight="800"
+    letter-spacing="-0.6"
+  >SchoolMS</text>
+</svg>

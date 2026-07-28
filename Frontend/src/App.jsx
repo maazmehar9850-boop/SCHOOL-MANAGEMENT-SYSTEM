@@ -16,27 +16,42 @@ import AddCourses from "./PAGES/ADDCourses.jsx";
 import TeacherTools from "./PAGES/TeacherTools.jsx";
 import TeacherAttendance from "./PAGES/TeacherAttendance.jsx";
 import TeacherMarks from "./PAGES/TeacherMarks.jsx";
-import TeacherProfile from "./PAGES/TeacherProfile.jsx";
 import StudentResources from "./PAGES/StudentResources.jsx";
 import StudentResults from "./PAGES/StudentResults.jsx";
 import StudentAttendance from "./PAGES/StudentAttendance.jsx";
-import StudentProfile from "./PAGES/StudentProfile.jsx";
+import Profile from "./PAGES/Profile.jsx";
 import StudentSubjects from "./PAGES/StudentSubjects.jsx";
 import Assignments from "./PAGES/Assignments.jsx";
 import Enrollments from "./PAGES/Enrollments.jsx";
+import ForgotPassword from "./PAGES/ForgotPassword.jsx";
+import ResetPassword from "./PAGES/ResetPassword.jsx";
+import AdminPasswordResets from "./PAGES/AdminPasswordResets.jsx";
+import SessionManager from "./components/SessionManager.jsx";
 
 function App() {
   return (
-    <Routes>
+    <>
+      <SessionManager />
+      <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       <Route
         path="/admin-dashboard"
         element={
           <ProtectedRoute roles={["admin"]}>
             <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/password-resets"
+        element={
+          <ProtectedRoute roles={["admin"]}>
+            <AdminPasswordResets />
           </ProtectedRoute>
         }
       />
@@ -122,10 +137,18 @@ function App() {
         }
       />
       <Route
+        path="/profile"
+        element={
+          <ProtectedRoute roles={["admin", "teacher", "student"]}>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/teacher-profile"
         element={
-          <ProtectedRoute roles={["teacher"]}>
-            <TeacherProfile />
+          <ProtectedRoute roles={["teacher", "admin"]}>
+            <Profile />
           </ProtectedRoute>
         }
       />
@@ -149,8 +172,8 @@ function App() {
       <Route
         path="/student-profile"
         element={
-          <ProtectedRoute roles={["student"]}>
-            <StudentProfile />
+          <ProtectedRoute roles={["student", "admin"]}>
+            <Profile />
           </ProtectedRoute>
         }
       />
@@ -219,8 +242,9 @@ function App() {
         }
       />
 
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   );
 }
 

@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
-  GraduationCap,
   Users,
   LayoutDashboard,
   CalendarCheck,
@@ -13,6 +12,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import GradientButton from "../components/GradientButton";
+import BrandLogo from "../components/BrandLogo";
 import API from "../api";
 
 import imgHero from "../assets/landing/landing-hero.png";
@@ -154,12 +154,8 @@ function Landing() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-3"
           >
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#3b5bdb] to-[#22b8cf] shadow-lg shadow-cyan-500/25">
-              <GraduationCap size={22} />
-            </div>
-            <span className="font-display text-xl font-extrabold tracking-tight">SchoolMS</span>
+            <BrandLogo size={44} light wordmarkClassName="font-display text-xl font-extrabold tracking-tight" />
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -167,6 +163,12 @@ function Landing() {
             transition={{ delay: 0.1 }}
             className="flex items-center gap-3"
           >
+            <Link
+              to="/forgot-password"
+              className="hidden text-sm font-semibold text-cyan-100/90 transition hover:text-white sm:inline"
+            >
+              Reset password
+            </Link>
             <Link to="/login">
               <GradientButton className="!py-2.5 !px-5">
                 Login
@@ -209,6 +211,11 @@ function Landing() {
                 <GradientButton className="!px-7 !py-3.5">
                   Login
                   <ArrowRight size={16} />
+                </GradientButton>
+              </Link>
+              <Link to="/forgot-password">
+                <GradientButton variant="secondary" className="!px-7 !py-3.5">
+                  Reset password
                 </GradientButton>
               </Link>
             </div>
@@ -392,10 +399,7 @@ function Landing() {
       <SectionScene image={imgFooter} overlay="deep" className="pt-20 pb-10">
         <div className="mx-auto flex max-w-7xl flex-col gap-10 px-4 md:flex-row md:justify-between md:px-8">
           <div>
-            <div className="flex items-center gap-2">
-              <GraduationCap size={22} />
-              <span className="font-display text-lg font-bold">SchoolMS</span>
-            </div>
+            <BrandLogo size={36} light wordmarkClassName="font-display text-lg font-bold" />
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-300">
               Smart school operations for admins, teachers, and students — designed to feel
               premium from the first login.
@@ -423,6 +427,11 @@ function Landing() {
                 <li>
                   <Link to="/login" className="transition hover:text-white">
                     Login
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/forgot-password" className="transition hover:text-white">
+                    Reset password
                   </Link>
                 </li>
               </ul>

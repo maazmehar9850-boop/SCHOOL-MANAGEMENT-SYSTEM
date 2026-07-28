@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import register from "../model/register.js";
 
 const getToken = (req) => {
   const authHeader = req.headers.authorization || req.headers.Authorization;
@@ -8,7 +9,7 @@ const getToken = (req) => {
   return token;
 };
 
-export const authenticate = (req, res, next) => {
+export const authenticate = async (req, res, next) => {
   const token = getToken(req);
   if (!token) {
     return res.status(401).json({ message: "Access denied. No token provided." });
@@ -21,6 +22,16 @@ export const authenticate = (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, secretKey);
+    const user = await register.findById(decoded.id).select("tokenVersion role");
+    if (!user) {
+      return res.status(401).json({ message: "Session ended. Please log in again." });
+    }
+
+    const tokenVersion = decoded.tokenVersion ?? 0;
+    if (tokenVersion !== (user.tokenVersion ?? 0)) {
+      return res.status(401).json({ message: "Session ended. Please log in again." });
+    }
+
     req.user = decoded;
     next();
   } catch (error) {

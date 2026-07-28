@@ -5,6 +5,8 @@ import API from "../api";
 import PageLayout from "../components/PageLayout";
 import GlassCard from "../components/GlassCard";
 import GradientButton from "../components/GradientButton";
+import PasswordField from "../components/PasswordField";
+import { validatePasswordStrength } from "../utils/passwordPolicy";
 
 function AddStudent() {
   const navigate = useNavigate();
@@ -47,6 +49,11 @@ function AddStudent() {
       toast.error("Select your course / subject first");
       return;
     }
+    const passwordError = validatePasswordStrength(form.Password);
+    if (passwordError) {
+      toast.error(passwordError);
+      return;
+    }
     setSaving(true);
     try {
       const res = await API.post("/teachers/students", form);
@@ -82,8 +89,8 @@ function AddStudent() {
         ) : (
           <form onSubmit={addStudent} className="space-y-4">
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-600">
-                Your course / subject
+              <span className="text-sm font-medium text-slate-700">
+                Course / subject <span className="text-rose-500">*</span>
               </span>
               <select
                 name="courseId"
@@ -101,34 +108,58 @@ function AddStudent() {
               </select>
             </label>
 
-            {["name", "email", "Password", "phone"].map((field) => (
-              <label key={field} className="block space-y-2">
-                <span className="text-sm font-medium capitalize text-slate-600">
-                  {field === "Password" ? "Password" : field}
-                </span>
-                <input
-                  type={
-                    field === "Password"
-                      ? "password"
-                      : field === "email"
-                        ? "email"
-                        : "text"
-                  }
-                  name={field}
-                  value={form[field]}
-                  onChange={handleChange}
-                  className="input-glass"
-                  required={["name", "email", "Password"].includes(field)}
-                  placeholder={
-                    field === "phone"
-                      ? "Optional"
-                      : field === "Password"
-                        ? "Min 6 characters"
-                        : ""
-                  }
-                />
-              </label>
-            ))}
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-slate-700">
+                Full name <span className="text-rose-500">*</span>
+              </span>
+              <input
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                className="input-glass"
+                placeholder="Student full name"
+                required
+              />
+            </label>
+
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-slate-700">
+                Email address <span className="text-rose-500">*</span>
+              </span>
+              <input
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                className="input-glass"
+                placeholder="student@school.com"
+                required
+              />
+            </label>
+
+            <PasswordField
+              label="Password"
+              name="Password"
+              value={form.Password}
+              onChange={handleChange}
+              placeholder="Create a strong password"
+              required
+              showStrength
+              autoComplete="new-password"
+            />
+
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-slate-700">Phone number</span>
+              <input
+                type="tel"
+                name="phone"
+                value={form.phone}
+                onChange={handleChange}
+                className="input-glass"
+                placeholder="Optional contact number"
+              />
+            </label>
 
             <p className="text-xs text-slate-500">
               If this email already exists as a student, they will be enrolled into

@@ -72,7 +72,14 @@ function StudentResources() {
       item.title || "Syllabus",
       `<p><strong>Course:</strong> ${item.course || "—"} · <strong>Teacher:</strong> ${item.teacher || "—"}</p>
        ${item.content || "<p>No content.</p>"}`,
-      { subtitle: "Course syllabus" }
+      {
+        type: "syllabus",
+        subtitle: "Course syllabus & learning outline",
+        meta: {
+          Course: item.course || "—",
+          Teacher: item.teacher || "—",
+        },
+      }
     );
   };
 
@@ -80,13 +87,15 @@ function StudentResources() {
     const blocks = syllabi
       .map(
         (item) =>
-          `<h2 style="margin-top:24px;font-size:16px">${item.title}</h2>
+          `<h2>${item.title}</h2>
            <p style="color:#64748b;font-size:13px">${item.course || ""} · ${item.teacher || ""}</p>
            ${item.content || ""}`
       )
       .join("");
     saveAsPdf("All syllabi", blocks || "<p>No syllabus available.</p>", {
-      subtitle: "Course syllabi",
+      type: "syllabus",
+      subtitle: "Complete course syllabi pack",
+      meta: { Documents: String(syllabi.length) },
     });
   };
 
@@ -104,7 +113,14 @@ function StudentResources() {
       `<p><strong>Course:</strong> ${d.course || "—"} · <strong>Teacher:</strong> ${d.teacher || "—"}</p>
        ${d.notes || ""}
        ${tableHtml(["Subject", "Date", "Day", "Time", "Room"], rows)}`,
-      { subtitle: "Official examination schedule" }
+      {
+        type: "datesheet",
+        subtitle: "Official examination schedule",
+        meta: {
+          Course: d.course || "—",
+          Teacher: d.teacher || "—",
+        },
+      }
     );
   };
 
@@ -121,13 +137,15 @@ function StudentResources() {
             e.startTime && e.endTime ? `${e.startTime} – ${e.endTime}` : e.time || "—";
           return [e.subject, e.date, day, time, e.room || "—"];
         });
-        return `<h2 style="margin-top:24px;font-size:16px">${d.title}</h2>
+        return `<h2>${d.title}</h2>
           <p style="color:#64748b;font-size:13px">${d.course || ""} · ${d.teacher || ""}</p>
           ${tableHtml(["Subject", "Date", "Day", "Time", "Room"], rows)}`;
       })
       .join("");
     saveAsPdf("All date sheets", blocks || "<p>No date sheets available.</p>", {
+      type: "datesheet",
       subtitle: "Complete exam schedule",
+      meta: { Sheets: String(datesheets.length) },
     });
   };
 
@@ -142,7 +160,11 @@ function StudentResources() {
     saveAsPdf(
       isStudent ? "My Results / Grades" : "Marks Report",
       tableHtml(["Student", "Course", "Subject", "Score", "Feedback"], rows),
-      { subtitle: isStudent ? "Student academic results" : "Course marks overview" }
+      {
+        type: "results",
+        subtitle: isStudent ? "Student academic results" : "Course marks overview",
+        meta: { Records: String(marks.length) },
+      }
     );
   };
 
@@ -156,8 +178,14 @@ function StudentResources() {
     ]);
     saveAsPdf(
       isStudent ? "My Attendance" : "Attendance Report",
-      tableHtml(["Student", "Course", "Date", "Status", "Teacher"], rows),
-      { subtitle: isStudent ? "Your attendance records" : "Attendance overview" }
+      tableHtml(["Student", "Course", "Date", "Status", "Teacher"], rows, {
+        statusColumn: 3,
+      }),
+      {
+        type: "attendance",
+        subtitle: isStudent ? "Your attendance records" : "Attendance overview",
+        meta: { Records: String(attendance.length) },
+      }
     );
   };
 

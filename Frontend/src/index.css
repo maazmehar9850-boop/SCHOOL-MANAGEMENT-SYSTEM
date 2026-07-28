@@ -232,7 +232,7 @@ textarea {
   background: transparent;
   color: #64748b;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .password-toggle:hover {
@@ -243,6 +243,24 @@ textarea {
 .password-toggle:focus-visible {
   outline: 2px solid rgba(59, 91, 219, 0.45);
   outline-offset: 1px;
+}
+
+.password-toggle--accent {
+  background: linear-gradient(135deg, rgba(59, 91, 219, 0.08), rgba(34, 184, 207, 0.12));
+  border: 1px solid rgba(59, 91, 219, 0.15);
+  box-shadow: 0 2px 8px rgba(59, 91, 219, 0.08);
+}
+
+.password-toggle--accent:hover {
+  background: linear-gradient(135deg, rgba(59, 91, 219, 0.18), rgba(34, 184, 207, 0.22));
+  color: #2563eb;
+  border-color: rgba(59, 91, 219, 0.35);
+  box-shadow: 0 4px 14px rgba(59, 91, 219, 0.18);
+  transform: scale(1.04);
+}
+
+.password-toggle--accent:active {
+  transform: scale(0.98);
 }
 
 /* Dedicated search field so the icon is never clipped by .input-glass padding */

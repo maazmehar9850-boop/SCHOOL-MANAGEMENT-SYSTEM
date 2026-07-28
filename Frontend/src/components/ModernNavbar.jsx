@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { LogOut, Bell } from "lucide-react";
 import GradientButton from "./GradientButton";
+import { logout as signOut } from "../utils/auth";
 
 function ModernNavbar({ role, title, subtitle }) {
   const navigate = useNavigate();
@@ -23,10 +24,7 @@ function ModernNavbar({ role, title, subtitle }) {
 
   const meta = defaults[role] || {};
 
-  const logout = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
+  const logout = () => signOut(navigate);
 
   return (
     <header className="glass-nav sticky top-0 z-20 mx-3 mt-3 rounded-[1.25rem] px-5 py-3.5 md:mx-5 md:mt-4">
@@ -51,9 +49,15 @@ function ModernNavbar({ role, title, subtitle }) {
           >
             <Bell size={17} />
           </button>
-          <div className="hidden h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#3b5bdb] to-[#22b8cf] text-xs font-bold text-white shadow-md sm:flex">
+          <button
+            type="button"
+            onClick={() => navigate("/profile")}
+            className="hidden h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#3b5bdb] to-[#22b8cf] text-xs font-bold text-white shadow-md transition hover:scale-105 sm:flex"
+            title="Open profile"
+            aria-label="Open profile"
+          >
             {name.charAt(0).toUpperCase()}
-          </div>
+          </button>
           <GradientButton variant="secondary" onClick={logout} className="!py-2 !px-4">
             <LogOut size={15} />
             Logout

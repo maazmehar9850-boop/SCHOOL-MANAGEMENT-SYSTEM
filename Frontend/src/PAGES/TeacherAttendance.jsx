@@ -179,8 +179,18 @@ function TeacherAttendance() {
     ]);
     saveAsPdf(
       "Attendance Sheet",
-      tableHtml(["Student", "Email", "Course", "Date", "Status"], pdfRows),
-      { subtitle: `Teacher: ${teacher} · ${date}` }
+      tableHtml(["Student", "Email", "Course", "Date", "Status"], pdfRows, {
+        statusColumn: 4,
+      }),
+      {
+        type: "attendance",
+        subtitle: "Daily class presence register",
+        meta: {
+          Teacher: teacher,
+          Date: date,
+          Course: courseName || "—",
+        },
+      }
     );
   };
 

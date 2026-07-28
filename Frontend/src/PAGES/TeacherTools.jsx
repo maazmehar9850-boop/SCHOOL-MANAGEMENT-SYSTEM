@@ -7,7 +7,7 @@ import {
   Plus,
   Pencil,
   Trash2,
-  Printer,
+  FileDown,
   Download,
   Eye,
   Upload,
@@ -28,7 +28,7 @@ import RichTextEditor from "../components/RichTextEditor";
 import Modal from "../components/Modal";
 import GradientButton from "../components/GradientButton";
 import InfoBanner from "../components/InfoBanner";
-import { saveAsPdf, tableHtml } from "../utils/saveAsPdf";
+import { saveAsPdf, tableHtml, paperQuestionsHtml } from "../utils/saveAsPdf";
 
 function stripHtml(html = "") {
   return String(html)
@@ -477,7 +477,15 @@ function TeacherTools() {
       `<p><strong>Course / Class:</strong> ${sheet.course || "—"} · <strong>Teacher:</strong> ${sheet.teacher || "—"}</p>
        ${sheet.notes || ""}
        ${tableHtml(["Subject", "Exam Date", "Day", "Time", "Room / Hall", "Invigilator"], rows)}`,
-      { subtitle: "Official examination schedule · A4 print" }
+      {
+        type: "datesheet",
+        subtitle: "Official examination timetable",
+        meta: {
+          Course: sheet.course || "—",
+          Teacher: sheet.teacher || "—",
+          Entries: String(sorted.length),
+        },
+      }
     );
   };
 
@@ -583,18 +591,21 @@ function TeacherTools() {
   };
 
   const exportPaper = (item) => {
-    const qs = (item.questions || [])
-      .map(
-        (q, i) =>
-          `<div style="margin:12px 0"><strong>Q${i + 1}.</strong> (${q.marks || 0} marks)<div>${q.q || ""}</div></div>`
-      )
-      .join("");
+    const qs = paperQuestionsHtml(item.questions || []);
     saveAsPdf(
       item.title || "Exam Paper",
       `<p><strong>Subject:</strong> ${item.subject || "—"} · <strong>Course:</strong> ${item.course || "—"} · <strong>Teacher:</strong> ${item.teacher || "—"}</p>
-       ${item.instructions || ""}
-       ${qs || "<p>See attached file.</p>"}`,
-      { subtitle: "Examination paper" }
+       ${item.instructions ? `<div style="margin:12px 0;padding:10px 12px;border:1px solid #c7d2fe;background:#eef2ff;border-radius:8px"><strong>Instructions</strong><div>${item.instructions}</div></div>` : ""}
+       ${qs}`,
+      {
+        type: "paper",
+        subtitle: "Examination question paper",
+        meta: {
+          Subject: item.subject || "—",
+          Course: item.course || "—",
+          Teacher: item.teacher || "—",
+        },
+      }
     );
   };
 
@@ -753,10 +764,10 @@ function TeacherTools() {
           <button
             type="button"
             className="action-icon-btn"
-            title="Print / PDF"
+            title="Save as PDF"
             onClick={() => printScheduleRow(row)}
           >
-            <Printer size={14} />
+            <FileDown size={14} />
           </button>
           {canManageSyllabusDatesheet && row.sheet?.status !== "finalized" && (
             <button
@@ -826,10 +837,10 @@ function TeacherTools() {
             <button
               type="button"
               className="action-icon-btn"
-              title="Export questions as PDF"
+              title="Save questions as PDF"
               onClick={() => exportPaper(row)}
             >
-              <Printer size={14} />
+              <FileDown size={14} />
             </button>
           )}
         </div>

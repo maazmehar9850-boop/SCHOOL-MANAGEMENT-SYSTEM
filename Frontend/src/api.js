@@ -1,5 +1,6 @@
 import axios from "axios";
 import toast from "react-hot-toast";
+import { isSessionExpiredByInactivity, markSessionActivity } from "./utils/session";
 
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:3030/api/v1",
@@ -7,9 +8,16 @@ const API = axios.create({
 
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
+  if (token && isSessionExpiredByInactivity()) {
+    localStorage.clear();
+    toast.error("Session expired after 10 minutes of inactivity.");
+    window.location.href = "/login";
+    return Promise.reject(new axios.Cancel("Session expired due to inactivity"));
+  }
   if (token) {
     config.headers = config.headers || {};
     config.headers.Authorization = `Bearer ${token}`;
+    markSessionActivity();
   }
   return config;
 });
@@ -18,11 +26,17 @@ API.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      const publicPaths = ["/", "/login", "/register"];
-      localStorage.clear();
-      if (!publicPaths.includes(window.location.pathname)) {
-        toast.error("Session expired. Please log in again.");
-        window.location.href = "/login";
+      const publicPaths = ["/", "/login", "/register", "/forgot-password", "/reset-password"];
+      const message = error.response?.data?.message || "Session expired. Please log in again.";
+      const onPublicPage = publicPaths.includes(window.location.pathname);
+      const isLogoutRequest = error.config?.url?.includes("/logout");
+
+      if (!isLogoutRequest) {
+        localStorage.clear();
+        if (!onPublicPage) {
+          toast.error(message);
+          window.location.href = "/login";
+        }
       }
     }
     return Promise.reject(error);
