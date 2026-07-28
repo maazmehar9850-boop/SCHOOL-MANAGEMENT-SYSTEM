@@ -1,6 +1,6 @@
 import axios from "axios";
-import toast from "react-hot-toast";
 import { isSessionExpiredByInactivity, markSessionActivity } from "./utils/session";
+import { redirectToLogin } from "./utils/notify";
 
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:3030/api/v1",
@@ -10,8 +10,7 @@ API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token && isSessionExpiredByInactivity()) {
     localStorage.clear();
-    toast.error("Session expired after 10 minutes of inactivity.");
-    window.location.href = "/login";
+    redirectToLogin("Session expired after 10 minutes of inactivity.");
     return Promise.reject(new axios.Cancel("Session expired due to inactivity"));
   }
   if (token) {
@@ -31,12 +30,9 @@ API.interceptors.response.use(
       const onPublicPage = publicPaths.includes(window.location.pathname);
       const isLogoutRequest = error.config?.url?.includes("/logout");
 
-      if (!isLogoutRequest) {
+      if (!isLogoutRequest && !onPublicPage) {
         localStorage.clear();
-        if (!onPublicPage) {
-          toast.error(message);
-          window.location.href = "/login";
-        }
+        redirectToLogin(message);
       }
     }
     return Promise.reject(error);

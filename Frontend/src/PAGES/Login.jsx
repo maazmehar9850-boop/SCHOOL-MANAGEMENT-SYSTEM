@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { Lock, Mail, Sparkles, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import API from "../api";
 import { beginAuthenticatedSession } from "../utils/auth";
+import { resetAuthRedirectState } from "../utils/notify";
 import Background from "../components/Background";
 import GlassCard from "../components/GlassCard";
 import GradientButton from "../components/GradientButton";
@@ -32,6 +33,10 @@ function Login() {
   const [focused, setFocused] = useState(null);
   const [form, setForm] = useState({ email: "", Password: "" });
 
+  useEffect(() => {
+    resetAuthRedirectState();
+  }, []);
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -51,11 +56,14 @@ function Login() {
       beginAuthenticatedSession();
 
       toast.success(`Welcome back, ${user.name || "user"}!`);
+      resetAuthRedirectState();
 
-      if (user.role === "admin") navigate("/admin-dashboard");
-      else if (user.role === "teacher") navigate("/teacher-dashboard");
-      else if (user.role === "student") navigate("/student-home");
-      else toast.error("Invalid user role");
+      window.setTimeout(() => {
+        if (user.role === "admin") navigate("/admin-dashboard");
+        else if (user.role === "teacher") navigate("/teacher-dashboard");
+        else if (user.role === "student") navigate("/student-home");
+        else toast.error("Invalid user role");
+      }, 450);
     } catch (err) {
       toast.error(err.response?.data?.message || "Login failed");
     } finally {

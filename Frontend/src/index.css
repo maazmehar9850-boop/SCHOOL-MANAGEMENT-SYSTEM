@@ -31,6 +31,30 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+.app-toaster {
+  top: max(0.75rem, env(safe-area-inset-top)) !important;
+  pointer-events: none;
+}
+
+.app-toaster > div {
+  pointer-events: auto;
+}
+
+.app-toast {
+  animation: toast-in 0.28s ease-out;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 * {
   box-sizing: border-box;
 }

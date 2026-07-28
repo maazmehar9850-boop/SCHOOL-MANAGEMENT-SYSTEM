@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 import { logout } from "../utils/auth";
+import { notifyInfo } from "../utils/notify";
 import {
   INACTIVITY_LIMIT_MS,
   INACTIVITY_WARNING_MS,
@@ -28,10 +28,7 @@ function SessionManager() {
     const showWarningIfNeeded = () => {
       if (!localStorage.getItem("token") || warningShown) return;
       warningShown = true;
-      toast("Session will expire in 1 minute due to inactivity.", {
-        icon: "⏳",
-        duration: 5000,
-      });
+      notifyInfo("Session will expire in 1 minute due to inactivity.");
     };
 
     const scheduleTimers = () => {
