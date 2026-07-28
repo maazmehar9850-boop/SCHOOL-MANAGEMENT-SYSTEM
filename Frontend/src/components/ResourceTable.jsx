@@ -9,12 +9,7 @@ import {
 } from "lucide-react";
 import SearchField from "./SearchField";
 import { TableSkeleton } from "./Skeleton";
-
-function getValue(row, key) {
-  if (!key) return undefined;
-  if (!key.includes(".")) return row[key];
-  return key.split(".").reduce((acc, part) => acc?.[part], row);
-}
+import MobileDataCards, { getTableValue } from "./MobileDataCards";
 
 /**
  * Professional glass table with search, filter, sort, pagination, expand.
@@ -58,7 +53,7 @@ function ResourceTable({
       const q = query.toLowerCase();
       rows = rows.filter((row) =>
         resolvedKeys.some((key) =>
-          String(getValue(row, key) ?? "")
+          String(getTableValue(row, key) ?? "")
             .toLowerCase()
             .includes(q)
         )
@@ -68,13 +63,13 @@ function ResourceTable({
     filters.forEach((f) => {
       const val = filterValues[f.key];
       if (!val) return;
-      rows = rows.filter((row) => String(getValue(row, f.key) ?? "") === String(val));
+      rows = rows.filter((row) => String(getTableValue(row, f.key) ?? "") === String(val));
     });
 
     if (sortKey) {
       rows.sort((a, b) => {
-        const av = getValue(a, sortKey) ?? "";
-        const bv = getValue(b, sortKey) ?? "";
+        const av = getTableValue(a, sortKey) ?? "";
+        const bv = getTableValue(b, sortKey) ?? "";
         if (av < bv) return sortDir === "asc" ? -1 : 1;
         if (av > bv) return sortDir === "asc" ? 1 : -1;
         return 0;
@@ -146,8 +141,15 @@ function ResourceTable({
         {toolbar ? <div className="flex flex-wrap items-center gap-2">{toolbar}</div> : null}
       </div>
 
-      <div className="pro-table-wrap overflow-x-auto">
-        <table className="min-w-full text-left text-sm">
+      <MobileDataCards
+        columns={columns}
+        rows={pageRows}
+        emptyMessage={emptyMessage}
+        getRowId={getRowId}
+      />
+
+      <div className="pro-table-wrap hidden md:block">
+        <table className="pro-table min-w-full text-left text-sm">
           <thead className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
             <tr>
               {expandable ? <th className="w-10 px-3 py-3.5" /> : null}
@@ -209,7 +211,7 @@ function ResourceTable({
                       ) : null}
                       {columns.map((col) => (
                         <td key={col.key} className={`px-4 py-3.5 text-slate-700 ${col.tdClassName || ""}`}>
-                          {col.render ? col.render(row) : getValue(row, col.key)}
+                          {col.render ? col.render(row) : getTableValue(row, col.key)}
                         </td>
                       ))}
                     </tr>
@@ -228,7 +230,7 @@ function ResourceTable({
         </table>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
+      <div className="flex flex-col gap-2 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
         <span>
           {filtered.length} result{filtered.length === 1 ? "" : "s"}
           {query.trim() ? ` for “${query.trim()}”` : ""}

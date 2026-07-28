@@ -12,7 +12,7 @@ function PageContentCard({
 }) {
   return (
     <GlassCard
-      className={`page-content-card ${padding ? "p-6 md:p-8" : ""} ${className}`}
+      className={`page-content-card ${padding ? "p-4 sm:p-6 md:p-8" : ""} ${className}`}
       hover={hover}
       delay={delay}
     >

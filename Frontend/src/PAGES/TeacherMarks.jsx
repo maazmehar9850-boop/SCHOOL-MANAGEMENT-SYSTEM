@@ -308,7 +308,7 @@ function TeacherMarks() {
               placeholder="Search students by name, email, or score…"
             />
 
-            <div className="inst-table-wrap mt-4">
+            <div className="inst-table-wrap inst-table-wrap--stack mt-4">
               <table className="inst-table">
                 <thead>
                   <tr>
@@ -337,9 +337,9 @@ function TeacherMarks() {
                   ) : (
                     filtered.map((student) => (
                       <tr key={student.key}>
-                        <td>{student.studentName}</td>
-                        <td>{student.email || "—"}</td>
-                        <td>
+                        <td data-label="Student">{student.studentName}</td>
+                        <td data-label="Email">{student.email || "—"}</td>
+                        <td data-label="Obtaining marks">
                           <input
                             type="number"
                             min="0"
@@ -356,8 +356,8 @@ function TeacherMarks() {
                             className="table-input table-input--score disabled:cursor-not-allowed disabled:opacity-60"
                           />
                         </td>
-                        <td className="text-slate-600">{totalMarks}</td>
-                        <td>
+                        <td data-label="Out of" className="text-slate-600">{totalMarks}</td>
+                        <td data-label="Teacher feedback">
                           <input
                             type="text"
                             value={student.feedback || ""}

@@ -401,7 +401,7 @@ function StudentResources() {
                           dangerouslySetInnerHTML={{ __html: d.notes }}
                         />
                       ) : null}
-                      <div className="inst-table-wrap">
+                      <div className="inst-table-wrap inst-table-wrap--stack">
                         <table className="inst-table">
                           <thead>
                             <tr>
@@ -432,21 +432,21 @@ function StudentResources() {
                                     : e.time || "—";
                                 return (
                                   <tr key={idx}>
-                                    <td className="font-medium text-slate-800">{e.subject}</td>
-                                    <td>
+                                    <td data-label="Subject" className="font-medium text-slate-800">{e.subject}</td>
+                                    <td data-label="Date">
                                       <span className="inline-flex items-center gap-1.5 text-slate-600">
                                         <CalendarDays size={14} className="text-indigo-500" />
                                         {e.date}
                                       </span>
                                     </td>
-                                    <td className="text-slate-600">{day}</td>
-                                    <td>
+                                    <td data-label="Day" className="text-slate-600">{day}</td>
+                                    <td data-label="Time">
                                       <span className="inline-flex items-center gap-1.5 text-slate-600">
                                         <Clock size={14} className="text-cyan-600" />
                                         {time}
                                       </span>
                                     </td>
-                                    <td className="text-slate-600">{e.room || "—"}</td>
+                                    <td data-label="Room" className="text-slate-600">{e.room || "—"}</td>
                                   </tr>
                                 );
                               })
@@ -482,7 +482,7 @@ function StudentResources() {
                   text="Attendance will show here after teachers mark your class."
                 />
               ) : (
-                <div className="inst-table-wrap">
+                <div className="inst-table-wrap inst-table-wrap--stack">
                   <table className="inst-table">
                     <thead>
                       <tr>
@@ -497,21 +497,21 @@ function StudentResources() {
                       {attendance.map((a) => (
                         <tr key={a._id}>
                           {!isStudent && (
-                            <td>
+                            <td data-label="Student">
                               <span className="inline-flex items-center gap-1.5">
                                 <User size={14} className="text-slate-400" />
                                 {a.studentName}
                               </span>
                             </td>
                           )}
-                          <td>
+                          <td data-label="Course">
                             <span className="inline-flex items-center gap-1.5">
                               <GraduationCap size={14} className="text-slate-400" />
                               {a.course}
                             </span>
                           </td>
-                          <td className="tabular-nums">{a.date}</td>
-                          <td>
+                          <td data-label="Date" className="tabular-nums">{a.date}</td>
+                          <td data-label="Status">
                             <span
                               className={`status-badge ${
                                 a.status === "Present"
@@ -522,7 +522,7 @@ function StudentResources() {
                               {a.status}
                             </span>
                           </td>
-                          <td>{a.teacher || "—"}</td>
+                          <td data-label="Teacher">{a.teacher || "—"}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -549,7 +549,7 @@ function StudentResources() {
                   text="Marks will appear here after teachers enter and publish scores."
                 />
               ) : (
-                <div className="inst-table-wrap">
+                <div className="inst-table-wrap inst-table-wrap--stack">
                   <table className="inst-table">
                     <thead>
                       <tr>
@@ -563,15 +563,15 @@ function StudentResources() {
                     <tbody>
                       {marks.map((m) => (
                         <tr key={m._id}>
-                          {!isStudent && <td>{m.studentName}</td>}
-                          <td>{m.course}</td>
-                          <td>{m.subject}</td>
-                          <td>
+                          {!isStudent && <td data-label="Student">{m.studentName}</td>}
+                          <td data-label="Course">{m.course}</td>
+                          <td data-label="Subject">{m.subject}</td>
+                          <td data-label="Score">
                             <span className="font-display text-base font-bold text-indigo-700">
                               {m.score}
                             </span>
                           </td>
-                          <td className="text-slate-600">{m.feedback || "—"}</td>
+                          <td data-label="Feedback" className="text-slate-600">{m.feedback || "—"}</td>
                         </tr>
                       ))}
                     </tbody>

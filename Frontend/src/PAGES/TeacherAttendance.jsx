@@ -292,7 +292,7 @@ function TeacherAttendance() {
               placeholder="Search enrolled students by name, email, or phone…"
             />
 
-            <div className="inst-table-wrap mt-4">
+            <div className="inst-table-wrap inst-table-wrap--stack mt-4">
               <table className="inst-table">
                 <thead>
                   <tr>
@@ -320,12 +320,12 @@ function TeacherAttendance() {
                   ) : (
                     filtered.map((record) => (
                       <tr key={record.key}>
-                        <td>{record.studentName}</td>
-                        <td>{record.email || "—"}</td>
-                        <td>
+                        <td data-label="Student">{record.studentName}</td>
+                        <td data-label="Email">{record.email || "—"}</td>
+                        <td data-label="Status">
                           <StatusBadge status={record.status} />
                         </td>
-                        <td>
+                        <td data-label="Mark attendance">
                           <div className="flex flex-wrap gap-2">
                             <button
                               type="button"
