@@ -1,17 +1,9 @@
+import { readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 import process from "node:process";
 
-const linuxOptionalPackages = [
-  {
-    name: "@rolldown/binding-linux-x64-gnu",
-    version: "1.0.3",
-  },
-  {
-    name: "lightningcss-linux-x64-gnu",
-    version: "1.32.0",
-  },
-];
+const packageLockPath = path.resolve(process.cwd(), "package-lock.json");
 const viteCliPath = path.resolve(process.cwd(), "node_modules", "vite", "bin", "vite.js");
 
 function run(command, args) {
@@ -24,12 +16,33 @@ function run(command, args) {
   }
 }
 
+function getLinuxNativePackages() {
+  const packageLock = JSON.parse(readFileSync(packageLockPath, "utf8"));
+  const packages = packageLock.packages || {};
+
+  return Object.entries(packages)
+    .filter(([packagePath, meta]) => {
+      if (!packagePath.startsWith("node_modules/")) return false;
+      const packageName = packagePath.replace(/^node_modules\//, "");
+      return (
+        packageName === "@rolldown/binding-linux-x64-gnu" ||
+        packageName.endsWith("linux-x64-gnu")
+      );
+    })
+    .map(([packagePath, meta]) => ({
+      name: packagePath.replace(/^node_modules\//, ""),
+      version: meta.version,
+    }))
+    .filter((pkg) => typeof pkg.version === "string");
+}
+
 if (process.platform === "linux") {
+  const linuxNativePackages = getLinuxNativePackages();
   console.log("Installing Linux native fallback packages for Vercel build...");
   run(process.platform === "win32" ? "npm.cmd" : "npm", [
     "install",
     "--no-save",
-    ...linuxOptionalPackages.map((pkg) => `${pkg.name}@${pkg.version}`),
+    ...linuxNativePackages.map((pkg) => `${pkg.name}@${pkg.version}`),
   ]);
 }
 
