@@ -1,12 +1,9 @@
 import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
 import cors from "cors";
 import routing from "./routing/routing.js";
+import { uploadsRoot } from "./utils/uploadPaths.js";
 
 const app = express();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 app.use(express.json({ limit: "1mb" }));
 app.use(
@@ -25,7 +22,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static(uploadsRoot));
 app.use("/api/v1", routing);
 
 app.get("/", (req, res) => {

@@ -1,18 +1,12 @@
-import fs from "fs";
-import path from "path";
 import multer from "multer";
-import { fileURLToPath } from "url";
+import {
+  coursesRoot,
+  ensureUploadDirs,
+  resourcesRoot,
+  submissionsRoot,
+} from "../utils/uploadPaths.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const submissionsRoot = path.join(__dirname, "..", "uploads", "submissions");
-const coursesRoot = path.join(__dirname, "..", "uploads", "courses");
-const resourcesRoot = path.join(__dirname, "..", "uploads", "resources");
-
-[submissionsRoot, coursesRoot, resourcesRoot].forEach((dir) => {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-});
+ensureUploadDirs();
 
 const makeStorage = (dest) =>
   multer.diskStorage({
