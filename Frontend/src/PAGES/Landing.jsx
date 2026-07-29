@@ -148,9 +148,9 @@ function Landing() {
 
   return (
     <div className="page-shell bg-[#050a12] text-white">
-      {/* Nav floats over hero */}
+      {/* Nav floats over hero — logo + login only */}
       <header className="absolute left-0 right-0 top-0 z-30">
-        <div className="landing-header-shell mx-auto flex max-w-7xl items-center justify-between px-4 py-5 md:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 md:px-8">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -161,14 +161,7 @@ function Landing() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="flex items-center gap-3"
           >
-            <Link
-              to="/forgot-password"
-              className="hidden text-sm font-semibold text-cyan-100/90 transition hover:text-white sm:inline"
-            >
-              Reset password
-            </Link>
             <Link to="/login">
               <GradientButton className="!py-2.5 !px-5">
                 Login
