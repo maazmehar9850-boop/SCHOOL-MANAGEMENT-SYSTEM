@@ -34,7 +34,7 @@ function Background({ variant = "default", children, className = "" }) {
   const isLanding = variant === "landing";
 
   return (
-    <div className={`page-shell ${className}`}>
+    <div className={`page-shell page-shell--${variant} ${className}`}>
       <div
         className={`bg-layer bg-image ${isLanding ? "!scale-100 !brightness-95" : ""}`}
         style={{ backgroundImage: `url(${image})` }}

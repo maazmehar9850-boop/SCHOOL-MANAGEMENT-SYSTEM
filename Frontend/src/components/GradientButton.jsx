@@ -10,13 +10,13 @@ function GradientButton({
 }) {
   const variants = {
     primary:
-      "bg-gradient-to-r from-[#3b5bdb] via-[#4c6ef5] to-[#22b8cf] text-white shadow-[0_12px_28px_rgba(59,91,219,0.28)] hover:brightness-110",
+      "bg-gradient-to-r from-[#1d4ed8] via-[#2563eb] to-[#0891b2] text-white border border-sky-300/20 shadow-[0_18px_36px_rgba(37,99,235,0.28)] hover:brightness-110",
     secondary:
-      "bg-white/75 text-slate-800 border border-white/60 shadow-sm hover:bg-white/95",
+      "bg-slate-950/60 text-slate-100 border border-sky-200/12 shadow-[0_14px_30px_rgba(2,6,23,0.24)] hover:bg-slate-900/80",
     danger:
       "bg-gradient-to-r from-rose-600 to-orange-500 text-white shadow-[0_12px_28px_rgba(225,29,72,0.22)]",
     ghost:
-      "bg-white/10 text-white border border-white/15 hover:bg-white/18",
+      "bg-slate-950/35 text-slate-100 border border-white/10 hover:bg-slate-900/55",
   };
 
   return (

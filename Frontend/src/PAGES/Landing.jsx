@@ -150,7 +150,7 @@ function Landing() {
     <div className="page-shell bg-[#050a12] text-white">
       {/* Nav floats over hero */}
       <header className="absolute left-0 right-0 top-0 z-30">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 md:px-8">
+        <div className="landing-header-shell mx-auto flex max-w-7xl items-center justify-between px-4 py-5 md:px-8">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}

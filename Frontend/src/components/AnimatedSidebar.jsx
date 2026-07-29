@@ -23,10 +23,10 @@ import { BrandMark } from "./BrandLogo";
 import { logout as signOut } from "../utils/auth";
 
 const linkClass = ({ isActive }) =>
-  `group flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-[13px] font-medium tracking-tight transition-all ${
+  `group flex items-center gap-3 rounded-2xl px-3.5 py-3 text-[13px] font-medium tracking-tight transition-all duration-200 ${
     isActive
-      ? "bg-gradient-to-r from-[#3b5bdb]/95 to-[#22b8cf]/85 text-white shadow-[0_10px_24px_rgba(59,91,219,0.28)]"
-      : "text-slate-300 hover:bg-white/[0.07] hover:text-white"
+      ? "bg-[linear-gradient(135deg,rgba(37,99,235,0.95),rgba(14,165,233,0.82))] text-white shadow-[0_14px_32px_rgba(37,99,235,0.28)] ring-1 ring-white/10"
+      : "text-slate-300 hover:bg-white/[0.06] hover:text-white hover:ring-1 hover:ring-white/8"
   }`;
 
 function AnimatedSidebar({ role }) {
@@ -80,13 +80,14 @@ function AnimatedSidebar({ role }) {
     role === "admin" ? adminLinks : role === "teacher" ? teacherLinks : studentLinks;
 
   const Nav = (
-    <aside className="glass-panel-dark flex h-full w-[17.5rem] flex-col px-4 py-6 text-white md:m-3 md:h-[calc(100vh-1.5rem)] md:rounded-[1.35rem]">
-      <div className="mb-7 px-2">
+    <aside className="app-sidebar glass-panel-dark relative flex h-full w-[17.5rem] flex-col overflow-hidden px-4 py-6 text-white md:m-3 md:h-[calc(100vh-1.5rem)] md:rounded-[1.6rem]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[radial-gradient(circle_at_top,rgba(96,165,250,0.22),transparent_72%)]" />
+      <div className="mb-7 rounded-2xl border border-white/8 bg-white/[0.03] px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
         <div className="flex items-center gap-3">
           <BrandMark size={40} className="shrink-0 shadow-lg shadow-cyan-500/20" />
           <div>
-            <h1 className="font-display text-lg font-bold tracking-tight">SchoolMS</h1>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-200/70">
+            <h1 className="font-display text-lg font-bold tracking-tight text-white">SchoolMS</h1>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-sky-200/80">
               {role} workspace
             </p>
           </div>
@@ -105,7 +106,7 @@ function AnimatedSidebar({ role }) {
       <button
         type="button"
         onClick={logout}
-        className="mt-3 flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-[13px] font-medium text-rose-300/90 transition hover:bg-rose-500/15 hover:text-rose-200"
+        className="mt-3 flex items-center gap-3 rounded-2xl border border-white/8 bg-white/[0.03] px-3.5 py-3 text-[13px] font-medium text-slate-200 transition hover:bg-white/[0.08] hover:text-white"
       >
         <LogOut size={17} />
         Sign out

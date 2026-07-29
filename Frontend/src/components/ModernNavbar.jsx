@@ -1,11 +1,26 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { LogOut, Bell } from "lucide-react";
+import { LogOut, Bell, Sparkles } from "lucide-react";
+import API from "../api";
 import GradientButton from "./GradientButton";
 import { logout as signOut } from "../utils/auth";
+import {
+  clearNotifications,
+  getSeenNotificationIds,
+  getNotifications,
+  markNotificationIdsSeen,
+  subscribeToNotifications,
+} from "../utils/notificationCenter";
 
 function ModernNavbar({ role, title, subtitle }) {
   const navigate = useNavigate();
   const name = localStorage.getItem("name") || "User";
+  const [isOpen, setIsOpen] = useState(false);
+  const [localNotifications, setLocalNotifications] = useState(() => getNotifications());
+  const [remoteNotifications, setRemoteNotifications] = useState([]);
+  const [seenIds, setSeenIds] = useState(() => getSeenNotificationIds());
+  const [loadingRemote, setLoadingRemote] = useState(false);
+  const panelRef = useRef(null);
 
   const defaults = {
     admin: {
@@ -23,16 +38,123 @@ function ModernNavbar({ role, title, subtitle }) {
   };
 
   const meta = defaults[role] || {};
+  const notifications = useMemo(() => {
+    const merged = [...remoteNotifications, ...localNotifications];
+    const unique = merged.filter(
+      (item, index) => merged.findIndex((entry) => entry.id === item.id) === index
+    );
+
+    return unique
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 20);
+  }, [localNotifications, remoteNotifications]);
+  const unreadCount = useMemo(
+    () => notifications.filter((item) => !item.read && !seenIds.includes(item.id)).length,
+    [notifications, seenIds]
+  );
 
   const logout = () => signOut(navigate);
 
+  useEffect(() => subscribeToNotifications(setLocalNotifications), []);
+
+  const loadRemoteNotifications = useCallback(async () => {
+    if (!localStorage.getItem("token")) return [];
+
+    setLoadingRemote(true);
+    try {
+      const res = await API.get("/notifications");
+      const items = Array.isArray(res.data?.notifications) ? res.data.notifications : [];
+      setRemoteNotifications(items);
+      return items;
+    } catch {
+      setRemoteNotifications([]);
+      return [];
+    } finally {
+      setLoadingRemote(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!localStorage.getItem("token")) return undefined;
+
+    loadRemoteNotifications();
+    const intervalId = window.setInterval(loadRemoteNotifications, 30000);
+
+    return () => window.clearInterval(intervalId);
+  }, [loadRemoteNotifications]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setSeenIds(markNotificationIdsSeen(notifications.map((item) => item.id)));
+  }, [isOpen, notifications]);
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+
+    const handleClickOutside = (event) => {
+      if (panelRef.current && !panelRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isOpen]);
+
+  const toggleNotifications = async () => {
+    const nextOpen = !isOpen;
+    setIsOpen(nextOpen);
+    if (nextOpen) {
+      await loadRemoteNotifications();
+    }
+  };
+
+  const handleClearNotifications = () => {
+    setSeenIds(markNotificationIdsSeen(notifications.map((item) => item.id)));
+    setLocalNotifications([]);
+    setRemoteNotifications([]);
+    clearNotifications();
+  };
+
+  const formatTime = (value) => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "Just now";
+
+    return new Intl.DateTimeFormat("en", {
+      hour: "numeric",
+      minute: "2-digit",
+      day: "numeric",
+      month: "short",
+    }).format(date);
+  };
+
+  const toneClasses = {
+    success: "border-emerald-200/70 bg-emerald-50 text-emerald-700",
+    error: "border-rose-200/80 bg-rose-50 text-rose-700",
+    info: "border-sky-200/80 bg-sky-50 text-sky-700",
+  };
+
   return (
-    <header className="glass-nav sticky top-0 z-20 mx-3 mt-3 rounded-[1.25rem] px-5 py-3.5 md:mx-5 md:mt-4">
+    <header className="app-navbar glass-nav sticky top-0 z-20 mx-3 mt-3 rounded-[1.35rem] px-5 py-4 md:mx-5 md:mt-4">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="min-w-0 pl-10 md:pl-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#3b5bdb]">
-            {name}
-          </p>
+          <div className="mb-1 inline-flex items-center gap-2 rounded-full border border-sky-300/12 bg-sky-400/8 px-2.5 py-1">
+            <Sparkles size={12} className="text-sky-300" />
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-sky-300">
+              {name}
+            </p>
+          </div>
           <h1 className="font-display mt-0.5 truncate text-xl font-bold text-slate-900 md:text-2xl">
             {title || meta.title}
           </h1>
@@ -42,17 +164,90 @@ function ModernNavbar({ role, title, subtitle }) {
         </div>
 
         <div className="flex items-center gap-2.5 self-end md:self-auto">
-          <button
-            type="button"
-            className="hidden rounded-xl border border-white/50 bg-white/55 p-2.5 text-slate-500 transition hover:bg-white/90 sm:inline-flex"
-            aria-label="Notifications"
-          >
-            <Bell size={17} />
-          </button>
+          <div className="relative" ref={panelRef}>
+            <button
+              type="button"
+              onClick={toggleNotifications}
+              className="relative inline-flex rounded-2xl border border-white/10 bg-white/[0.04] p-2.5 text-slate-200 transition hover:bg-white/[0.08] hover:text-white"
+              aria-label="Notifications"
+              aria-expanded={isOpen}
+            >
+              <Bell size={17} />
+              {unreadCount > 0 ? (
+                <span className="absolute -right-1 -top-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-[10px] font-bold text-white shadow-[0_8px_18px_rgba(244,63,94,0.35)]">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              ) : null}
+            </button>
+
+            {isOpen ? (
+              <div className="absolute right-0 top-[calc(100%+12px)] z-50 w-[min(92vw,22rem)] overflow-hidden rounded-3xl border border-slate-200/70 bg-white/95 shadow-[0_20px_60px_rgba(15,23,42,0.18)] backdrop-blur-xl">
+                <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">Notifications</p>
+                    <p className="text-xs text-slate-500">
+                      {notifications.length === 0
+                        ? "No recent updates"
+                        : `${notifications.length} recent update${notifications.length === 1 ? "" : "s"}`}
+                    </p>
+                  </div>
+                  {notifications.length > 0 ? (
+                    <button
+                      type="button"
+                      onClick={handleClearNotifications}
+                      className="text-xs font-medium text-slate-500 transition hover:text-slate-900"
+                    >
+                      Clear all
+                    </button>
+                  ) : null}
+                </div>
+
+                <div className="max-h-80 overflow-y-auto px-3 py-3">
+                  {loadingRemote && notifications.length === 0 ? (
+                    <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+                      Loading notifications...
+                    </div>
+                  ) : notifications.length === 0 ? (
+                    <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+                      New notifications will appear here.
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {notifications.map((item) => (
+                        <div
+                          key={item.id}
+                          className="rounded-2xl border border-slate-100 bg-slate-50/85 px-3 py-3"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <span
+                              className={`inline-flex rounded-full border px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${
+                                toneClasses[item.type] || toneClasses.info
+                              }`}
+                            >
+                              {item.type}
+                            </span>
+                            <span className="shrink-0 text-[11px] text-slate-400">
+                              {formatTime(item.createdAt)}
+                            </span>
+                          </div>
+                          {item.title ? (
+                            <p className="mt-2 text-sm font-semibold text-slate-900">{item.title}</p>
+                          ) : null}
+                          <p className={`text-sm leading-5 text-slate-700 ${item.title ? "mt-1" : "mt-2"}`}>
+                            {item.message}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : null}
+          </div>
           <button
             type="button"
             onClick={() => navigate("/profile")}
-            className="hidden h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#3b5bdb] to-[#22b8cf] text-xs font-bold text-white shadow-md transition hover:scale-105 sm:flex"
+            className="hidden h-10 w-10 items-center justify-center rounded-full border border-sky-300/12 bg-gradient-to-br from-[#1d4ed8] via-[#2563eb] to-[#0891b2] text-xs font-bold text-white shadow-[0_16px_32px_rgba(37,99,235,0.28)] transition hover:scale-105 sm:flex"
             title="Open profile"
             aria-label="Open profile"
           >

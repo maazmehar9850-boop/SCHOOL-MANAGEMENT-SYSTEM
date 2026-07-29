@@ -92,6 +92,7 @@ import {
   rejectPasswordResetRequest,
   completePasswordReset,
 } from "../controller/passwordResetController.js";
+import { getNotifications } from "../controller/notificationController.js";
 
 const router = express.Router();
 
@@ -179,6 +180,7 @@ router.delete("/delete/:id", authenticate, authorizeRoles("admin"), deleteone);
 // Dashboard
 router.get("/public/stats", getPublicStats);
 router.get("/dashboard/stats", authenticate, getDashboardStats);
+router.get("/notifications", authenticate, getNotifications);
 
 // Teacher's assigned students
 router.get("/my-students", authenticate, authorizeRoles("teacher"), getMyStudents);

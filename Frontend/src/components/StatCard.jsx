@@ -17,7 +17,7 @@ function StatCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, delay, ease: [0.22, 1, 0.36, 1] }}
       whileHover={interactive ? { y: -5 } : undefined}
-      className={`group relative h-full overflow-hidden rounded-2xl border border-white/70 bg-gradient-to-br from-white/90 via-white/75 to-white/60 p-5 shadow-[0_8px_30px_rgba(15,23,42,0.06)] backdrop-blur-xl transition-shadow duration-300 ${
+      className={`stat-card group relative h-full overflow-hidden rounded-2xl border border-white/70 bg-gradient-to-br from-white/90 via-white/75 to-white/60 p-5 shadow-[0_8px_30px_rgba(15,23,42,0.06)] backdrop-blur-xl transition-shadow duration-300 ${
         interactive
           ? "cursor-pointer hover:border-white hover:shadow-[0_16px_40px_rgba(15,23,42,0.12)]"
           : ""

@@ -37,11 +37,11 @@ const THEMES = {
   },
   attendance: {
     label: "ATTENDANCE REGISTER",
-    accent: "#9f1239",
-    accentSoft: "#ffe4e6",
-    ribbon: "#e11d48",
-    tableHead: "#881337",
-    badge: "#9f1239",
+    accent: "#1d4ed8",
+    accentSoft: "#dbeafe",
+    ribbon: "#0ea5e9",
+    tableHead: "#1e3a8a",
+    badge: "#1d4ed8",
     note: "Daily class presence register",
   },
   datesheet: {
@@ -291,7 +291,7 @@ function baseCss(theme, type) {
       font-size: 24px;
       font-weight: 800;
       letter-spacing: -0.02em;
-      color: #0f172a;
+      color: ${theme.accent};
     }
     .subtitle {
       margin: 6px 0 0;
@@ -429,14 +429,14 @@ function baseCss(theme, type) {
       border-radius: 999px;
     }
     .attendance-legend .present { background: #d1fae5; color: #065f46; }
-    .attendance-legend .absent { background: #ffe4e6; color: #9f1239; }
+    .attendance-legend .absent { background: #dbeafe; color: #1d4ed8; }
     .attendance-legend .late { background: #fef3c7; color: #92400e; }
     .body-attendance .status-present {
       color: #065f46; background: #d1fae5; font-weight: 800;
       border-radius: 6px; padding: 2px 8px; display: inline-block;
     }
     .body-attendance .status-absent {
-      color: #9f1239; background: #ffe4e6; font-weight: 800;
+      color: #1d4ed8; background: #dbeafe; font-weight: 800;
       border-radius: 6px; padding: 2px 8px; display: inline-block;
     }
     .body-attendance table th { background: ${theme.tableHead}; }

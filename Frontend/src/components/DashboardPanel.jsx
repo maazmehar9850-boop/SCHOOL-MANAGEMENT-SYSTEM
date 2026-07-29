@@ -10,7 +10,7 @@ function DashboardPanel({
   className = "",
 }) {
   return (
-    <GlassCard className={`p-6 md:p-8 ${className}`} hover={hover} delay={delay}>
+    <GlassCard className={`dashboard-panel p-6 md:p-8 ${className}`} hover={hover} delay={delay}>
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 className="font-display text-xl font-bold text-slate-900">{title}</h2>

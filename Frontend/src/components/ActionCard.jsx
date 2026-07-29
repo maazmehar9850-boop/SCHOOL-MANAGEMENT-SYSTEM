@@ -17,7 +17,7 @@ function ActionCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ y: -4 }}
-      className="group flex h-full min-h-[7.5rem] flex-col justify-between rounded-2xl border border-white/70 bg-white/65 p-5 shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-white hover:bg-white/85 hover:shadow-[0_14px_36px_rgba(15,23,42,0.1)]"
+      className="action-card group flex h-full min-h-[7.5rem] flex-col justify-between rounded-2xl border border-white/70 bg-white/65 p-5 shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-white hover:bg-white/85 hover:shadow-[0_14px_36px_rgba(15,23,42,0.1)]"
     >
       <div className="flex items-start justify-between gap-3">
         <div

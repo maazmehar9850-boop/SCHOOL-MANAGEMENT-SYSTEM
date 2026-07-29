@@ -167,7 +167,7 @@ function AdminDashboard() {
         }
       >
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="rounded-2xl border border-emerald-200/70 bg-emerald-50/70 p-4">
+          <div className="admin-status-card admin-status-card--health rounded-2xl border p-4">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500 text-white">
                 <Activity size={18} />
@@ -182,7 +182,7 @@ function AdminDashboard() {
               </div>
             </div>
           </div>
-          <div className="rounded-2xl border border-white/70 bg-white/60 p-4">
+          <div className="admin-status-card rounded-2xl border p-4">
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
               Attendance & marks
             </p>
@@ -190,7 +190,7 @@ function AdminDashboard() {
               View, print, and export records from the admin sidebar.
             </p>
           </div>
-          <div className="rounded-2xl border border-white/70 bg-white/60 p-4">
+          <div className="admin-status-card rounded-2xl border p-4">
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
               Student management
             </p>
