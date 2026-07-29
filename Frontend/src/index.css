@@ -243,6 +243,44 @@ textarea {
   color: #8ea0bb !important;
 }
 
+/* Notification dropdown — readable on white panel inside dark navbar */
+.notification-panel {
+  color: #334155;
+  -webkit-font-smoothing: antialiased;
+}
+
+.glass-nav .notification-panel .text-slate-900,
+.notification-panel .text-slate-900 {
+  color: #0f172a !important;
+}
+
+.glass-nav .notification-panel .text-slate-700,
+.notification-panel .text-slate-700 {
+  color: #334155 !important;
+}
+
+.glass-nav .notification-panel .text-slate-500,
+.notification-panel .text-slate-500 {
+  color: #64748b !important;
+}
+
+.glass-nav .notification-panel .text-slate-400,
+.notification-panel .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+.notification-panel .border-emerald-200\/70 {
+  color: #047857 !important;
+}
+
+.notification-panel .border-rose-200\/80 {
+  color: #be123c !important;
+}
+
+.notification-panel .border-sky-200\/80 {
+  color: #0369a1 !important;
+}
+
 .page-shell--admin .glass-nav {
   background: linear-gradient(
     180deg,

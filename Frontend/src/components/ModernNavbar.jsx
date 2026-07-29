@@ -181,67 +181,81 @@ function ModernNavbar({ role, title, subtitle }) {
             </button>
 
             {isOpen ? (
-              <div className="absolute right-0 top-[calc(100%+12px)] z-50 w-[min(92vw,22rem)] overflow-hidden rounded-3xl border border-slate-200/70 bg-white/95 shadow-[0_20px_60px_rgba(15,23,42,0.18)] backdrop-blur-xl">
-                <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900">Notifications</p>
-                    <p className="text-xs text-slate-500">
-                      {notifications.length === 0
-                        ? "No recent updates"
-                        : `${notifications.length} recent update${notifications.length === 1 ? "" : "s"}`}
-                    </p>
+              <>
+                <button
+                  type="button"
+                  className="notification-backdrop fixed inset-0 z-[90] bg-slate-950/45 sm:hidden"
+                  aria-label="Close notifications"
+                  onClick={() => setIsOpen(false)}
+                />
+                <div className="notification-panel fixed left-3 right-3 top-[5.25rem] z-[100] flex max-h-[min(72vh,26rem)] flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_24px_64px_rgba(15,23,42,0.22)] sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+12px)] sm:w-[min(calc(100vw-2rem),22rem)] sm:max-h-80">
+                  <div className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-100 px-4 py-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-slate-900">Notifications</p>
+                      <p className="text-xs text-slate-500">
+                        {notifications.length === 0
+                          ? "No recent updates"
+                          : `${notifications.length} recent update${notifications.length === 1 ? "" : "s"}`}
+                      </p>
+                    </div>
+                    {notifications.length > 0 ? (
+                      <button
+                        type="button"
+                        onClick={handleClearNotifications}
+                        className="shrink-0 text-xs font-medium text-slate-500 transition hover:text-slate-900"
+                      >
+                        Clear all
+                      </button>
+                    ) : null}
                   </div>
-                  {notifications.length > 0 ? (
-                    <button
-                      type="button"
-                      onClick={handleClearNotifications}
-                      className="text-xs font-medium text-slate-500 transition hover:text-slate-900"
-                    >
-                      Clear all
-                    </button>
-                  ) : null}
-                </div>
 
-                <div className="max-h-80 overflow-y-auto px-3 py-3">
-                  {loadingRemote && notifications.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
-                      Loading notifications...
-                    </div>
-                  ) : notifications.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
-                      New notifications will appear here.
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {notifications.map((item) => (
-                        <div
-                          key={item.id}
-                          className="rounded-2xl border border-slate-100 bg-slate-50/85 px-3 py-3"
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <span
-                              className={`inline-flex rounded-full border px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${
-                                toneClasses[item.type] || toneClasses.info
+                  <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-3">
+                    {loadingRemote && notifications.length === 0 ? (
+                      <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+                        Loading notifications...
+                      </div>
+                    ) : notifications.length === 0 ? (
+                      <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm leading-6 text-slate-500">
+                        New notifications will appear here.
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {notifications.map((item) => (
+                          <div
+                            key={item.id}
+                            className="rounded-2xl border border-slate-100 bg-slate-50 px-3 py-3"
+                          >
+                            <div className="flex flex-wrap items-start justify-between gap-2">
+                              <span
+                                className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] ${
+                                  toneClasses[item.type] || toneClasses.info
+                                }`}
+                              >
+                                {item.type}
+                              </span>
+                              <span className="shrink-0 text-[11px] leading-5 text-slate-400">
+                                {formatTime(item.createdAt)}
+                              </span>
+                            </div>
+                            {item.title ? (
+                              <p className="mt-2 break-words text-sm font-semibold leading-5 text-slate-900">
+                                {item.title}
+                              </p>
+                            ) : null}
+                            <p
+                              className={`break-words text-sm leading-6 text-slate-700 ${
+                                item.title ? "mt-1" : "mt-2"
                               }`}
                             >
-                              {item.type}
-                            </span>
-                            <span className="shrink-0 text-[11px] text-slate-400">
-                              {formatTime(item.createdAt)}
-                            </span>
+                              {item.message}
+                            </p>
                           </div>
-                          {item.title ? (
-                            <p className="mt-2 text-sm font-semibold text-slate-900">{item.title}</p>
-                          ) : null}
-                          <p className={`text-sm leading-5 text-slate-700 ${item.title ? "mt-1" : "mt-2"}`}>
-                            {item.message}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              </>
             ) : null}
           </div>
           <button
