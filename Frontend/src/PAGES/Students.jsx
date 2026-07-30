@@ -5,24 +5,39 @@ import PageLayout from "../components/PageLayout";
 import PageContentCard from "../components/PageContentCard";
 import InfoBanner from "../components/InfoBanner";
 import DataTable from "../components/DataTable";
-import Skeleton from "../components/Skeleton";
+import { TableSkeleton } from "../components/Skeleton";
+import { cachedFetch, getCached } from "../utils/apiCache";
+
+const CACHE_KEY = "list:students";
 
 function Students() {
-  const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const cached = getCached(CACHE_KEY);
+  const [students, setStudents] = useState(() => (Array.isArray(cached) ? cached : []));
+  const [loading, setLoading] = useState(!Array.isArray(cached));
 
   useEffect(() => {
+    let ignore = false;
     const load = async () => {
       try {
-        const res = await API.get("/students");
-        setStudents(Array.isArray(res.data) ? res.data : []);
+        const data = await cachedFetch(
+          CACHE_KEY,
+          async () => {
+            const res = await API.get("/students");
+            return Array.isArray(res.data) ? res.data : [];
+          },
+          45000
+        );
+        if (!ignore) setStudents(data);
       } catch {
-        toast.error("Failed to load students");
+        if (!ignore) toast.error("Failed to load students");
       } finally {
-        setLoading(false);
+        if (!ignore) setLoading(false);
       }
     };
     load();
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   const columns = [
@@ -71,7 +86,7 @@ function Students() {
           Adding, attendance, and marks are handled by each subject teacher only.
         </InfoBanner>
         {loading ? (
-          <Skeleton className="h-64 w-full rounded-2xl" />
+          <TableSkeleton rows={6} label="Loading students..." />
         ) : (
           <DataTable
             columns={columns}

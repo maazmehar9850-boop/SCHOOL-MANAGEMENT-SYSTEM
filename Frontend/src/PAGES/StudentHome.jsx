@@ -7,6 +7,7 @@ import {
   Award,
   Library,
   FileText,
+  Banknote,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import API from "../api";
@@ -15,24 +16,33 @@ import StatCard from "../components/StatCard";
 import ActionCard from "../components/ActionCard";
 import DashboardPanel from "../components/DashboardPanel";
 import { StatSkeleton } from "../components/Skeleton";
+import { cachedFetch, getCached } from "../utils/apiCache";
 
 function StudentHome() {
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const cacheKey = "dashboard:stats:student";
+  const [stats, setStats] = useState(() => getCached(cacheKey));
+  const [loading, setLoading] = useState(!getCached(cacheKey));
   const name = localStorage.getItem("name") || "Student";
 
   useEffect(() => {
+    let ignore = false;
     const load = async () => {
       try {
-        const res = await API.get("/dashboard/stats");
-        setStats(res.data);
+        const data = await cachedFetch(cacheKey, async () => {
+          const res = await API.get("/dashboard/stats");
+          return res.data;
+        }, 20000);
+        if (!ignore) setStats(data);
       } catch {
-        toast.error("Failed to load student stats");
+        if (!ignore) toast.error("Failed to load student stats");
       } finally {
-        setLoading(false);
+        if (!ignore) setLoading(false);
       }
     };
     load();
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   const statCards = [
@@ -117,6 +127,14 @@ function StudentHome() {
             description="See records marked by teachers"
             accent="from-emerald-500 to-teal-600"
             delay={0.08}
+          />
+          <ActionCard
+            to="/student-fees"
+            icon={Banknote}
+            title="My fees"
+            description="View pending and paid fees, download receipts"
+            accent="from-teal-500 to-emerald-600"
+            delay={0.1}
           />
           <ActionCard
             to="/resources"

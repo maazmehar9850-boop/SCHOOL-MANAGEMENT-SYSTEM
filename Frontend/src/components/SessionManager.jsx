@@ -10,7 +10,8 @@ import {
   markSessionActivity,
 } from "../utils/session";
 
-const EVENTS = ["mousemove", "mousedown", "keydown", "scroll", "touchstart", "click"];
+const EVENTS = ["mousedown", "keydown", "touchstart", "click", "scroll"];
+const ACTIVITY_THROTTLE_MS = 4000;
 
 function SessionManager() {
   const navigate = useNavigate();
@@ -19,6 +20,9 @@ function SessionManager() {
     let warningTimeoutId;
     let logoutTimeoutId;
     let warningShown = false;
+    let lastHandledAt = 0;
+    let pendingActivity = false;
+    let activityFlushId;
 
     const clearTimers = () => {
       window.clearTimeout(warningTimeoutId);
@@ -56,10 +60,27 @@ function SessionManager() {
       logoutTimeoutId = window.setTimeout(handleExpiredSession, msUntilLogout);
     };
 
-    const handleActivity = () => {
+    const flushActivity = () => {
+      pendingActivity = false;
+      activityFlushId = undefined;
+      lastHandledAt = Date.now();
       markSessionActivity();
       warningShown = false;
       scheduleTimers();
+    };
+
+    const handleActivity = () => {
+      if (!localStorage.getItem("token")) return;
+
+      const now = Date.now();
+      if (now - lastHandledAt >= ACTIVITY_THROTTLE_MS) {
+        flushActivity();
+        return;
+      }
+
+      if (pendingActivity) return;
+      pendingActivity = true;
+      activityFlushId = window.setTimeout(flushActivity, ACTIVITY_THROTTLE_MS - (now - lastHandledAt));
     };
 
     const handleExpiredSession = async () => {
@@ -86,6 +107,7 @@ function SessionManager() {
 
     return () => {
       clearTimers();
+      window.clearTimeout(activityFlushId);
       EVENTS.forEach((eventName) => {
         window.removeEventListener(eventName, handleActivity);
       });

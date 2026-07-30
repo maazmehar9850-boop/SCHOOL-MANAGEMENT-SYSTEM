@@ -86,3 +86,40 @@ export function subscribeToNotifications(callback) {
   window.addEventListener(EVENT_NAME, handler);
   return () => window.removeEventListener(EVENT_NAME, handler);
 }
+
+const REMOTE_CACHE_TTL_MS = 45000;
+let remoteCache = { items: [], fetchedAt: 0, inflight: null };
+
+export function getCachedRemoteNotifications() {
+  return remoteCache.items;
+}
+
+export async function fetchRemoteNotifications(fetcher, { force = false } = {}) {
+  const now = Date.now();
+  if (!force && remoteCache.items.length && now - remoteCache.fetchedAt < REMOTE_CACHE_TTL_MS) {
+    return remoteCache.items;
+  }
+
+  if (remoteCache.inflight) {
+    return remoteCache.inflight;
+  }
+
+  remoteCache.inflight = Promise.resolve()
+    .then(fetcher)
+    .then((items) => {
+      const list = Array.isArray(items) ? items : [];
+      remoteCache = { items: list, fetchedAt: Date.now(), inflight: null };
+      return list;
+    })
+    .catch((error) => {
+      remoteCache.inflight = null;
+      throw error;
+    });
+
+  return remoteCache.inflight;
+}
+
+export function clearRemoteNotificationCache() {
+  remoteCache = { items: [], fetchedAt: 0, inflight: null };
+}
+

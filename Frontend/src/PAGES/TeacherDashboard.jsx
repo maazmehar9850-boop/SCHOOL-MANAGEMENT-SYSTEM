@@ -18,24 +18,33 @@ import ActionCard from "../components/ActionCard";
 import DashboardPanel from "../components/DashboardPanel";
 import GradientButton from "../components/GradientButton";
 import { StatSkeleton } from "../components/Skeleton";
+import { cachedFetch, getCached } from "../utils/apiCache";
 
 function TeacherDashboard() {
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const cacheKey = "dashboard:stats:teacher";
+  const [stats, setStats] = useState(() => getCached(cacheKey));
+  const [loading, setLoading] = useState(!getCached(cacheKey));
   const name = localStorage.getItem("name") || "Teacher";
 
   useEffect(() => {
+    let ignore = false;
     const load = async () => {
       try {
-        const res = await API.get("/dashboard/stats");
-        setStats(res.data);
+        const data = await cachedFetch(cacheKey, async () => {
+          const res = await API.get("/dashboard/stats");
+          return res.data;
+        }, 20000);
+        if (!ignore) setStats(data);
       } catch {
-        toast.error("Failed to load teacher stats");
+        if (!ignore) toast.error("Failed to load teacher stats");
       } finally {
-        setLoading(false);
+        if (!ignore) setLoading(false);
       }
     };
     load();
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   const statCards = [

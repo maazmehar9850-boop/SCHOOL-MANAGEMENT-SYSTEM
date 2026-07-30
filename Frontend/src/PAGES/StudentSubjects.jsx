@@ -4,7 +4,7 @@ import API from "../api";
 import PageLayout from "../components/PageLayout";
 import GlassCard from "../components/GlassCard";
 import DataTable from "../components/DataTable";
-import Skeleton from "../components/Skeleton";
+import { TableSkeleton } from "../components/Skeleton";
 
 function StudentSubjects() {
   const [rows, setRows] = useState([]);
@@ -59,7 +59,7 @@ function StudentSubjects() {
     >
       <GlassCard className="p-6" hover={false}>
         {loading ? (
-          <Skeleton className="h-64 w-full" />
+          <TableSkeleton rows={5} label="Loading subjects..." />
         ) : (
           <DataTable
             columns={columns}

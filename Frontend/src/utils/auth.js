@@ -2,6 +2,8 @@ import toast from "react-hot-toast";
 import API from "../api";
 import { clearSessionActivity, startSession } from "./session";
 import { resetAuthRedirectState } from "./notify";
+import { clearRemoteNotificationCache } from "./notificationCenter";
+import { clearCache } from "./apiCache";
 
 export async function logout(navigate, options = {}) {
   const { silent = false, reason = "manual" } = options;
@@ -13,6 +15,8 @@ export async function logout(navigate, options = {}) {
 
   localStorage.clear();
   clearSessionActivity();
+  clearRemoteNotificationCache();
+  clearCache();
   resetAuthRedirectState();
 
   if (!silent) {

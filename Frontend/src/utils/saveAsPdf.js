@@ -71,6 +71,15 @@ const THEMES = {
     badge: "#1d4ed8",
     note: "Approved course outline & learning plan",
   },
+  receipt: {
+    label: "FEE RECEIPT",
+    accent: "#0f766e",
+    accentSoft: "#ccfbf1",
+    ribbon: "#14b8a6",
+    tableHead: "#115e59",
+    badge: "#0f766e",
+    note: "Official fee payment receipt — keep for your records",
+  },
   default: {
     label: "OFFICIAL DOCUMENT",
     accent: "#3b5bdb",
@@ -228,6 +237,9 @@ function typeDecor(type) {
       <span class="leg absent">Absent</span>
       <span class="leg late">Late / Leave</span>
     </div>`;
+  }
+  if (type === "receipt") {
+    return `<div class="receipt-band">Payment acknowledged · This is a computer-generated receipt</div>`;
   }
   return "";
 }
@@ -522,6 +534,48 @@ function baseCss(theme, type) {
       border-bottom: 2px solid ${theme.ribbon};
       padding-bottom: 4px;
     }
+
+    /* RECEIPT — fee payment */
+    .theme-receipt .pdf-title-block {
+      text-align: center;
+      background: linear-gradient(180deg, ${theme.accentSoft}, #fff);
+      border: 1px solid ${theme.accent}33;
+      border-radius: 16px;
+      padding: 18px 16px;
+    }
+    .receipt-band {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: ${theme.badge};
+      background: ${theme.accentSoft};
+      padding: 8px;
+      border-radius: 8px;
+    }
+    .body-receipt .receipt-amount {
+      text-align: center;
+      margin: 16px 0;
+      padding: 16px;
+      background: ${theme.accentSoft};
+      border-radius: 12px;
+      border: 1px dashed ${theme.accent}55;
+    }
+    .body-receipt .receipt-amount .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #64748b;
+    }
+    .body-receipt .receipt-amount .value {
+      font-size: 28px;
+      font-weight: 800;
+      color: ${theme.accent};
+      margin-top: 4px;
+    }
+    .body-receipt table th { background: ${theme.tableHead}; }
   `;
 }
 

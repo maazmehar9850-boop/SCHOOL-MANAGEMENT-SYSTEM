@@ -1,5 +1,4 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
   Users,
@@ -17,13 +16,14 @@ import {
   X,
   Link2,
   KeyRound,
+  Banknote,
 } from "lucide-react";
 import { useState } from "react";
 import { BrandMark } from "./BrandLogo";
 import { logout as signOut } from "../utils/auth";
 
 const linkClass = ({ isActive }) =>
-  `group flex items-center gap-3 rounded-2xl px-3.5 py-3 text-[13px] font-medium tracking-tight transition-all duration-200 ${
+  `group flex items-center gap-3 rounded-2xl px-3.5 py-3 text-[13px] font-medium tracking-tight transition-colors duration-150 ${
     isActive
       ? "bg-[linear-gradient(135deg,rgba(37,99,235,0.95),rgba(14,165,233,0.82))] text-white shadow-[0_14px_32px_rgba(37,99,235,0.28)] ring-1 ring-white/10"
       : "text-slate-300 hover:bg-white/[0.06] hover:text-white hover:ring-1 hover:ring-white/8"
@@ -40,6 +40,7 @@ function AnimatedSidebar({ role }) {
     { to: "/students", label: "Students", icon: Users },
     { to: "/teachers", label: "Teachers", icon: GraduationCap },
     { to: "/courses", label: "Courses", icon: BookOpen },
+    { to: "/fees", label: "Fees", icon: Banknote },
     { to: "/enrollments", label: "Enrollments", icon: Link2 },
     { to: "/assignments", label: "Assignments", icon: ClipboardList },
     { to: "/teacher-tools", label: "Syllabus & Dates", icon: Library },
@@ -69,6 +70,7 @@ function AnimatedSidebar({ role }) {
     { to: "/student-home", label: "Dashboard", icon: LayoutDashboard },
     { to: "/profile", label: "My Profile", icon: User },
     { to: "/courses", label: "Courses", icon: BookOpen },
+    { to: "/student-fees", label: "My Fees", icon: Banknote },
     { to: "/student-attendance", label: "Attendance", icon: CalendarCheck },
     { to: "/student-results", label: "Results", icon: FileText },
     { to: "/student-subjects", label: "Subjects", icon: BookOpen },
@@ -118,7 +120,7 @@ function AnimatedSidebar({ role }) {
     <>
       <button
         type="button"
-        className="fixed left-4 top-4 z-40 rounded-xl border border-white/15 bg-slate-950/60 p-2 text-white backdrop-blur-md md:hidden"
+        className="fixed left-4 top-4 z-40 rounded-xl border border-white/15 bg-slate-950/60 p-2 text-white md:hidden"
         onClick={() => setOpen(true)}
         aria-label="Open menu"
       >
@@ -127,34 +129,26 @@ function AnimatedSidebar({ role }) {
 
       <div className="hidden shrink-0 md:block">{Nav}</div>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            className="fixed inset-0 z-50 md:hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-sm" onClick={() => setOpen(false)} />
-            <motion.div
-              initial={{ x: -300 }}
-              animate={{ x: 0 }}
-              exit={{ x: -300 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="absolute left-0 top-0 h-full p-2"
+      {open ? (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <button
+            type="button"
+            className="absolute inset-0 bg-slate-950/65"
+            aria-label="Close menu"
+            onClick={() => setOpen(false)}
+          />
+          <div className="absolute left-0 top-0 h-full p-2">
+            <button
+              type="button"
+              className="absolute right-4 top-5 z-10 rounded-lg bg-white/10 p-1.5"
+              onClick={() => setOpen(false)}
             >
-              <button
-                type="button"
-                className="absolute right-4 top-5 z-10 rounded-lg bg-white/10 p-1.5"
-                onClick={() => setOpen(false)}
-              >
-                <X size={16} />
-              </button>
-              {Nav}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <X size={16} />
+            </button>
+            {Nav}
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }

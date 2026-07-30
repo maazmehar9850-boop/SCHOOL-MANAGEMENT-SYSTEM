@@ -93,6 +93,16 @@ import {
   completePasswordReset,
 } from "../controller/passwordResetController.js";
 import { getNotifications } from "../controller/notificationController.js";
+import {
+  getFees,
+  getFeeSummary,
+  getFeeById,
+  createFee,
+  assignFeeToAll,
+  collectFee,
+  deleteFee,
+  getMyFees,
+} from "../controller/feeController.js";
 
 const router = express.Router();
 
@@ -350,6 +360,16 @@ router.post(
 router.get("/attendance", authenticate, getAttendance);
 router.put("/attendance/:id", authenticate, authorizeRoles("teacher"), updateAttendance);
 router.delete("/attendance/:id", authenticate, authorizeRoles("teacher"), deleteAttendance);
+
+// Fees (admin collection + student view)
+router.get("/fees/summary", authenticate, authorizeRoles("admin"), getFeeSummary);
+router.get("/fees/mine", authenticate, authorizeRoles("student", "admin"), getMyFees);
+router.get("/fees", authenticate, authorizeRoles("admin"), getFees);
+router.post("/fees/assign-all", authenticate, authorizeRoles("admin"), assignFeeToAll);
+router.post("/fees", authenticate, authorizeRoles("admin"), createFee);
+router.post("/fees/:id/collect", authenticate, authorizeRoles("admin"), collectFee);
+router.get("/fees/:id", authenticate, authorizeRoles("admin"), getFeeById);
+router.delete("/fees/:id", authenticate, authorizeRoles("admin"), deleteFee);
 
 // Marks
 router.post("/marks", authenticate, authorizeRoles("teacher"), addMark);

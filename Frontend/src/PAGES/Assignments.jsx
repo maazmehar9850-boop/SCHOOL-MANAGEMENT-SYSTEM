@@ -270,7 +270,7 @@ function Assignments() {
           <button
             type="button"
             onClick={() => openSubmit(row)}
-            className="inline-flex items-center gap-1 rounded-xl bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100"
+            className="btn-edit"
           >
             <Upload size={14} />
             {row.mySubmission ? "Update file" : "Upload"}
@@ -280,7 +280,7 @@ function Assignments() {
               href={fileUrl(row.mySubmission.fileUrl)}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1 rounded-xl bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200"
+              className="btn-edit"
             >
               <Eye size={14} />
               View
@@ -307,7 +307,7 @@ function Assignments() {
           <button
             type="button"
             onClick={() => openSubmissions(row)}
-            className="inline-flex items-center gap-1 rounded-xl bg-cyan-50 px-3 py-1.5 text-xs font-semibold text-cyan-800 hover:bg-cyan-100"
+            className="btn-edit"
           >
             <Eye size={14} />
             {isAdmin ? "View" : "Review"}
@@ -317,16 +317,20 @@ function Assignments() {
               <button
                 type="button"
                 onClick={() => openEdit(row)}
-                className="rounded-xl bg-indigo-50 p-2 text-indigo-600 hover:bg-indigo-100"
+                className="btn-edit"
+                title="Edit"
               >
                 <Pencil size={16} />
+                Edit
               </button>
               <button
                 type="button"
                 onClick={() => remove(row._id)}
-                className="rounded-xl bg-rose-50 p-2 text-rose-600 hover:bg-rose-100"
+                className="btn-delete"
+                title="Delete"
               >
                 <Trash2 size={16} />
+                Delete
               </button>
             </>
           )}

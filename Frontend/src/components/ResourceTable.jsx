@@ -200,7 +200,7 @@ function ResourceTable({
                           <button
                             type="button"
                             onClick={() => setExpandedId(isOpen ? null : id)}
-                            className="rounded-lg border border-slate-200/80 bg-white/80 px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-white"
+                            className="action-icon-btn"
                             aria-expanded={isOpen}
                           >
                             {isOpen ? "−" : "+"}
@@ -238,7 +238,7 @@ function ResourceTable({
             type="button"
             disabled={currentPage <= 1}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
-            className="rounded-lg border border-white/50 bg-white/70 p-1.5 transition hover:bg-white disabled:opacity-35"
+            className="action-icon-btn disabled:opacity-35"
             aria-label="Previous page"
           >
             <ChevronLeft size={15} />
@@ -250,7 +250,7 @@ function ResourceTable({
             type="button"
             disabled={currentPage >= totalPages}
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            className="rounded-lg border border-white/50 bg-white/70 p-1.5 transition hover:bg-white disabled:opacity-35"
+            className="action-icon-btn disabled:opacity-35"
             aria-label="Next page"
           >
             <ChevronRight size={15} />

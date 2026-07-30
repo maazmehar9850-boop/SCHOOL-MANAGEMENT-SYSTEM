@@ -6,6 +6,9 @@ import GradientButton from "./GradientButton";
 import { logout as signOut } from "../utils/auth";
 import {
   clearNotifications,
+  clearRemoteNotificationCache,
+  fetchRemoteNotifications,
+  getCachedRemoteNotifications,
   getSeenNotificationIds,
   getNotifications,
   markNotificationIdsSeen,
@@ -17,7 +20,7 @@ function ModernNavbar({ role, title, subtitle }) {
   const name = localStorage.getItem("name") || "User";
   const [isOpen, setIsOpen] = useState(false);
   const [localNotifications, setLocalNotifications] = useState(() => getNotifications());
-  const [remoteNotifications, setRemoteNotifications] = useState([]);
+  const [remoteNotifications, setRemoteNotifications] = useState(() => getCachedRemoteNotifications());
   const [seenIds, setSeenIds] = useState(() => getSeenNotificationIds());
   const [loadingRemote, setLoadingRemote] = useState(false);
   const panelRef = useRef(null);
@@ -57,20 +60,23 @@ function ModernNavbar({ role, title, subtitle }) {
 
   useEffect(() => subscribeToNotifications(setLocalNotifications), []);
 
-  const loadRemoteNotifications = useCallback(async () => {
+  const loadRemoteNotifications = useCallback(async ({ showLoading = false, force = false } = {}) => {
     if (!localStorage.getItem("token")) return [];
+    if (document.visibilityState === "hidden") return getCachedRemoteNotifications();
 
-    setLoadingRemote(true);
+    if (showLoading) setLoadingRemote(true);
     try {
-      const res = await API.get("/notifications");
-      const items = Array.isArray(res.data?.notifications) ? res.data.notifications : [];
+      const items = await fetchRemoteNotifications(async () => {
+        const res = await API.get("/notifications");
+        return Array.isArray(res.data?.notifications) ? res.data.notifications : [];
+      }, { force });
       setRemoteNotifications(items);
       return items;
     } catch {
-      setRemoteNotifications([]);
-      return [];
+      setRemoteNotifications(getCachedRemoteNotifications());
+      return getCachedRemoteNotifications();
     } finally {
-      setLoadingRemote(false);
+      if (showLoading) setLoadingRemote(false);
     }
   }, []);
 
@@ -78,15 +84,24 @@ function ModernNavbar({ role, title, subtitle }) {
     if (!localStorage.getItem("token")) return undefined;
 
     loadRemoteNotifications();
-    const intervalId = window.setInterval(loadRemoteNotifications, 30000);
+
+    const intervalId = window.setInterval(() => {
+      if (document.visibilityState === "visible") {
+        loadRemoteNotifications({ force: true });
+      }
+    }, 90000);
 
     return () => window.clearInterval(intervalId);
   }, [loadRemoteNotifications]);
 
   useEffect(() => {
-    if (!isOpen) return;
-    setSeenIds(markNotificationIdsSeen(notifications.map((item) => item.id)));
-  }, [isOpen, notifications]);
+    if (!isOpen || notifications.length === 0) return;
+    const unreadIds = notifications
+      .filter((item) => !item.read && !seenIds.includes(item.id))
+      .map((item) => item.id);
+    if (unreadIds.length === 0) return;
+    setSeenIds(markNotificationIdsSeen(unreadIds));
+  }, [isOpen, notifications, seenIds]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -116,7 +131,10 @@ function ModernNavbar({ role, title, subtitle }) {
     const nextOpen = !isOpen;
     setIsOpen(nextOpen);
     if (nextOpen) {
-      await loadRemoteNotifications();
+      await loadRemoteNotifications({
+        showLoading: remoteNotifications.length === 0,
+        force: true,
+      });
     }
   };
 
@@ -125,6 +143,7 @@ function ModernNavbar({ role, title, subtitle }) {
     setLocalNotifications([]);
     setRemoteNotifications([]);
     clearNotifications();
+    clearRemoteNotificationCache();
   };
 
   const formatTime = (value) => {

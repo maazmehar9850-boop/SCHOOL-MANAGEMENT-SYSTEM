@@ -5,7 +5,7 @@ import PageLayout from "../components/PageLayout";
 import PageContentCard from "../components/PageContentCard";
 import DataTable from "../components/DataTable";
 import SaveAsPdfButton from "../components/SaveAsPdfButton";
-import Skeleton from "../components/Skeleton";
+import { TableSkeleton } from "../components/Skeleton";
 import { StatPill } from "../components/SheetUI";
 import { saveAsPdf, tableHtml } from "../utils/saveAsPdf";
 
@@ -125,7 +125,7 @@ function StudentResults() {
         </div>
 
         {loading ? (
-          <Skeleton className="h-64 w-full rounded-2xl" />
+          <TableSkeleton rows={5} label="Loading results..." />
         ) : (
           <DataTable
             columns={columns}

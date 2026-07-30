@@ -5,19 +5,31 @@ import PageLayout from "../components/PageLayout";
 import GlassCard from "../components/GlassCard";
 import DataTable from "../components/DataTable";
 import GradientButton from "../components/GradientButton";
-import Skeleton from "../components/Skeleton";
+import { TableSkeleton } from "../components/Skeleton";
 import PasswordField from "../components/PasswordField";
 import { validatePasswordStrength } from "../utils/passwordPolicy";
+import { cachedFetch, clearCache, getCached } from "../utils/apiCache";
+
+const CACHE_KEY = "list:teachers";
 
 function Teachers() {
-  const [teachers, setTeachers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const cached = getCached(CACHE_KEY);
+  const [teachers, setTeachers] = useState(() => (Array.isArray(cached) ? cached : []));
+  const [loading, setLoading] = useState(!Array.isArray(cached));
   const [editingTeacher, setEditingTeacher] = useState(null);
 
-  const fetchTeachers = async () => {
+  const fetchTeachers = async ({ force = false } = {}) => {
     try {
-      const res = await API.get("/teachers");
-      setTeachers(res.data);
+      if (force) clearCache(CACHE_KEY);
+      const data = await cachedFetch(
+        CACHE_KEY,
+        async () => {
+          const res = await API.get("/teachers");
+          return Array.isArray(res.data) ? res.data : [];
+        },
+        45000
+      );
+      setTeachers(data);
     } catch {
       toast.error("Failed to load teachers");
     } finally {
@@ -34,7 +46,7 @@ function Teachers() {
     try {
       await API.delete(`/delete/${id}`);
       toast.success("Teacher deleted");
-      fetchTeachers();
+      await fetchTeachers({ force: true });
     } catch {
       toast.error("Delete failed");
     }
@@ -58,7 +70,7 @@ function Teachers() {
       await API.put(`/update/${editingTeacher._id}`, payload);
       toast.success("Teacher updated");
       setEditingTeacher(null);
-      fetchTeachers();
+      await fetchTeachers({ force: true });
     } catch (err) {
       toast.error(err.response?.data?.message || "Update failed");
     }
@@ -76,7 +88,7 @@ function Teachers() {
         <div className="flex gap-2">
           <button
             type="button"
-            className="rounded-xl bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700"
+            className="btn-edit"
             onClick={() =>
               setEditingTeacher({
                 ...row,
@@ -86,11 +98,7 @@ function Teachers() {
           >
             Edit
           </button>
-          <button
-            type="button"
-            className="rounded-xl bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700"
-            onClick={() => delteacher(row._id)}
-          >
+          <button type="button" className="btn-delete" onClick={() => delteacher(row._id)}>
             Delete
           </button>
         </div>
@@ -102,7 +110,7 @@ function Teachers() {
     <PageLayout role="admin" variant="admin" title="Teachers" subtitle="Manage teacher accounts">
       <GlassCard className="p-6" hover={false}>
         {loading ? (
-          <Skeleton className="h-64 w-full" />
+          <TableSkeleton rows={6} label="Loading teachers..." />
         ) : (
           <DataTable columns={columns} data={teachers} searchKeys={["name", "email", "subject"]} />
         )}

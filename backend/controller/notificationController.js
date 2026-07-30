@@ -7,7 +7,7 @@ import PasswordResetRequest from "../model/PasswordResetRequest.js";
 import Submission from "../model/Submission.js";
 import register from "../model/register.js";
 
-const MAX_ITEMS = 12;
+const MAX_ITEMS = 10;
 
 const sortByDate = (items) =>
   items
@@ -29,10 +29,16 @@ export const getNotifications = async (req, res) => {
     if (role === "admin") {
       const [pendingResets, recentTeachers] = await Promise.all([
         PasswordResetRequest.find({ status: "pending" })
+          .select("name email createdAt")
           .sort({ createdAt: -1 })
-          .limit(6)
+          .limit(5)
           .lean(),
-        register.find({ role: "teacher" }).sort({ createdAt: -1 }).limit(6).lean(),
+        register
+          .find({ role: "teacher" })
+          .select("name email createdAt")
+          .sort({ createdAt: -1 })
+          .limit(5)
+          .lean(),
       ]);
 
       notifications = [
@@ -64,16 +70,22 @@ export const getNotifications = async (req, res) => {
       );
 
       const [enrollments, submissions] = await Promise.all([
-        Enrollment.find({ courseId: { $in: courseIds }, status: "active" })
-          .populate("studentId", "name")
-          .populate("courseId", "courseName")
-          .sort({ createdAt: -1 })
-          .limit(6)
-          .lean(),
-        Submission.find({ assignmentId: { $in: assignmentIds } })
-          .sort({ submittedAt: -1 })
-          .limit(6)
-          .lean(),
+        courseIds.length
+          ? Enrollment.find({ courseId: { $in: courseIds }, status: "active" })
+              .select("studentId courseId createdAt")
+              .populate("studentId", "name")
+              .populate("courseId", "courseName")
+              .sort({ createdAt: -1 })
+              .limit(5)
+              .lean()
+          : Promise.resolve([]),
+        assignmentIds.length
+          ? Submission.find({ assignmentId: { $in: assignmentIds } })
+              .select("assignmentId studentName submittedAt createdAt")
+              .sort({ submittedAt: -1 })
+              .limit(5)
+              .lean()
+          : Promise.resolve([]),
       ]);
 
       notifications = [
@@ -100,15 +112,33 @@ export const getNotifications = async (req, res) => {
 
     if (role === "student") {
       const enrollments = await Enrollment.find({ studentId: userId, status: "active" })
-        .select("courseId createdAt")
+        .select("courseId")
         .lean();
       const courseIds = enrollments.map((item) => item.courseId);
 
       const [assignments, marks, attendance, resetRequests] = await Promise.all([
-        Assignment.find({ courseId: { $in: courseIds } }).sort({ createdAt: -1 }).limit(6).lean(),
-        Mark.find({ studentId: userId }).sort({ updatedAt: -1 }).limit(6).lean(),
-        Attendance.find({ studentId: userId }).sort({ createdAt: -1 }).limit(6).lean(),
-        PasswordResetRequest.find({ userId }).sort({ updatedAt: -1 }).limit(3).lean(),
+        courseIds.length
+          ? Assignment.find({ courseId: { $in: courseIds } })
+              .select("title course createdAt")
+              .sort({ createdAt: -1 })
+              .limit(5)
+              .lean()
+          : Promise.resolve([]),
+        Mark.find({ studentId: userId })
+          .select("subject score maxScore feedback updatedAt")
+          .sort({ updatedAt: -1 })
+          .limit(5)
+          .lean(),
+        Attendance.find({ studentId: userId })
+          .select("course status date createdAt")
+          .sort({ createdAt: -1 })
+          .limit(5)
+          .lean(),
+        PasswordResetRequest.find({ userId })
+          .select("status updatedAt createdAt")
+          .sort({ updatedAt: -1 })
+          .limit(2)
+          .lean(),
       ]);
 
       notifications = [
@@ -123,7 +153,9 @@ export const getNotifications = async (req, res) => {
           id: `student-mark-${item._id}-${new Date(item.updatedAt).getTime()}`,
           type: "success",
           title: "Marks updated",
-          message: `${item.subject}: ${item.score}/${item.maxScore}${item.feedback ? ` - ${item.feedback}` : ""}`,
+          message: `${item.subject}: ${item.score}/${item.maxScore}${
+            item.feedback ? ` - ${item.feedback}` : ""
+          }`,
           createdAt: item.updatedAt,
         })),
         ...attendance.map((item) => ({
@@ -137,7 +169,8 @@ export const getNotifications = async (req, res) => {
           .filter((item) => item.status !== "pending")
           .map((item) => ({
             id: `student-reset-${item._id}-${new Date(item.updatedAt || item.createdAt).getTime()}`,
-            type: item.status === "approved" ? "success" : item.status === "rejected" ? "error" : "info",
+            type:
+              item.status === "approved" ? "success" : item.status === "rejected" ? "error" : "info",
             title: "Password reset update",
             message: `Your password reset request was ${item.status}.`,
             createdAt: item.updatedAt || item.createdAt,

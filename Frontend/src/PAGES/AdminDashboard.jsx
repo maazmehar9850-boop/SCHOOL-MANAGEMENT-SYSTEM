@@ -10,6 +10,7 @@ import {
   Library,
   Activity,
   KeyRound,
+  Banknote,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import API from "../api";
@@ -19,23 +20,32 @@ import ActionCard from "../components/ActionCard";
 import DashboardPanel from "../components/DashboardPanel";
 import GradientButton from "../components/GradientButton";
 import { StatSkeleton } from "../components/Skeleton";
+import { cachedFetch, getCached } from "../utils/apiCache";
 
 function AdminDashboard() {
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const cacheKey = "dashboard:stats:admin";
+  const [stats, setStats] = useState(() => getCached(cacheKey));
+  const [loading, setLoading] = useState(!getCached(cacheKey));
 
   useEffect(() => {
+    let ignore = false;
     const load = async () => {
       try {
-        const res = await API.get("/dashboard/stats");
-        setStats(res.data);
+        const data = await cachedFetch(cacheKey, async () => {
+          const res = await API.get("/dashboard/stats");
+          return res.data;
+        }, 20000);
+        if (!ignore) setStats(data);
       } catch {
-        toast.error("Failed to load dashboard stats");
+        if (!ignore) toast.error("Failed to load dashboard stats");
       } finally {
-        setLoading(false);
+        if (!ignore) setLoading(false);
       }
     };
     load();
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   const statCards = [
@@ -120,6 +130,14 @@ function AdminDashboard() {
             description="Browse all learners in the system"
             accent="from-sky-500 to-blue-600"
             delay={0.08}
+          />
+          <ActionCard
+            to="/fees"
+            icon={Banknote}
+            title="Student fees"
+            description="Collect fees, view pending/paid, download receipts"
+            accent="from-teal-500 to-emerald-600"
+            delay={0.1}
           />
           <ActionCard
             to="/enrollments"

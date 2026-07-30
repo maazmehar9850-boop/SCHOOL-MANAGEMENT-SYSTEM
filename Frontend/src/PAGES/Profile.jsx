@@ -5,7 +5,7 @@ import API from "../api";
 import PageLayout from "../components/PageLayout";
 import GlassCard from "../components/GlassCard";
 import GradientButton from "../components/GradientButton";
-import Skeleton from "../components/Skeleton";
+import { TableSkeleton } from "../components/Skeleton";
 import PasswordField from "../components/PasswordField";
 import PasswordStrengthHint from "../components/PasswordStrengthHint";
 import { validatePasswordStrength } from "../utils/passwordPolicy";
@@ -173,7 +173,7 @@ function Profile() {
   return (
     <PageLayout role={role} variant="profile" title="My Profile" subtitle={config.subtitle}>
       {loading ? (
-        <Skeleton className="h-96 w-full rounded-3xl" />
+        <TableSkeleton rows={6} label="Loading profile..." />
       ) : (
         <div className="grid gap-5 lg:grid-cols-[280px_1fr]">
           <GlassCard className="p-6 text-center" hover={false}>

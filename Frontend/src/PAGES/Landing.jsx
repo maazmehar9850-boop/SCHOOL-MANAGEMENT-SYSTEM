@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Users,
@@ -77,13 +77,38 @@ const roles = [
 ];
 
 const fadeUp = {
-  initial: { opacity: 0, y: 28 },
+  initial: { opacity: 0, y: 16 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, amount: 0.25 },
-  transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
+  viewport: { once: true, amount: 0.2 },
+  transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] },
 };
 
-function SectionScene({ image, overlay = "default", children, className = "", id }) {
+function SectionScene({ image, overlay = "default", children, className = "", id, eager = false }) {
+  const sectionRef = useRef(null);
+  const [visible, setVisible] = useState(eager);
+
+  useEffect(() => {
+    if (eager || visible) return undefined;
+    const node = sectionRef.current;
+    if (!node || typeof IntersectionObserver === "undefined") {
+      setVisible(true);
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "220px 0px" }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [eager, visible]);
+
   const overlays = {
     default:
       "bg-gradient-to-b from-[#061018]/55 via-[#0a1c2e]/48 to-[#071018]/78",
@@ -94,10 +119,14 @@ function SectionScene({ image, overlay = "default", children, className = "", id
   };
 
   return (
-    <section id={id} className={`landing-section relative overflow-hidden ${className}`}>
+    <section
+      ref={sectionRef}
+      id={id}
+      className={`landing-section relative overflow-hidden ${className}`}
+    >
       <div
         className="absolute inset-0 scale-105 bg-cover bg-center"
-        style={{ backgroundImage: `url(${image})` }}
+        style={visible ? { backgroundImage: `url(${image})` } : undefined}
         aria-hidden
       />
       <div className={`absolute inset-0 ${overlays[overlay] || overlays.default}`} aria-hidden />
@@ -176,6 +205,7 @@ function Landing() {
       <SectionScene
         image={imgHero}
         overlay="hero"
+        eager
         className="flex min-h-screen items-center"
       >
         <div className="mx-auto w-full max-w-7xl px-4 pb-24 pt-28 md:px-8">

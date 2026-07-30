@@ -5,7 +5,7 @@ import API from "../api";
 import PageLayout from "../components/PageLayout";
 import PageContentCard from "../components/PageContentCard";
 import GradientButton from "../components/GradientButton";
-import Skeleton from "../components/Skeleton";
+import { TableSkeleton } from "../components/Skeleton";
 
 const STATUS_TONE = {
   pending: "bg-amber-100 text-amber-800",
@@ -101,7 +101,7 @@ function AdminPasswordResets() {
         </div>
 
         {loading ? (
-          <Skeleton className="h-48 w-full rounded-2xl" />
+          <TableSkeleton rows={4} label="Loading requests..." />
         ) : requests.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-slate-200 py-12 text-center text-slate-500">
             <KeyRound className="mx-auto mb-3 opacity-40" size={32} />

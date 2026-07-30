@@ -133,7 +133,7 @@ function DataTable({
             type="button"
             disabled={currentPage <= 1}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
-            className="rounded-lg border border-white/50 bg-white/70 p-1.5 transition hover:bg-white disabled:opacity-35"
+            className="action-icon-btn disabled:opacity-35"
             aria-label="Previous page"
           >
             <ChevronLeft size={15} />
@@ -145,7 +145,7 @@ function DataTable({
             type="button"
             disabled={currentPage >= totalPages}
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            className="rounded-lg border border-white/50 bg-white/70 p-1.5 transition hover:bg-white disabled:opacity-35"
+            className="action-icon-btn disabled:opacity-35"
             aria-label="Next page"
           >
             <ChevronRight size={15} />

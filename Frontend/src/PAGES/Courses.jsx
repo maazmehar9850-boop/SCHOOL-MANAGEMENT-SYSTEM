@@ -7,7 +7,8 @@ import PageLayout from "../components/PageLayout";
 import GlassCard from "../components/GlassCard";
 import DataTable from "../components/DataTable";
 import GradientButton from "../components/GradientButton";
-import Skeleton from "../components/Skeleton";
+import { TableSkeleton } from "../components/Skeleton";
+import { cachedFetch, clearCache, getCached } from "../utils/apiCache";
 
 function mediaHref(url) {
   if (!url) return "";
@@ -18,8 +19,10 @@ function mediaHref(url) {
 function Courses() {
   const role = localStorage.getItem("role") || "student";
   const isAdmin = role === "admin";
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const cacheKey = `list:courses:${role}`;
+  const cached = getCached(cacheKey);
+  const [courses, setCourses] = useState(() => (Array.isArray(cached) ? cached : []));
+  const [loading, setLoading] = useState(!Array.isArray(cached));
   const [viewing, setViewing] = useState(null);
   const [editingCourse, setEditingCourse] = useState(null);
   const [formData, setFormData] = useState({
@@ -32,11 +35,19 @@ function Courses() {
   const [editVideo, setEditVideo] = useState(null);
   const [editPdf, setEditPdf] = useState(null);
 
-  const fetchCourses = async () => {
+  const fetchCourses = async ({ force = false } = {}) => {
     try {
+      if (force) clearCache(cacheKey);
       // Teachers: ?all=1 shows every active course (materials). Assignments/attendance use own courses.
-      const res = await API.get(role === "teacher" ? "/courses?all=1" : "/courses");
-      setCourses(res.data);
+      const data = await cachedFetch(
+        cacheKey,
+        async () => {
+          const res = await API.get(role === "teacher" ? "/courses?all=1" : "/courses");
+          return Array.isArray(res.data) ? res.data : [];
+        },
+        45000
+      );
+      setCourses(data);
     } catch {
       toast.error("Failed to load courses");
     } finally {
@@ -117,7 +128,7 @@ function Courses() {
           <button
             type="button"
             onClick={() => setViewing(row)}
-            className="rounded-xl bg-slate-900 px-3 py-1 text-xs font-semibold text-white"
+            className="btn-edit"
           >
             View
           </button>
@@ -126,14 +137,14 @@ function Courses() {
               <button
                 type="button"
                 onClick={() => openEdit(row)}
-                className="rounded-xl bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700"
+                className="btn-edit"
               >
                 Edit
               </button>
               <button
                 type="button"
                 onClick={() => deleteCourse(row._id)}
-                className="rounded-xl bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700"
+                className="btn-delete"
               >
                 Delete
               </button>
@@ -167,7 +178,7 @@ function Courses() {
 
       <GlassCard className="p-6" hover={false}>
         {loading ? (
-          <Skeleton className="h-64 w-full" />
+          <TableSkeleton rows={6} label="Loading courses..." />
         ) : (
           <DataTable
             columns={columns}

@@ -2,17 +2,26 @@ export const INACTIVITY_LIMIT_MS = 10 * 60 * 1000;
 export const INACTIVITY_WARNING_MS = 60 * 1000;
 export const LAST_ACTIVITY_KEY = "lastActivityAt";
 
-export function markSessionActivity() {
+const ACTIVITY_WRITE_THROTTLE_MS = 5000;
+let lastWriteAt = 0;
+
+export function markSessionActivity(force = false) {
   if (!localStorage.getItem("token")) return;
-  localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
+
+  const now = Date.now();
+  if (!force && now - lastWriteAt < ACTIVITY_WRITE_THROTTLE_MS) return;
+
+  lastWriteAt = now;
+  localStorage.setItem(LAST_ACTIVITY_KEY, String(now));
 }
 
 export function clearSessionActivity() {
+  lastWriteAt = 0;
   localStorage.removeItem(LAST_ACTIVITY_KEY);
 }
 
 export function startSession() {
-  markSessionActivity();
+  markSessionActivity(true);
 }
 
 export function getLastActivityAt() {

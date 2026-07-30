@@ -9,7 +9,7 @@ import DataTable from "../components/DataTable";
 import StatCard from "../components/StatCard";
 import GradientButton from "../components/GradientButton";
 import Modal from "../components/Modal";
-import Skeleton, { StatSkeleton } from "../components/Skeleton";
+import { StatSkeleton, TableSkeleton } from "../components/Skeleton";
 import PasswordField from "../components/PasswordField";
 import { validatePasswordStrength } from "../utils/passwordPolicy";
 
@@ -117,7 +117,7 @@ function MyStudents() {
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            className="rounded-xl bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700"
+            className="btn-edit"
             onClick={() => openEdit(row)}
           >
             <span className="inline-flex items-center gap-1">
@@ -127,7 +127,7 @@ function MyStudents() {
           </button>
           <button
             type="button"
-            className="rounded-xl bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700"
+            className="btn-delete"
             onClick={() => deleteStudent(row)}
           >
             <span className="inline-flex items-center gap-1">
@@ -187,7 +187,7 @@ function MyStudents() {
         }
       >
         {loading ? (
-          <Skeleton className="h-64 w-full rounded-2xl" />
+          <TableSkeleton rows={6} label="Loading students..." />
         ) : (
           <DataTable
             columns={columns}
