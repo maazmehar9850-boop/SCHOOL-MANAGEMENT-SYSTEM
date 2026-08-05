@@ -1,9 +1,17 @@
 import { Navigate, Routes, Route } from "react-router-dom";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 import AppShell from "./components/AppShell";
+import SiteLayout from "./components/SiteLayout.jsx";
 import SessionManager from "./components/SessionManager.jsx";
-import Landing from "./PAGES/Landing.jsx";
+import Home from "./PAGES/Home.jsx";
+import About from "./PAGES/About.jsx";
+import Academics from "./PAGES/Academics.jsx";
+import Portal from "./PAGES/Portal.jsx";
+import Gallery from "./PAGES/Gallery.jsx";
+import Contact from "./PAGES/Contact.jsx";
 import Login from "./PAGES/Login.jsx";
+
 import Register from "./PAGES/Register.jsx";
 import AdminDashboard from "./PAGES/AdminDashboard.jsx";
 import TeacherDashboard from "./PAGES/TeacherDashboard.jsx";
@@ -36,7 +44,14 @@ function App() {
     <>
       <SessionManager />
       <Routes>
-        <Route path="/" element={<Landing />} />
+        <Route element={<SiteLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/academics" element={<Academics />} />
+          <Route path="/portal" element={<Portal />} />
+          <Route path="/gallery" element={<Gallery />} />
+          <Route path="/contact" element={<Contact />} />
+        </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

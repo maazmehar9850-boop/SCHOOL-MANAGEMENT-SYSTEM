@@ -25,7 +25,18 @@ API.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      const publicPaths = ["/", "/login", "/register", "/forgot-password", "/reset-password"];
+      const publicPaths = [
+        "/",
+        "/about",
+        "/academics",
+        "/portal",
+        "/gallery",
+        "/contact",
+        "/login",
+        "/register",
+        "/forgot-password",
+        "/reset-password",
+      ];
       const message = error.response?.data?.message || "Session expired. Please log in again.";
       const onPublicPage = publicPaths.includes(window.location.pathname);
       const isLogoutRequest = error.config?.url?.includes("/logout");

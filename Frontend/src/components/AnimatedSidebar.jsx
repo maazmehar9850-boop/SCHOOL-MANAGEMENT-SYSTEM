@@ -88,7 +88,7 @@ function AnimatedSidebar({ role }) {
         <div className="flex items-center gap-3">
           <BrandMark size={40} className="shrink-0 shadow-lg shadow-cyan-500/20" />
           <div>
-            <h1 className="font-display text-lg font-bold tracking-tight text-white">SchoolMS</h1>
+            <h1 className="font-display text-lg font-bold tracking-tight text-white">Aspira College</h1>
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-sky-200/80">
               {role} workspace
             </p>

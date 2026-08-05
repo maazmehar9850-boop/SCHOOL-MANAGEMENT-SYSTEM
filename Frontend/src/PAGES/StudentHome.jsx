@@ -16,6 +16,7 @@ import StatCard from "../components/StatCard";
 import ActionCard from "../components/ActionCard";
 import DashboardPanel from "../components/DashboardPanel";
 import { StatSkeleton } from "../components/Skeleton";
+import { StudentDashboardCharts } from "../components/DashboardCharts";
 import { cachedFetch, getCached } from "../utils/apiCache";
 
 function StudentHome() {
@@ -51,7 +52,8 @@ function StudentHome() {
       title: "Attendance",
       value: `${stats?.attendancePercent ?? 0}%`,
       icon: CalendarCheck,
-      accent: "from-emerald-500 to-teal-600",
+      accent: "from-emerald-400 to-teal-500",
+      glow: "rgba(52, 211, 153, 0.4)",
       hint: "Your presence across courses",
     },
     {
@@ -59,7 +61,8 @@ function StudentHome() {
       title: "Assignments",
       value: stats?.assignments ?? 0,
       icon: ClipboardList,
-      accent: "from-sky-500 to-blue-600",
+      accent: "from-cyan-400 to-blue-500",
+      glow: "rgba(34, 211, 238, 0.4)",
       hint: "Tasks from your teachers",
     },
     {
@@ -67,7 +70,8 @@ function StudentHome() {
       title: "Courses",
       value: stats?.enrolledCourses ?? 0,
       icon: BookOpen,
-      accent: "from-amber-500 to-orange-500",
+      accent: "from-amber-400 to-orange-500",
+      glow: "rgba(251, 191, 36, 0.4)",
       hint: "Subjects you are enrolled in",
     },
     {
@@ -75,7 +79,8 @@ function StudentHome() {
       title: "Average grade",
       value: `${stats?.marksAverage ?? 0} / ${stats?.grade ?? "—"}`,
       icon: Award,
-      accent: "from-indigo-500 to-violet-600",
+      accent: "from-violet-400 to-fuchsia-500",
+      glow: "rgba(168, 85, 247, 0.4)",
       hint: "Marks and performance summary",
     },
   ];
@@ -85,7 +90,7 @@ function StudentHome() {
       role="student"
       variant="student"
       title={`Welcome, ${name}`}
-      subtitle="Track attendance, assignments, results, and learning resources"
+      subtitle="Your Aspira College attendance, assignments, results, and resources"
     >
       {loading ? (
         <StatSkeleton />
@@ -99,6 +104,8 @@ function StudentHome() {
         </section>
       )}
 
+      {!loading ? <StudentDashboardCharts stats={stats} /> : null}
+
       <DashboardPanel
         title="Learning hub"
         subtitle="Jump to your subjects, results, attendance, and downloadable resources."
@@ -110,14 +117,14 @@ function StudentHome() {
             icon={BookOpen}
             title="My subjects"
             description="View enrolled courses and teachers"
-            accent="from-amber-500 to-orange-500"
+            accent="from-amber-400 to-orange-500"
           />
           <ActionCard
             to="/student-results"
             icon={FileText}
             title="My results"
             description="Check marks, scores, and feedback"
-            accent="from-indigo-500 to-violet-600"
+            accent="from-violet-400 to-fuchsia-500"
             delay={0.04}
           />
           <ActionCard
@@ -125,7 +132,7 @@ function StudentHome() {
             icon={CalendarCheck}
             title="Attendance"
             description="See records marked by teachers"
-            accent="from-emerald-500 to-teal-600"
+            accent="from-emerald-400 to-teal-500"
             delay={0.08}
           />
           <ActionCard
@@ -133,7 +140,7 @@ function StudentHome() {
             icon={Banknote}
             title="My fees"
             description="View pending and paid fees, download receipts"
-            accent="from-teal-500 to-emerald-600"
+            accent="from-cyan-400 to-teal-500"
             delay={0.1}
           />
           <ActionCard
@@ -141,7 +148,7 @@ function StudentHome() {
             icon={Library}
             title="Resources"
             description="Syllabus, date sheets, grades & PDF export"
-            accent="from-sky-500 to-blue-600"
+            accent="from-sky-400 to-blue-500"
             delay={0.12}
           />
         </div>

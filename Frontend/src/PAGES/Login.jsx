@@ -137,7 +137,7 @@ function Login() {
                 <span className="mb-3 inline-flex">
                   <BrandMark size={48} className="shadow-lg shadow-cyan-500/30" />
                 </span>
-                <span className="mt-3 block">SchoolMS</span>
+                <span className="mt-3 block">Aspira College</span>
               </h2>
               <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/80">
                 A calm, modern workspace for admins, teachers, and students —

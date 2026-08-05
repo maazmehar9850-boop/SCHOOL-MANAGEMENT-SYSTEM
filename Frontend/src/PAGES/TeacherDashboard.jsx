@@ -18,6 +18,7 @@ import ActionCard from "../components/ActionCard";
 import DashboardPanel from "../components/DashboardPanel";
 import GradientButton from "../components/GradientButton";
 import { StatSkeleton } from "../components/Skeleton";
+import { TeacherDashboardCharts } from "../components/DashboardCharts";
 import { cachedFetch, getCached } from "../utils/apiCache";
 
 function TeacherDashboard() {
@@ -53,7 +54,8 @@ function TeacherDashboard() {
       title: "Assigned students",
       value: stats?.assignedStudents ?? 0,
       icon: Users,
-      accent: "from-sky-500 to-blue-600",
+      accent: "from-cyan-400 to-blue-500",
+      glow: "rgba(34, 211, 238, 0.4)",
       hint: "Learners in your courses",
     },
     {
@@ -61,7 +63,8 @@ function TeacherDashboard() {
       title: "Attendance rate",
       value: `${stats?.attendanceRate ?? 0}%`,
       icon: CalendarCheck,
-      accent: "from-emerald-500 to-teal-600",
+      accent: "from-emerald-400 to-teal-500",
+      glow: "rgba(52, 211, 153, 0.4)",
       hint: "Present across your classes",
     },
     {
@@ -69,7 +72,8 @@ function TeacherDashboard() {
       title: "Assignments",
       value: stats?.assignments ?? 0,
       icon: BookOpen,
-      accent: "from-amber-500 to-orange-500",
+      accent: "from-amber-400 to-orange-500",
+      glow: "rgba(251, 191, 36, 0.4)",
       hint: "Active class work",
     },
     {
@@ -77,7 +81,8 @@ function TeacherDashboard() {
       title: "Pending reviews",
       value: stats?.pendingSubmissions ?? 0,
       icon: ClipboardList,
-      accent: "from-indigo-500 to-violet-600",
+      accent: "from-violet-400 to-fuchsia-500",
+      glow: "rgba(168, 85, 247, 0.4)",
       hint: "Submissions awaiting grading",
     },
   ];
@@ -87,7 +92,7 @@ function TeacherDashboard() {
       role="teacher"
       variant="teacher"
       title={`Welcome, ${name}`}
-      subtitle="Your classes, attendance, marks, and teaching tools in one workspace"
+      subtitle="Your Aspira College classes, attendance, marks, and teaching tools"
     >
       {loading ? (
         <StatSkeleton />
@@ -100,6 +105,8 @@ function TeacherDashboard() {
           ))}
         </section>
       )}
+
+      {!loading ? <TeacherDashboardCharts stats={stats} /> : null}
 
       <DashboardPanel
         title="Teaching shortcuts"
@@ -120,14 +127,14 @@ function TeacherDashboard() {
             icon={CalendarCheck}
             title="Mark attendance"
             description="Record present or absent for enrolled students"
-            accent="from-emerald-500 to-teal-600"
+            accent="from-emerald-400 to-teal-500"
           />
           <ActionCard
             to="/marks"
             icon={Award}
             title="Enter marks"
             description="Save scores for your allotted subject only"
-            accent="from-indigo-500 to-violet-600"
+            accent="from-violet-400 to-fuchsia-500"
             delay={0.04}
           />
           <ActionCard
@@ -135,7 +142,7 @@ function TeacherDashboard() {
             icon={ClipboardList}
             title="Assignments"
             description="Create work and review submissions"
-            accent="from-amber-500 to-orange-500"
+            accent="from-amber-400 to-orange-500"
             delay={0.08}
           />
           <ActionCard
@@ -143,7 +150,7 @@ function TeacherDashboard() {
             icon={Users}
             title="My students"
             description="View learners enrolled in your courses"
-            accent="from-sky-500 to-blue-600"
+            accent="from-cyan-400 to-blue-500"
             delay={0.12}
           />
           <ActionCard
@@ -151,7 +158,7 @@ function TeacherDashboard() {
             icon={UserPlus}
             title="Add student"
             description="Enroll a learner in your subject"
-            accent="from-cyan-500 to-indigo-500"
+            accent="from-sky-400 to-indigo-500"
             delay={0.16}
           />
           <ActionCard
@@ -159,7 +166,7 @@ function TeacherDashboard() {
             icon={Library}
             title="Resources"
             description="Syllabus, date sheets, attendance & grades"
-            accent="from-rose-500 to-pink-600"
+            accent="from-fuchsia-400 to-pink-500"
             delay={0.2}
           />
         </div>

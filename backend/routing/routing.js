@@ -1,5 +1,5 @@
 import express from "express";
-import sendMail from "../nodemailer/gmail.js";
+import sendMail, { sendContactMessage } from "../nodemailer/gmail.js";
 import { authenticate, authorizeRoles } from "../middleware/middleware.js";
 import { validate } from "../middleware/validate.js";
 import {
@@ -189,6 +189,7 @@ router.delete("/delete/:id", authenticate, authorizeRoles("admin"), deleteone);
 
 // Dashboard
 router.get("/public/stats", getPublicStats);
+router.post("/public/contact", sendContactMessage);
 router.get("/dashboard/stats", authenticate, getDashboardStats);
 router.get("/notifications", authenticate, getNotifications);
 

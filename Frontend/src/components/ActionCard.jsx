@@ -6,25 +6,25 @@ function ActionCard({
   icon: Icon,
   title,
   description,
-  accent = "from-[#3b5bdb] to-[#22b8cf]",
+  accent = "from-[#22d3ee] to-[#3b82f6]",
   onClick,
 }) {
   const inner = (
-    <div className="action-card group flex h-full min-h-[7.5rem] flex-col justify-between rounded-2xl border border-white/70 bg-white/65 p-5 shadow-sm transition-transform duration-150 hover:-translate-y-0.5 hover:border-white hover:bg-white/85 hover:shadow-[0_14px_36px_rgba(15,23,42,0.1)]">
+    <div className="action-card group flex h-full min-h-[7.5rem] flex-col justify-between rounded-2xl p-5 transition-transform duration-200 hover:-translate-y-0.5">
       <div className="flex items-start justify-between gap-3">
         <div
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${accent} text-white shadow-md ring-4 ring-white/40`}
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${accent} text-white shadow-[0_0_18px_rgba(34,211,238,0.28)]`}
         >
           {Icon ? <Icon size={18} strokeWidth={2.1} /> : null}
         </div>
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100/80 text-slate-400 transition-colors group-hover:bg-slate-900 group-hover:text-white">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-slate-500 transition-colors group-hover:bg-cyan-500/20 group-hover:text-cyan-300">
           <ArrowUpRight size={15} />
         </span>
       </div>
       <div className="mt-4">
-        <h3 className="font-display text-base font-semibold text-slate-900">{title}</h3>
+        <h3 className="font-display text-base font-semibold text-white">{title}</h3>
         {description ? (
-          <p className="mt-1 text-sm leading-relaxed text-slate-500">{description}</p>
+          <p className="mt-1 text-sm leading-relaxed text-slate-400">{description}</p>
         ) : null}
       </div>
     </div>
@@ -34,7 +34,7 @@ function ActionCard({
     return (
       <Link
         to={to}
-        className="block h-full outline-none focus-visible:rounded-2xl focus-visible:ring-2 focus-visible:ring-[#3b5bdb]/40"
+        className="block h-full outline-none focus-visible:rounded-2xl focus-visible:ring-2 focus-visible:ring-cyan-400/40"
       >
         {inner}
       </Link>
@@ -45,7 +45,7 @@ function ActionCard({
     <button
       type="button"
       onClick={onClick}
-      className="block h-full w-full text-left outline-none focus-visible:rounded-2xl focus-visible:ring-2 focus-visible:ring-[#3b5bdb]/40"
+      className="block h-full w-full text-left outline-none focus-visible:rounded-2xl focus-visible:ring-2 focus-visible:ring-cyan-400/40"
     >
       {inner}
     </button>
