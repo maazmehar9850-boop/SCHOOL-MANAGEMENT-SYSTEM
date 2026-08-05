@@ -123,7 +123,7 @@ async function main() {
 
   const page = await context.newPage();
 
-  console.log("Recording SchoolMS frontend demo...");
+  console.log("Recording Aspira College frontend demo...");
   console.log(`App: ${BASE_URL}`);
 
   console.log("\nPublic pages");

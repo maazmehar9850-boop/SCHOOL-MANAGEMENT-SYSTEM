@@ -202,7 +202,7 @@ function StudentResources() {
           ? "Syllabus, date sheets, attendance, and grades — export any report as PDF"
           : isTeacher
             ? "Your course resources, attendance, and marks — export as PDF"
-            : "School resources overview"
+            : "Campus resources overview"
       }
     >
       <div className="resources-page-stack">

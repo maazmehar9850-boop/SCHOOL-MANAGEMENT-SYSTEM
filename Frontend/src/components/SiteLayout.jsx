@@ -1,8 +1,9 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { ArrowRight, Menu, X } from "lucide-react";
 import GradientButton from "./GradientButton";
 import BrandLogo from "./BrandLogo";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 const navLinks = [
   { to: "/", label: "Home", end: true },
@@ -13,8 +14,20 @@ const navLinks = [
   { to: "/contact", label: "Contact" },
 ];
 
+const PAGE_TITLES = {
+  "/": "Home",
+  "/about": "About",
+  "/academics": "Academics",
+  "/portal": "Portal",
+  "/gallery": "Gallery",
+  "/contact": "Contact",
+};
+
 function SiteLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { pathname } = useLocation();
+  useDocumentTitle(PAGE_TITLES[pathname] || "Campus");
+
 
   return (
     <div className="site-shell min-h-screen">

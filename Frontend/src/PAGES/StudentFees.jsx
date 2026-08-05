@@ -231,7 +231,7 @@ function StudentFees() {
 
       <PageContentCard
         title="Fee statements"
-        subtitle="Only fees assigned to your account by the school admin"
+        subtitle="Only fees assigned to your account by the college admin"
         action={
           <GradientButton variant="secondary" onClick={load}>
             <RefreshCw size={16} />

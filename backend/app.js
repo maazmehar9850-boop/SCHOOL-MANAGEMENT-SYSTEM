@@ -26,7 +26,7 @@ app.use("/uploads", express.static(uploadsRoot));
 app.use("/api/v1", routing);
 
 app.get("/", (req, res) => {
-  res.json({ name: "SchoolMS API", status: "ok", version: "1.0.0" });
+  res.json({ name: "Aspira College API", status: "ok", version: "1.0.0" });
 });
 
 app.use((err, req, res, next) => {

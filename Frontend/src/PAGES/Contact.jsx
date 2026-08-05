@@ -57,7 +57,7 @@ function Contact() {
             </h1>
             <p className="mt-5 text-base leading-relaxed text-[var(--lg-muted)]">
               For admissions, portal access, or general inquiries, reach the campus office during
-              school hours — or send a message using the form. Campus currently serves{" "}
+              college hours — or send a message using the form. Campus currently serves{" "}
               {loading ? "—" : data.students} students and {loading ? "—" : data.teachers} teachers.
             </p>
           </div>

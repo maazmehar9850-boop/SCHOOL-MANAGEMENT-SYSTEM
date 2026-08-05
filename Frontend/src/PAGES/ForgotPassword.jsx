@@ -8,6 +8,7 @@ import Background from "../components/Background";
 import GlassCard from "../components/GlassCard";
 import GradientButton from "../components/GradientButton";
 import { BrandMark } from "../components/BrandLogo";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -15,6 +16,7 @@ function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [statusInfo, setStatusInfo] = useState(null);
+  useDocumentTitle("Forgot Password");
 
   const checkStatus = async () => {
     if (!email.trim()) {
@@ -67,7 +69,7 @@ function ForgotPassword() {
             <BrandMark size={40} className="mx-auto mb-3" />
             <h1 className="font-display text-2xl font-bold text-slate-900">Reset password</h1>
             <p className="mt-2 text-sm leading-relaxed text-slate-600">
-              For teachers and students only. Submit a request — your school admin
+              For teachers and students only. Submit a request — your Aspira College admin
               must approve it before you can set a new password.
             </p>
           </motion.div>
@@ -76,7 +78,7 @@ function ForgotPassword() {
             <form onSubmit={submitRequest} className="space-y-4">
               <label className="block space-y-2">
                 <span className="text-sm font-medium text-slate-700">
-                  School email <span className="text-rose-500">*</span>
+                  College email <span className="text-rose-500">*</span>
                 </span>
                 <div className="input-field-wrap">
                   <Mail className="input-icon-left" size={18} strokeWidth={2} aria-hidden />
@@ -85,7 +87,7 @@ function ForgotPassword() {
                     className="input-glass"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@school.com"
+                    placeholder="you@aspiracollege.com"
                     autoComplete="email"
                     required
                   />
@@ -124,7 +126,7 @@ function ForgotPassword() {
                   <p className="font-semibold">Request submitted</p>
                   <p className="mt-1">
                     An admin will review your request. After approval, open the reset
-                    password page and continue with your school email.
+                    password page and continue with your college email.
                   </p>
                 </div>
               </div>

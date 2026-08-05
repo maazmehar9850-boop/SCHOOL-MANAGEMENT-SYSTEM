@@ -351,7 +351,7 @@ function Assignments() {
         isTeacher
           ? "Create assignments, review submissions, and grade work"
           : isAdmin
-            ? "View school-wide assignments and submission progress"
+            ? "View campus-wide assignments and submission progress"
             : "View course assignments and upload PDF or image submissions"
       }
     >

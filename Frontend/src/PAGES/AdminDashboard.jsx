@@ -164,7 +164,7 @@ function AdminDashboard() {
             to="/assignments"
             icon={ClipboardList}
             title="Assignments"
-            description="Review school-wide assignment activity"
+            description="Review campus-wide assignment activity"
             accent="from-amber-400 to-orange-500"
           />
           <ActionCard

@@ -198,7 +198,7 @@ export const signupUser = async (req, res) => {
     if (role === "student") {
       return res.status(403).json({
         message:
-          "Students are added by their subject teacher. Please contact your school.",
+          "Students are added by their subject teacher. Please contact Aspira College.",
       });
     }
 

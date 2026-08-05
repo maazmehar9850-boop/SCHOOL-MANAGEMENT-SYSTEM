@@ -87,7 +87,7 @@ const THEMES = {
     ribbon: "#22b8cf",
     tableHead: "#1e293b",
     badge: "#3b5bdb",
-    note: "SchoolMS generated document",
+    note: "Aspira College generated document",
   },
 };
 
@@ -188,8 +188,8 @@ function buildDocumentHtml({ title, bodyHtml, subtitle, generated, type, theme, 
     <div class="brand-block">
       <div class="logo">${LOGO_SVG}</div>
       <div>
-        <div class="brand-name">SchoolMS</div>
-        <div class="brand-tag">School Management System</div>
+        <div class="brand-name">Aspira College</div>
+        <div class="brand-tag">Campus Management Portal</div>
       </div>
     </div>
     <div class="doc-badge">${escapeHtml(theme.label)}</div>
@@ -209,7 +209,7 @@ function buildDocumentHtml({ title, bodyHtml, subtitle, generated, type, theme, 
 
   <footer class="pdf-foot">
     <div>
-      <strong>SchoolMS</strong> · ${escapeHtml(theme.note)}
+      <strong>Aspira College</strong> · ${escapeHtml(theme.note)}
     </div>
     <div>Generated ${escapeHtml(generated)}</div>
   </footer>

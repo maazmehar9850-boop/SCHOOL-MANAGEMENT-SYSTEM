@@ -450,7 +450,7 @@ function AdminFees() {
 
       <PageContentCard
         title="Fees register"
-        subtitle="Pending and paid student fees across the school"
+        subtitle="Pending and paid student fees across the campus"
         action={
           <div className="flex flex-wrap gap-2">
             <GradientButton variant="secondary" onClick={load}>

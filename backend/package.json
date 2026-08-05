@@ -1,7 +1,7 @@
 {
   "name": "backend-server",
   "version": "1.0.0",
-  "description": "School Management System API",
+  "description": "Aspira College campus portal API",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",

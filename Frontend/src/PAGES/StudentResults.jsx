@@ -90,7 +90,7 @@ function StudentResults() {
         type: "results",
         subtitle: "Academic grades and teacher feedback",
         meta: {
-          Document: isAdmin ? "School-wide results" : "Student results",
+          Document: isAdmin ? "Campus-wide results" : "Student results",
           Records: String(marks.length),
         },
       }
@@ -106,7 +106,7 @@ function StudentResults() {
         isStudent
           ? "Your marks only — save a PDF copy anytime"
           : isAdmin
-            ? "School-wide marks sheet — save as professional PDF"
+            ? "Campus-wide marks sheet — save as professional PDF"
             : "Marks for your allotted subjects"
       }
     >

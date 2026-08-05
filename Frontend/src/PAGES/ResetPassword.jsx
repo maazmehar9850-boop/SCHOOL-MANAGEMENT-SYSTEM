@@ -10,6 +10,7 @@ import GradientButton from "../components/GradientButton";
 import PasswordField from "../components/PasswordField";
 import { validatePasswordStrength } from "../utils/passwordPolicy";
 import { BrandMark } from "../components/BrandLogo";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 function ResetPassword() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ function ResetPassword() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  useDocumentTitle("Reset Password");
 
   const submitReset = async (e) => {
     e.preventDefault();
@@ -74,14 +76,14 @@ function ResetPassword() {
             <BrandMark size={40} className="mx-auto mb-3" />
             <h1 className="font-display text-2xl font-bold text-slate-900">Set new password</h1>
             <p className="mt-2 text-sm text-slate-600">
-              After admin approval, enter your school email and set a new password.
+              After admin approval, enter your college email and set a new password.
             </p>
           </motion.div>
 
           <form onSubmit={submitReset} className="space-y-4">
             <label className="block space-y-2">
               <span className="text-sm font-medium text-slate-700">
-                School email <span className="text-rose-500">*</span>
+                College email <span className="text-rose-500">*</span>
               </span>
               <div className="input-field-wrap">
                 <Mail className="input-icon-left" size={18} strokeWidth={2} aria-hidden />
@@ -90,7 +92,7 @@ function ResetPassword() {
                   className="input-glass"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@school.com"
+                  placeholder="you@aspiracollege.com"
                   autoComplete="email"
                   required
                 />

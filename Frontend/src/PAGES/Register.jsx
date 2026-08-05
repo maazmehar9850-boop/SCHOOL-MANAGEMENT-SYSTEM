@@ -11,6 +11,7 @@ import GradientButton from "../components/GradientButton";
 import FormField from "../components/FormField";
 import PasswordField from "../components/PasswordField";
 import { validatePasswordStrength } from "../utils/passwordPolicy";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 function Register() {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ function Register() {
     Password: "",
     role: "teacher",
   });
+  useDocumentTitle("Register");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -97,7 +99,7 @@ function Register() {
                 type="email"
                 value={form.email}
                 onChange={handleChange}
-                placeholder="you@school.com"
+                placeholder="you@aspiracollege.com"
                 required
                 className="pl-10"
               />

@@ -10,6 +10,7 @@ import Background from "../components/Background";
 import GlassCard from "../components/GlassCard";
 import GradientButton from "../components/GradientButton";
 import { BrandMark } from "../components/BrandLogo";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 const ease = [0.22, 1, 0.36, 1];
 
@@ -32,6 +33,7 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [focused, setFocused] = useState(null);
   const [form, setForm] = useState({ email: "", Password: "" });
+  useDocumentTitle("Login");
 
   useEffect(() => {
     resetAuthRedirectState();
@@ -202,7 +204,7 @@ function Login() {
                   <BrandMark size={48} className="shadow-lg shadow-cyan-500/25" />
                 </motion.div>
                 <h1 className="font-display text-2xl font-bold text-slate-900">Welcome back</h1>
-                <p className="mt-1.5 text-sm text-slate-500">Sign in to continue to your workspace</p>
+                <p className="mt-1.5 text-sm text-slate-500">Sign in to your Aspira College account</p>
               </motion.div>
             </motion.div>
 
@@ -235,7 +237,7 @@ function Login() {
                     onFocus={() => setFocused("email")}
                     onBlur={() => setFocused(null)}
                     className="input-glass"
-                    placeholder="you@school.com"
+                    placeholder="you@aspiracollege.com"
                     autoComplete="email"
                     required
                   />

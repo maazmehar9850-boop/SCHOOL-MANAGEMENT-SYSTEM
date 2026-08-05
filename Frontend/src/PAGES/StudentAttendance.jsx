@@ -67,7 +67,7 @@ function StudentAttendance() {
       {
         type: "attendance",
         subtitle: isAdmin
-          ? "School-wide attendance records"
+          ? "Campus-wide attendance records"
           : "Student attendance record",
         meta: {
           Records: String(attendance.length),

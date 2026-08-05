@@ -10,7 +10,7 @@ import { validatePasswordStrength } from "../utils/passwordPolicy";
 
 const FIELDS = [
   { key: "name", label: "Full name", type: "text", required: true, placeholder: "Teacher full name" },
-  { key: "email", label: "Email address", type: "email", required: true, placeholder: "teacher@school.com" },
+  { key: "email", label: "Email address", type: "email", required: true, placeholder: "teacher@aspiracollege.com" },
   { key: "subject", label: "Subject", type: "text", placeholder: "e.g. Mathematics" },
   { key: "experience", label: "Experience", type: "text", placeholder: "e.g. 5 years" },
 ];

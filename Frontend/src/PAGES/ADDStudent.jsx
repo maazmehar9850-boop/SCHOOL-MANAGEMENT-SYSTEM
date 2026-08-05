@@ -133,7 +133,7 @@ function AddStudent() {
                 value={form.email}
                 onChange={handleChange}
                 className="input-glass"
-                placeholder="student@school.com"
+                placeholder="student@aspiracollege.com"
                 required
               />
             </label>
