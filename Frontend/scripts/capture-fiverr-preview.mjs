@@ -11,7 +11,7 @@ const PREVIEW_DIR = path.join(ROOT, "fiverr-preview");
 
 const BASE_URL = process.env.APP_URL || "http://localhost:5173";
 const API_URL =
-  process.env.API_URL || "https://sms-backendm.vercel.app/api/v1";
+  process.env.API_URL || "https://cms-backen.vercel.app/api/v1";
 
 const ACCOUNTS = {
   admin: { email: "admin@gmail.com", Password: "123456" },
@@ -32,7 +32,7 @@ async function login(role) {
   const endpoints = [
     "http://localhost:3030/api/v1",
     process.env.API_URL,
-    "https://sms-backendm.vercel.app/api/v1",
+    "https://cms-backen.vercel.app/api/v1",
   ].filter(Boolean);
 
   let lastError = null;

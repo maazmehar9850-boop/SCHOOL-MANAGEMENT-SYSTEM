@@ -2,8 +2,22 @@ import axios from "axios";
 import { isSessionExpiredByInactivity, markSessionActivity } from "./utils/session";
 import { redirectToLogin } from "./utils/notify";
 
+function resolveApiBase() {
+  const fromEnv = (import.meta.env.VITE_API_URL || "").trim();
+  const isStale =
+    !fromEnv ||
+    fromEnv.includes("sms-backendm.vercel.app") ||
+    fromEnv.includes("sms-maaz.vercel.app");
+
+  if (!isStale) return fromEnv.replace(/\/$/, "");
+  if (import.meta.env.PROD) return "https://cms-backen.vercel.app/api/v1";
+  return fromEnv || "http://localhost:3030/api/v1";
+}
+
+const API_BASE = resolveApiBase();
+
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3030/api/v1",
+  baseURL: API_BASE,
 });
 
 API.interceptors.request.use((config) => {
@@ -50,10 +64,8 @@ API.interceptors.response.use(
   }
 );
 
-const API_ORIGIN = (import.meta.env.VITE_API_URL || "http://localhost:3030/api/v1").replace(
-  /\/api\/v1\/?$/,
-  ""
-);
+const API_ORIGIN = API_BASE.replace(/\/api\/v1\/?$/, "");
+
 
 export const fileUrl = (path) => {
   if (!path) return "";

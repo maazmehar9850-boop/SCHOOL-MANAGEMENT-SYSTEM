@@ -6,11 +6,27 @@ import { uploadsRoot } from "./utils/uploadPaths.js";
 const app = express();
 
 app.use(express.json({ limit: "1mb" }));
+
+const allowedOrigins = new Set(
+  [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://cms-maaz.vercel.app",
+    process.env.FRONTEND_URL,
+    ...(process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(",") : []),
+  ]
+    .map((o) => (o || "").trim())
+    .filter(Boolean)
+);
+
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN
-      ? process.env.CORS_ORIGIN.split(",").map((o) => o.trim())
-      : ["http://localhost:3000", "http://localhost:5173"],
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.has(origin)) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
     credentials: true,
   })
 );
