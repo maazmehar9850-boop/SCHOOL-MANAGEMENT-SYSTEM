@@ -7,6 +7,10 @@ import SessionManager from "./components/SessionManager.jsx";
 import Home from "./PAGES/Home.jsx";
 import About from "./PAGES/About.jsx";
 import Academics from "./PAGES/Academics.jsx";
+import Admissions from "./PAGES/Admissions.jsx";
+import Faculty from "./PAGES/Faculty.jsx";
+import CampusLife from "./PAGES/CampusLife.jsx";
+import News from "./PAGES/News.jsx";
 import Portal from "./PAGES/Portal.jsx";
 import Gallery from "./PAGES/Gallery.jsx";
 import Contact from "./PAGES/Contact.jsx";
@@ -48,6 +52,10 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/academics" element={<Academics />} />
+          <Route path="/admissions" element={<Admissions />} />
+          <Route path="/faculty" element={<Faculty />} />
+          <Route path="/campus-life" element={<CampusLife />} />
+          <Route path="/news" element={<News />} />
           <Route path="/portal" element={<Portal />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/contact" element={<Contact />} />
