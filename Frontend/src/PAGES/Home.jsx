@@ -2,13 +2,11 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
-  MapPin,
   BookOpen,
   Users,
   GraduationCap,
   Award,
   Building2,
-  Sparkles,
 } from "lucide-react";
 import GradientButton from "../components/GradientButton";
 import usePublicCampusData from "../hooks/usePublicCampusData";
@@ -16,9 +14,17 @@ import imgBuilding from "../assets/landing/landing-building.png";
 import imgCampus from "../assets/landing/aspira-students.png";
 import imgClass from "../assets/landing/aspira-classroom.png";
 
+const fadeUp = {
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.2 },
+  transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
+};
+
 function Home() {
   const { data, loading } = usePublicCampusData();
   const college = data.college || {};
+  const campusName = college.name || "Aspira College";
 
   const stats = [
     { value: String(data.students), label: "Students" },
@@ -34,41 +40,32 @@ function Home() {
 
   return (
     <>
-      <section className="relative overflow-hidden px-3 pb-6 pt-4 md:px-5">
-        <div className="relative mx-auto min-h-[88vh] max-w-7xl overflow-hidden rounded-[2rem] border border-white/25 shadow-[0_35px_90px_rgba(2,12,30,0.4)]">
+      <section className="site-hero">
+        <div className="site-hero__media" aria-hidden="true">
           <img
             src={imgBuilding}
-            alt={`${college.name || "Aspira College"} campus building`}
-            className="absolute inset-0 h-full w-full object-cover"
+            alt=""
+            fetchPriority="high"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#020b18]/88 via-[#071829]/62 to-[#071829]/25" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#020b18]/80 via-transparent to-[#020b18]/30" />
-
-          <div className="relative z-10 grid min-h-[88vh] items-end gap-8 px-5 py-12 md:grid-cols-[1.2fr_0.8fr] md:items-center md:px-10 lg:px-14 lg:py-16">
+        </div>
+        <div className="site-hero__veil" aria-hidden="true" />
+        <div className="site-hero__content">
+          <div className="mx-auto w-full max-w-7xl">
             <motion.div
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              className="max-w-2xl text-white"
+              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+              className="max-w-3xl"
             >
-              <p className="liquid-chip mb-5">
-                <MapPin size={12} />
-                {college.campus || "Dolat Nagar · Gujrat"}
-              </p>
-              <p className="mb-3 text-sm font-semibold uppercase tracking-[0.28em] text-sky-200/90">
-                Admissions open · Portal online
-              </p>
-              <h1 className="font-display text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-                {college.name || "Aspira College"}
-                <span className="mt-2 block bg-gradient-to-r from-amber-100 via-white to-sky-200 bg-clip-text text-transparent">
-                  Gujrat Campus
-                </span>
+              <h1 className="site-hero__brand">
+                {campusName}
+                <span>Gujrat Campus</span>
               </h1>
-              <p className="mt-6 max-w-xl text-base leading-relaxed text-slate-200/95 sm:text-lg">
-                A modern college experience for ambitious students — strong academics, caring
-                faculty, and a digital campus portal for attendance, results, and daily learning.
+              <p className="site-hero__copy">
+                Strong academics, caring faculty, and a digital campus portal for attendance,
+                results, and daily learning — at {college.campus || "Dolat Nagar, Gujrat"}.
               </p>
-              <div className="mt-9 flex flex-wrap gap-3">
+              <div className="site-hero__actions">
                 <Link to="/login">
                   <GradientButton className="!rounded-full !px-8 !py-3.5 !text-base">
                     Portal Login
@@ -85,137 +82,113 @@ function Home() {
                 </Link>
               </div>
             </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15, duration: 0.7 }}
-              className="liquid-glass-dark p-6 text-white md:p-7"
-            >
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-200/90">
-                Campus at a glance
-              </p>
-              <div className="mt-5 grid grid-cols-2 gap-4">
-                {stats.slice(0, 4).map((s) => (
-                  <div key={s.label} className="rounded-xl border border-white/10 bg-white/5 p-3">
-                    <p className="font-display text-2xl font-extrabold">
-                      {loading ? "—" : s.value}
-                    </p>
-                    <p className="mt-1 text-xs text-slate-300">{s.label}</p>
-                  </div>
-                ))}
-              </div>
-              <ul className="mt-5 space-y-3 text-sm text-slate-200/90">
-                {[
-                  `${loading ? "—" : data.assignments} assignments in system`,
-                  `${loading ? "—" : data.enrollments} active enrollments`,
-                  college.phone || "0319 8018795",
-                ].map((line) => (
-                  <li key={line} className="flex items-start gap-3">
-                    <Sparkles size={16} className="mt-0.5 shrink-0 text-sky-300" />
-                    <span>{line}</span>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 pb-4 md:px-8">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <section className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-12">
+        <motion.div
+          {...fadeUp}
+          className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6"
+        >
           {stats.map((item) => (
-            <div key={item.label} className="liquid-glass p-5">
-              <p className="font-display text-3xl font-extrabold text-[var(--lg-ink)]">
-                {loading ? "—" : item.value}
-              </p>
-              <p className="mt-1 text-sm font-medium text-[var(--lg-muted)]">{item.label}</p>
+            <div key={item.label} className="site-stat">
+              <p className="site-stat__value">{loading ? "—" : item.value}</p>
+              <p className="site-stat__label">{item.label}</p>
             </div>
           ))}
-        </div>
+        </motion.div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-14 md:px-8">
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-          <div className="max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0b5fff]">
-              Programs
-            </p>
-            <h2 className="font-display mt-2 text-3xl font-bold text-[var(--lg-ink)] md:text-4xl">
-              Active courses this session
-            </h2>
-            <p className="mt-3 text-[var(--lg-muted)]">
-              Programs currently offered at Aspira College.
+      <section className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-14">
+        <motion.div
+          {...fadeUp}
+          className="mb-8 flex flex-wrap items-end justify-between gap-4"
+        >
+          <div>
+            <p className="site-eyebrow">Programs</p>
+            <h2 className="site-section-title mt-2">Active courses this session</h2>
+            <p className="site-section-lead">
+              Programs currently offered at {campusName}.
             </p>
           </div>
-          <Link to="/academics" className="text-sm font-semibold text-[#0b5fff]">
-            View academics →
+          <Link to="/academics" className="site-link inline-flex items-center gap-1">
+            View academics <ArrowRight size={14} />
           </Link>
-        </div>
+        </motion.div>
 
         {loading ? (
-          <div className="liquid-glass p-8 text-sm text-[var(--lg-muted)]">Loading courses...</div>
+          <div className="site-card p-8 text-sm text-[var(--lg-muted)]">Loading courses...</div>
         ) : featuredCourses.length === 0 ? (
-          <div className="liquid-glass p-8 text-sm text-[var(--lg-muted)]">
+          <div className="site-card p-8 text-sm text-[var(--lg-muted)]">
             No active courses yet. Add courses from the admin portal.
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredCourses.slice(0, 6).map((course) => (
-              <div key={course.id} className="liquid-glass p-5">
-                <p className="text-xs font-semibold uppercase tracking-wider text-[#0b5fff]">
+            {featuredCourses.slice(0, 6).map((course, i) => (
+              <motion.div
+                key={course.id}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05, duration: 0.45 }}
+                className="site-card p-5 md:p-6"
+              >
+                <p className="site-card__meta">
                   {course.code} · {course.className}
                 </p>
-                <h3 className="font-display mt-2 text-lg font-bold text-[var(--lg-ink)]">
-                  {course.name}
-                </h3>
-                <p className="mt-2 text-sm text-[var(--lg-muted)]">
-                  Teacher: {course.teacher || "TBA"}
-                </p>
+                <h3 className="site-card__title mt-2.5 text-lg">{course.name}</h3>
+                <p className="site-card__text mt-2">Teacher: {course.teacher || "TBA"}</p>
                 {course.duration ? (
-                  <p className="mt-1 text-xs text-slate-500">Duration: {course.duration}</p>
+                  <p className="mt-1.5 text-xs font-medium text-slate-500">
+                    Duration: {course.duration}
+                  </p>
                 ) : null}
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 pb-10 md:px-8">
-        <div className="mb-8 max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0b5fff]">Faculty</p>
-          <h2 className="font-display mt-2 text-3xl font-bold text-[var(--lg-ink)] md:text-4xl">
-            Our faculty
-          </h2>
-        </div>
+      <section className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-14">
+        <motion.div {...fadeUp} className="mb-8">
+          <p className="site-eyebrow">Faculty</p>
+          <h2 className="site-section-title mt-2">Our faculty</h2>
+          <p className="site-section-lead">
+            Experienced teachers guiding students across every program.
+          </p>
+        </motion.div>
         {loading ? (
-          <div className="liquid-glass p-8 text-sm text-[var(--lg-muted)]">Loading faculty...</div>
+          <div className="site-card p-8 text-sm text-[var(--lg-muted)]">Loading faculty...</div>
         ) : faculty.length === 0 ? (
-          <div className="liquid-glass p-8 text-sm text-[var(--lg-muted)]">
+          <div className="site-card p-8 text-sm text-[var(--lg-muted)]">
             No faculty records yet.
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {faculty.map((t) => (
-              <div key={t.id} className="liquid-glass p-5">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0b5fff]/10 text-sm font-bold text-[#0b5fff]">
-                  {(t.name || "T").slice(0, 1).toUpperCase()}
-                </div>
-                <h3 className="font-display mt-3 text-base font-bold text-[var(--lg-ink)]">
-                  {t.name}
-                </h3>
-                <p className="mt-1 text-sm text-[var(--lg-muted)]">{t.subject}</p>
+            {faculty.map((t, i) => (
+              <motion.div
+                key={t.id}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.04, duration: 0.4 }}
+                className="site-card p-5 md:p-6"
+              >
+                <div className="site-avatar">{(t.name || "T").slice(0, 1).toUpperCase()}</div>
+                <h3 className="site-card__title mt-3.5 text-base">{t.name}</h3>
+                <p className="site-card__text mt-1.5">{t.subject}</p>
                 {t.experience ? (
-                  <p className="mt-1 text-xs text-slate-500">{t.experience}</p>
+                  <p className="mt-1.5 text-xs font-medium text-slate-500">{t.experience}</p>
                 ) : null}
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-10 md:px-8">
-        <div className="grid gap-5 md:grid-cols-3">
+      <section className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-14">
+        <div className="grid gap-4 md:grid-cols-3">
           {[
             {
               to: "/academics",
@@ -235,33 +208,43 @@ function Home() {
               title: "Admissions guidance",
               text: `Call ${college.phone || "0319 8018795"} or visit ${college.campus || "Dolat Nagar, Gujrat"}.`,
             },
-          ].map((card) => (
-            <Link key={card.to} to={card.to} className="liquid-glass group block p-6 md:p-7">
-              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl border border-white/60 bg-white/50 text-[#0b5fff] shadow-sm">
-                <card.icon size={20} />
-              </div>
-              <h3 className="font-display text-xl font-bold text-[var(--lg-ink)]">{card.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-[var(--lg-muted)]">{card.text}</p>
-              <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#0b5fff]">
-                Learn more <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
-              </span>
-            </Link>
+          ].map((card, i) => (
+            <motion.div
+              key={card.to}
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.08, duration: 0.45 }}
+            >
+              <Link to={card.to} className="site-card group block h-full p-6 md:p-7">
+                <div className="site-card__icon">
+                  <card.icon size={20} strokeWidth={2.1} />
+                </div>
+                <h3 className="site-card__title mt-4 text-xl">{card.title}</h3>
+                <p className="site-card__text mt-2">{card.text}</p>
+                <span className="site-link mt-5 inline-flex items-center gap-1">
+                  Learn more
+                  <ArrowRight
+                    size={14}
+                    className="transition group-hover:translate-x-0.5"
+                  />
+                </span>
+              </Link>
+            </motion.div>
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 pb-16 md:px-8 md:pb-24">
-        <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
-          <div className="liquid-glass p-7 md:p-10">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0b5fff]">
-              Why Aspira
-            </p>
-            <h2 className="font-display mt-3 text-3xl font-bold text-[var(--lg-ink)] md:text-4xl">
+      <section className="mx-auto max-w-7xl px-4 pb-16 pt-6 md:px-8 md:pb-24 md:pt-10">
+        <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-14">
+          <motion.div {...fadeUp}>
+            <p className="site-eyebrow">Why Aspira</p>
+            <h2 className="site-section-title mt-3">
               A college environment designed for focus and growth
             </h2>
-            <p className="mt-4 text-[var(--lg-muted)] leading-relaxed">
-              From first-day orientation to final results, {college.name || "Aspira College"} supports
-              every stage of student life at {college.campus || "Dolat Nagar, Gujrat"}.
+            <p className="site-section-lead mt-4 !max-w-none">
+              From first-day orientation to final results, {campusName} supports every stage of
+              student life at {college.campus || "Dolat Nagar, Gujrat"}.
             </p>
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
               {[
@@ -276,22 +259,30 @@ function Home() {
                   text: `Current average marks in portal: ${loading ? "—" : data.avgMarks}`,
                 },
               ].map((item) => (
-                <div key={item.title} className="rounded-2xl border border-white/50 bg-white/35 p-4">
-                  <item.icon className="text-[#0b5fff]" size={20} />
-                  <h3 className="mt-3 font-display font-bold text-[var(--lg-ink)]">{item.title}</h3>
-                  <p className="mt-1 text-sm text-[var(--lg-muted)]">{item.text}</p>
+                <div key={item.title} className="site-card p-5">
+                  <div className="site-card__icon">
+                    <item.icon size={18} strokeWidth={2.1} />
+                  </div>
+                  <h3 className="site-card__title mt-3.5 text-base">{item.title}</h3>
+                  <p className="site-card__text mt-1.5">{item.text}</p>
                 </div>
               ))}
             </div>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="liquid-media h-64 sm:h-full sm:min-h-[420px]">
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="grid gap-4 sm:grid-cols-2"
+          >
+            <div className="site-media h-64 sm:h-full sm:min-h-[420px]">
               <img src={imgCampus} alt="Aspira College students on campus" />
             </div>
-            <div className="liquid-media h-64 sm:mt-10 sm:h-[360px]">
+            <div className="site-media h-64 sm:mt-10 sm:h-[360px]">
               <img src={imgClass} alt="Aspira College classroom" />
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
     </>

@@ -29,21 +29,39 @@ const CAPTURES = [
 ];
 
 async function login(role) {
-  const res = await fetch(`${API_URL}/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(ACCOUNTS[role]),
-  });
-  if (!res.ok) throw new Error(`Login failed for ${role}: ${res.status}`);
-  const data = await res.json();
-  const user = data.User;
-  return {
-    token: data.token,
-    role: user.role,
-    name: user.name || user.email,
-    email: user.email || "",
-    userId: user._id,
-  };
+  const endpoints = [
+    "http://localhost:3030/api/v1",
+    process.env.API_URL,
+    "https://sms-backendm.vercel.app/api/v1",
+  ].filter(Boolean);
+
+  let lastError = null;
+  for (const base of endpoints) {
+    try {
+      const res = await fetch(`${base}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(ACCOUNTS[role]),
+      });
+      if (!res.ok) {
+        lastError = new Error(`Login failed for ${role}: ${res.status} @ ${base}`);
+        continue;
+      }
+      const data = await res.json();
+      const user = data.User;
+      console.log(`  Logged in via ${base}`);
+      return {
+        token: data.token,
+        role: user.role,
+        name: user.name || user.email,
+        email: user.email || "",
+        userId: user._id,
+      };
+    } catch (err) {
+      lastError = err;
+    }
+  }
+  throw lastError || new Error(`Login failed for ${role}`);
 }
 
 async function seedAuth(page, auth) {
@@ -63,6 +81,7 @@ async function capturePage(browser, { name, path: routePath, auth }) {
     deviceScaleFactor: 2,
   });
   const desktopPage = await desktopContext.newPage();
+  desktopPage.setDefaultTimeout(90000);
 
   if (auth) {
     const session = await login(auth);
@@ -71,13 +90,14 @@ async function capturePage(browser, { name, path: routePath, auth }) {
 
   console.log(`  Desktop: ${routePath}`);
   await desktopPage.goto(`${BASE_URL}${routePath}`, {
-    waitUntil: "networkidle",
-    timeout: 60000,
+    waitUntil: "domcontentloaded",
+    timeout: 90000,
   });
-  await desktopPage.waitForTimeout(3500);
+  await desktopPage.waitForTimeout(5000);
   await desktopPage.screenshot({
     path: path.join(ASSETS_DIR, `${name}.png`),
     fullPage: false,
+    timeout: 90000,
   });
   await desktopContext.close();
 
@@ -87,6 +107,7 @@ async function capturePage(browser, { name, path: routePath, auth }) {
     isMobile: true,
   });
   const mobilePage = await mobileContext.newPage();
+  mobilePage.setDefaultTimeout(90000);
 
   if (auth) {
     const session = await login(auth);
@@ -95,13 +116,14 @@ async function capturePage(browser, { name, path: routePath, auth }) {
 
   console.log(`  Mobile: ${routePath}`);
   await mobilePage.goto(`${BASE_URL}${routePath}`, {
-    waitUntil: "networkidle",
-    timeout: 60000,
+    waitUntil: "domcontentloaded",
+    timeout: 90000,
   });
-  await mobilePage.waitForTimeout(3500);
+  await mobilePage.waitForTimeout(5000);
   await mobilePage.screenshot({
     path: path.join(ASSETS_DIR, `${name}-mobile.png`),
     fullPage: false,
+    timeout: 90000,
   });
   await mobileContext.close();
 }
@@ -109,8 +131,8 @@ async function capturePage(browser, { name, path: routePath, auth }) {
 const SECTIONS = [
   {
     png: "section-landing.png",
-    title: "Landing Hero — Desktop + Mobile",
-    subtitle: "Homepage module",
+    title: "Aspira Landing — Desktop + Mobile",
+    subtitle: "College homepage",
     img: "assets/landing-hero.png",
     mobile: "assets/landing-hero-mobile.png",
   },

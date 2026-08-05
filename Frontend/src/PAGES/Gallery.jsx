@@ -1,3 +1,7 @@
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import GradientButton from "../components/GradientButton";
 import imgBuilding from "../assets/landing/landing-building.png";
 import imgStudents from "../assets/landing/aspira-students.png";
 import imgClassroom from "../assets/landing/aspira-classroom.png";
@@ -20,45 +24,59 @@ const gallery = [
 function Gallery() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-14 md:px-8 md:py-20">
-      <div className="liquid-glass max-w-3xl p-7 md:p-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0b5fff]">Gallery</p>
-        <h1 className="font-display mt-3 text-4xl font-extrabold tracking-tight text-[var(--lg-ink)] md:text-5xl">
-          Campus life at Aspira
-        </h1>
-        <p className="mt-5 text-base leading-relaxed text-[var(--lg-muted)]">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55 }}
+        className="max-w-3xl"
+      >
+        <p className="site-eyebrow">Gallery</p>
+        <h1 className="site-heading mt-3 text-4xl md:text-5xl">Campus life at Aspira</h1>
+        <p className="site-lead mt-5">
           A closer look at Aspira College — the campus building, classrooms, labs, library, and the
           everyday moments that shape learning in Dolat Nagar, Gujrat.
         </p>
-      </div>
+      </motion.div>
 
       <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {gallery.map((item, i) => (
-          <figure key={`${item.caption}-${i}`} className="liquid-glass overflow-hidden !p-0">
-            <div className="h-60 overflow-hidden">
-              <img
-                src={item.image}
-                alt={item.caption}
-                className="h-full w-full object-cover transition duration-500 hover:scale-105"
-                loading="lazy"
-              />
+          <motion.figure
+            key={`${item.caption}-${i}`}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: (i % 3) * 0.05, duration: 0.45 }}
+            className="site-card overflow-hidden !p-0"
+          >
+            <div className="site-media !rounded-none !border-0 !shadow-none h-60">
+              <img src={item.image} alt={item.caption} loading="lazy" />
             </div>
             <figcaption className="px-4 py-4">
-              <p className="text-sm font-semibold text-[var(--lg-ink)]">{item.caption}</p>
-              <p className="mt-1 text-xs text-[var(--lg-muted)]">{item.note}</p>
+              <p className="site-card__title text-sm">{item.caption}</p>
+              <p className="site-card__text mt-1 text-xs">{item.note}</p>
             </figcaption>
-          </figure>
+          </motion.figure>
         ))}
       </div>
 
-      <div className="liquid-glass mt-14 p-7 md:p-10">
-        <h2 className="font-display text-2xl font-bold text-[var(--lg-ink)] md:text-3xl">
-          Visit campus to feel the difference
-        </h2>
-        <p className="mt-4 max-w-3xl leading-relaxed text-[var(--lg-muted)]">
+      <motion.div
+        initial={{ opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="mt-16 max-w-3xl"
+      >
+        <h2 className="site-section-title">Visit campus to feel the difference</h2>
+        <p className="site-section-lead !max-w-none">
           Photos tell part of the story — walking through Aspira College shows the rest. Meet faculty,
           see classrooms, and ask about admissions for the upcoming session.
         </p>
-      </div>
+        <Link to="/contact" className="mt-6 inline-block">
+          <GradientButton className="!rounded-full !px-7 !py-3">
+            Plan a visit
+            <ArrowRight size={16} />
+          </GradientButton>
+        </Link>
+      </motion.div>
     </div>
   );
 }

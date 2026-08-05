@@ -106,9 +106,7 @@ function SiteLayout() {
             </div>
             <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">
               <div>
-                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#0b5fff]">
-                  Explore
-                </p>
+                <p className="site-eyebrow mb-3">Explore</p>
                 <ul className="space-y-2 text-sm text-[var(--lg-muted)]">
                   {navLinks.map((l) => (
                     <li key={l.to}>
@@ -120,9 +118,7 @@ function SiteLayout() {
                 </ul>
               </div>
               <div>
-                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#0b5fff]">
-                  Portal
-                </p>
+                <p className="site-eyebrow mb-3">Portal</p>
                 <ul className="space-y-2 text-sm text-[var(--lg-muted)]">
                   <li>
                     <Link to="/login" className="transition hover:text-[var(--lg-ink)]">
@@ -137,9 +133,7 @@ function SiteLayout() {
                 </ul>
               </div>
               <div>
-                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#0b5fff]">
-                  Contact
-                </p>
+                <p className="site-eyebrow mb-3">Contact</p>
                 <ul className="space-y-2 text-sm text-[var(--lg-muted)]">
                   <li>Dolat Nagar, Gujrat</li>
                   <li>0319 8018795</li>

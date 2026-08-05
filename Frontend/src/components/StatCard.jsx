@@ -27,10 +27,8 @@ function StatCard({
 
       <div className="relative flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-            {title}
-          </p>
-          <p className="font-display mt-2.5 text-[1.85rem] font-bold leading-none tracking-tight text-white sm:text-[2rem]">
+          <p className="eyebrow eyebrow--muted">{title}</p>
+          <p className="stat-card__value font-display mt-2.5 text-[1.85rem] font-bold leading-none tracking-tight text-white sm:text-[2.05rem]">
             {value}
           </p>
           {trend ? (

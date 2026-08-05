@@ -12,10 +12,8 @@ function DashboardPanel({
     <GlassCard className={`dashboard-panel p-6 md:p-8 ${className}`} hover={hover}>
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h2 className="font-display text-xl font-bold text-white">{title}</h2>
-          {subtitle ? (
-            <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-400">{subtitle}</p>
-          ) : null}
+          <h2 className="card-heading">{title}</h2>
+          {subtitle ? <p className="card-lead mt-1.5 max-w-2xl">{subtitle}</p> : null}
         </div>
         {action ? <div className="shrink-0">{action}</div> : null}
       </div>

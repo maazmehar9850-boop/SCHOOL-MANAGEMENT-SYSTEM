@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import GradientButton from "../components/GradientButton";
 import imgAdmin from "../assets/landing/aspira-corridor.png";
@@ -32,12 +33,15 @@ const roles = [
 function Portal() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-14 md:px-8 md:py-20">
-      <div className="liquid-glass max-w-3xl p-7 md:p-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0b5fff]">Portal</p>
-        <h1 className="font-display mt-3 text-4xl font-extrabold tracking-tight text-[var(--lg-ink)] md:text-5xl">
-          One campus. Three portals.
-        </h1>
-        <p className="mt-5 text-base leading-relaxed text-[var(--lg-muted)]">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55 }}
+        className="max-w-3xl"
+      >
+        <p className="site-eyebrow">Portal</p>
+        <h1 className="site-heading mt-3 text-4xl md:text-5xl">One campus. Three portals.</h1>
+        <p className="site-lead mt-5">
           Sign in with your Aspira College account to access tools for your role. The portal is
           built to reduce paperwork, improve communication, and keep academic records accurate.
         </p>
@@ -49,39 +53,37 @@ function Portal() {
             </GradientButton>
           </Link>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="mt-12 space-y-8">
+      <div className="mt-14 space-y-10">
         {roles.map((r, index) => (
-          <div
+          <motion.div
             key={r.role}
-            className={`liquid-glass grid items-center gap-8 p-5 md:grid-cols-2 md:gap-10 md:p-8 ${
-              index % 2 === 1 ? "md:[&>div:first-child]:order-2" : ""
+            initial={{ opacity: 0, y: 22 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.5 }}
+            className={`grid items-center gap-8 lg:grid-cols-2 lg:gap-12 ${
+              index % 2 === 1 ? "lg:[&>div:first-child]:order-2" : ""
             }`}
           >
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#0b5fff]">
-                {r.role}
-              </p>
-              <h2 className="font-display mt-2 text-2xl font-bold text-[var(--lg-ink)] md:text-3xl">
-                {r.title}
-              </h2>
-              <p className="mt-3 text-sm leading-relaxed text-[var(--lg-muted)] md:text-base">
-                {r.text}
-              </p>
-              <ul className="mt-5 space-y-2">
+              <p className="site-eyebrow">{r.role}</p>
+              <h2 className="site-section-title mt-2">{r.title}</h2>
+              <p className="site-section-lead !max-w-none">{r.text}</p>
+              <ul className="mt-5 space-y-2.5">
                 {r.points.map((p) => (
-                  <li key={p} className="flex items-center gap-2 text-sm text-[var(--lg-ink)]">
-                    <CheckCircle2 size={16} className="text-[#0b5fff]" />
+                  <li key={p} className="flex items-center gap-2.5 text-sm font-medium text-[var(--lg-ink)]">
+                    <CheckCircle2 size={16} className="shrink-0 text-[var(--lg-accent)]" />
                     {p}
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="liquid-media h-64 md:h-80">
+            <div className="site-media h-64 md:h-80">
               <img src={r.image} alt={r.role} />
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>

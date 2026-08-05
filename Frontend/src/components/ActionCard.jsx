@@ -22,10 +22,8 @@ function ActionCard({
         </span>
       </div>
       <div className="mt-4">
-        <h3 className="font-display text-base font-semibold text-white">{title}</h3>
-        {description ? (
-          <p className="mt-1 text-sm leading-relaxed text-slate-400">{description}</p>
-        ) : null}
+        <h3 className="card-heading text-[1.05rem]">{title}</h3>
+        {description ? <p className="card-lead mt-1.5">{description}</p> : null}
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { MapPin, Phone, Mail, Clock, ArrowRight } from "lucide-react";
 import GradientButton from "../components/GradientButton";
@@ -48,40 +49,56 @@ function Contact() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-14 md:px-8 md:py-20">
-      <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-10">
+      <div className="grid items-start gap-10 lg:grid-cols-2 lg:gap-14">
         <div className="space-y-6">
-          <div className="liquid-glass p-7 md:p-10">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0b5fff]">Contact</p>
-            <h1 className="font-display mt-3 text-4xl font-extrabold tracking-tight text-[var(--lg-ink)] md:text-5xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55 }}
+          >
+            <p className="site-eyebrow">Contact</p>
+            <h1 className="site-heading mt-3 text-4xl md:text-5xl">
               Get in touch with {college.name || "Aspira College"}
             </h1>
-            <p className="mt-5 text-base leading-relaxed text-[var(--lg-muted)]">
+            <p className="site-lead mt-5">
               For admissions, portal access, or general inquiries, reach the campus office during
               college hours — or send a message using the form. Campus currently serves{" "}
               {loading ? "—" : data.students} students and {loading ? "—" : data.teachers} teachers.
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            {contactCards.map((item) => (
-              <div key={item.title} className="liquid-glass p-5">
-                <item.icon className="text-[#0b5fff]" size={20} />
-                <h3 className="mt-3 font-display text-base font-bold text-[var(--lg-ink)]">
-                  {item.title}
-                </h3>
-                <p className="mt-1 text-sm text-[var(--lg-muted)]">{item.text}</p>
-              </div>
+            {contactCards.map((item, i) => (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.08 + i * 0.05, duration: 0.4 }}
+                className="site-card p-5"
+              >
+                <div className="site-card__icon">
+                  <item.icon size={18} strokeWidth={2.1} />
+                </div>
+                <h3 className="site-card__title mt-3.5 text-base">{item.title}</h3>
+                <p className="site-card__text mt-1.5">{item.text}</p>
+              </motion.div>
             ))}
           </div>
 
-          <div className="liquid-media h-72">
+          <div className="site-media h-72">
             <img src={imgContact} alt="Aspira College campus" />
           </div>
         </div>
 
-        <form onSubmit={onContactSubmit} className="liquid-glass p-6 md:p-8">
-          <h2 className="font-display text-2xl font-bold text-[var(--lg-ink)]">Send a message</h2>
-          <p className="mt-2 text-sm text-[var(--lg-muted)]">
+        <motion.form
+          initial={{ opacity: 0, y: 22 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: 0.1 }}
+          onSubmit={onContactSubmit}
+          className="site-card p-6 md:p-8"
+        >
+          <h2 className="site-section-title text-[1.65rem]">Send a message</h2>
+          <p className="site-section-lead !mt-2">
             Your message goes to {college.email || "maazmehar9850@gmail.com"}.
           </p>
 
@@ -154,7 +171,11 @@ function Contact() {
               />
             </div>
             <div className="flex flex-wrap gap-3 pt-1">
-              <GradientButton type="submit" className="!rounded-full !px-7 !py-3" disabled={sendingContact}>
+              <GradientButton
+                type="submit"
+                className="!rounded-full !px-7 !py-3"
+                disabled={sendingContact}
+              >
                 {sendingContact ? "Sending..." : "Send message"}
                 <ArrowRight size={16} />
               </GradientButton>
@@ -162,14 +183,14 @@ function Contact() {
                 <GradientButton
                   type="button"
                   variant="secondary"
-                  className="!rounded-full !border-white/50 !bg-white/45 !px-7 !py-3 !text-[var(--lg-ink)] hover:!bg-white/70"
+                  className="!rounded-full !border-white/60 !bg-white/55 !px-7 !py-3 !text-[var(--lg-ink)] hover:!bg-white/80"
                 >
                   Portal Login
                 </GradientButton>
               </Link>
             </div>
           </div>
-        </form>
+        </motion.form>
       </div>
     </div>
   );

@@ -1,39 +1,47 @@
 import logoMark from "../assets/aspira-logo.png";
 
-function BrandMark({ size = 40, className = "" }) {
+function BrandMark({ size = 40, className = "", framed = true }) {
   return (
-    <img
-      src={logoMark}
-      alt="Aspira College"
-      width={size}
-      height={size}
-      className={`shrink-0 rounded-md object-contain bg-white ${className}`}
+    <span
+      className={`brand-mark ${framed ? "brand-mark--framed" : ""} ${className}`}
       style={{ width: size, height: size }}
-    />
+    >
+      <img
+        src={logoMark}
+        alt="Aspira College"
+        width={size}
+        height={size}
+        className="brand-mark__img"
+      />
+    </span>
   );
 }
 
 function BrandLogo({
   size = 44,
   showWordmark = true,
-  wordmarkClassName = "font-display text-lg font-extrabold tracking-tight md:text-xl",
+  wordmarkClassName = "",
   className = "",
   light = false,
   name = "Aspira College",
   subtitle = "Dolat Nagar, Gujrat",
 }) {
   return (
-    <div className={`inline-flex items-center gap-2.5 ${className}`}>
-      <BrandMark size={size} className="shadow-sm ring-1 ring-slate-200/80" />
+    <div className={`brand-logo inline-flex items-center gap-3 ${className}`}>
+      <BrandMark size={size} />
       {showWordmark ? (
-        <div className="min-w-0 leading-tight">
-          <span className={`${wordmarkClassName} block ${light ? "text-white" : "text-[#0b2a5b]"}`}>
+        <div className="brand-logo__text min-w-0 leading-tight">
+          <span
+            className={`brand-logo__name font-display block text-lg font-extrabold tracking-tight md:text-xl ${
+              light ? "brand-logo__name--light" : ""
+            } ${wordmarkClassName}`}
+          >
             {name}
           </span>
           {subtitle ? (
             <span
-              className={`block text-[11px] font-semibold uppercase tracking-[0.12em] ${
-                light ? "text-amber-200/90" : "text-slate-500"
+              className={`brand-logo__subtitle block text-[10px] font-semibold uppercase tracking-[0.16em] ${
+                light ? "brand-logo__subtitle--light" : ""
               }`}
             >
               {subtitle}

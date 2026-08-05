@@ -19,12 +19,8 @@ function PageContentCard({
       {(title || subtitle || action) && (
         <div className="page-content-card__header">
           <div>
-            {title ? (
-              <h2 className="font-display text-xl font-bold text-slate-900">{title}</h2>
-            ) : null}
-            {subtitle ? (
-              <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-500">{subtitle}</p>
-            ) : null}
+            {title ? <h2 className="card-heading">{title}</h2> : null}
+            {subtitle ? <p className="card-lead mt-1.5 max-w-3xl">{subtitle}</p> : null}
           </div>
           {action ? <div className="shrink-0">{action}</div> : null}
         </div>
