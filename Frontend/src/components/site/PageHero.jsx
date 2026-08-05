@@ -23,7 +23,7 @@ function PageHero({
         <span className="page-hero__orb page-hero__orb--3" />
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-16 md:px-8 md:py-24">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-16 pt-28 md:px-8 md:pb-24 md:pt-32">
         {breadcrumbs.length > 0 ? (
           <nav aria-label="Breadcrumb" className="mb-6 flex flex-wrap items-center gap-1.5 text-sm text-white/70">
             <Link to="/" className="inline-flex items-center gap-1 transition hover:text-white">

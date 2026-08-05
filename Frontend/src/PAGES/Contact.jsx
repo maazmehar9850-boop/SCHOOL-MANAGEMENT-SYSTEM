@@ -37,13 +37,29 @@ function Contact() {
   const onSubmit = async (e) => {
     e.preventDefault();
     if (sending) return;
+
+    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
+      toast.error("Name, email, and message are required");
+      return;
+    }
+
     setSending(true);
     try {
-      const res = await API.post("/public/contact", form);
+      const res = await API.post("/public/contact", {
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        subject: form.subject.trim() || "Aspira College contact inquiry",
+        message: form.message.trim(),
+      });
       toast.success(res.data?.message || "Message sent successfully");
       setForm({ name: "", email: "", phone: "", subject: "", message: "" });
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to send message");
+      const msg =
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to send message. Please try again.";
+      toast.error(msg);
     } finally {
       setSending(false);
     }
@@ -61,7 +77,7 @@ function Contact() {
       <PageHero
         eyebrow="Contact Us"
         title="We would love to hear from you"
-        lead="Reach the Aspira College office for admissions guidance, campus visits, or general inquiries."
+        lead={`Reach the ${college.name || "Aspira College"} office for admissions guidance, campus visits, or general inquiries. Currently serving ${data.students || 0} students and ${data.teachers || 0} teachers.`}
         image={IMG.contact}
         breadcrumbs={[{ label: "Contact" }]}
       />

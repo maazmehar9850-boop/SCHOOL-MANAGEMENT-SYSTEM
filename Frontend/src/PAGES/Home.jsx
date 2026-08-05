@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
@@ -21,6 +21,7 @@ import SectionHeader from "../components/site/SectionHeader";
 import { FadeIn, Stagger, StaggerItem } from "../components/site/FadeIn";
 import AnimatedCounter from "../components/site/AnimatedCounter";
 import { IconBadge, Stars } from "../components/site/GlassPanel";
+import usePublicCampusData from "../hooks/usePublicCampusData";
 import { IMG } from "../data/siteImages";
 import { EVENTS, FAQS, NEWS, PROGRAMS, TESTIMONIALS } from "../data/siteContent";
 
@@ -98,16 +99,53 @@ const successStories = [
   },
 ];
 
-const stats = [
-  { value: 10000, suffix: "+", label: "Students", icon: Users },
-  { value: 150, suffix: "+", label: "Faculty Members", icon: GraduationCap },
-  { value: 50, suffix: "+", label: "Academic Programs", icon: BookOpen },
-  { value: 95, suffix: "%", label: "Student Satisfaction", icon: Sparkles },
+const programImages = [
+  IMG.intermediate,
+  IMG.undergrad,
+  IMG.cs,
+  IMG.business,
+  IMG.commerce,
+  IMG.arts,
+  IMG.premed,
+  IMG.preeng,
+  IMG.shortCourses,
 ];
 
 function Home() {
+  const { data, loading } = usePublicCampusData();
+  const college = data.college || {};
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   const active = TESTIMONIALS[testimonialIndex];
+
+  const stats = useMemo(
+    () => [
+      { value: Number(data.students) || 0, suffix: "+", label: "Students", icon: Users },
+      { value: Number(data.teachers) || 0, suffix: "+", label: "Faculty Members", icon: GraduationCap },
+      { value: Number(data.courses) || 0, suffix: "+", label: "Academic Programs", icon: BookOpen },
+      {
+        value: Number(data.attendanceAccuracy) || 0,
+        suffix: "%",
+        label: "Attendance Rate",
+        icon: Sparkles,
+      },
+    ],
+    [data]
+  );
+
+  const featuredPrograms = useMemo(() => {
+    const fromDb = (data.featuredCourses || []).slice(0, 6).map((course, i) => ({
+      id: course.id || course.code || i,
+      title: course.name,
+      category: course.className || course.code || "Program",
+      duration: course.duration || "Session based",
+      eligibility: course.teacher ? `Faculty: ${course.teacher}` : "Open enrollment",
+      description:
+        course.description ||
+        `${course.name} is an active Aspira College program with structured academic support.`,
+      image: programImages[i % programImages.length],
+    }));
+    return fromDb.length > 0 ? fromDb : PROGRAMS.slice(0, 6);
+  }, [data.featuredCourses]);
 
   const nextTestimonial = () => setTestimonialIndex((i) => (i + 1) % TESTIMONIALS.length);
   const prevTestimonial = () =>
@@ -126,57 +164,61 @@ function Home() {
           <span className="site-hero__orb site-hero__orb--3" />
         </div>
 
-        <div className="site-hero__content">
-          <div className="mx-auto w-full max-w-7xl">
-            <motion.div
-              initial={{ opacity: 0, y: 28 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-              className="max-w-3xl"
-            >
-              <p className="site-hero__brand">Aspira College</p>
-              <h1 className="site-hero__title">
-                Empowering Future Leaders Through Quality Education
-              </h1>
-              <p className="site-hero__copy">
-                Aspira College provides an inspiring learning environment where students gain academic
-                excellence, practical knowledge, leadership skills, and career-focused education. Our
-                mission is to prepare every student for success in higher education and professional life.
-              </p>
-              <div className="site-hero__actions">
-                <SiteButton to="/admissions" className="!rounded-full !px-8 !py-3.5 !text-base">
-                  Apply Now
-                  <ArrowRight size={18} />
-                </SiteButton>
-                <SiteButton
-                  to="/academics"
-                  variant="outline"
-                  className="!rounded-full !px-8 !py-3.5 !text-base"
-                >
-                  Explore Programs
-                </SiteButton>
-              </div>
-            </motion.div>
+        <div className="site-hero__inner">
+          <div className="site-hero__content">
+            <div className="mx-auto w-full max-w-7xl">
+              <motion.div
+                initial={{ opacity: 0, y: 28 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+                className="max-w-3xl"
+              >
+                <p className="site-hero__brand">{college.name || "Aspira College"}</p>
+                <h1 className="site-hero__title">
+                  Empowering Future Leaders Through Quality Education
+                </h1>
+                <p className="site-hero__copy">
+                  Aspira College provides an inspiring learning environment where students gain academic
+                  excellence, practical knowledge, leadership skills, and career-focused education. Our
+                  mission is to prepare every student for success in higher education and professional life.
+                </p>
+                <div className="site-hero__actions">
+                  <SiteButton to="/admissions" className="!rounded-full !px-8 !py-3.5 !text-base">
+                    Apply Now
+                    <ArrowRight size={18} />
+                  </SiteButton>
+                  <SiteButton
+                    to="/academics"
+                    variant="outline"
+                    className="!rounded-full !px-8 !py-3.5 !text-base"
+                  >
+                    Explore Programs
+                  </SiteButton>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+
+          <div className="site-hero__stats">
+            <div className="mx-auto max-w-7xl">
+              <Stagger className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {stats.map((stat) => (
+                  <StaggerItem key={stat.label}>
+                    <div className="site-stat flex items-center gap-4 !p-4 md:!p-5">
+                      <IconBadge icon={stat.icon} />
+                      <div>
+                        <p className="site-stat__value">
+                          {loading ? "—" : <AnimatedCounter value={stat.value} suffix={stat.suffix} />}
+                        </p>
+                        <p className="site-stat__label">{stat.label}</p>
+                      </div>
+                    </div>
+                  </StaggerItem>
+                ))}
+              </Stagger>
+            </div>
           </div>
         </div>
-      </section>
-
-      <section className="relative z-10 mx-auto -mt-16 max-w-7xl px-4 md:-mt-20 md:px-8">
-        <Stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat) => (
-            <StaggerItem key={stat.label}>
-              <div className="site-stat flex items-center gap-4 !p-5">
-                <IconBadge icon={stat.icon} />
-                <div>
-                  <p className="site-stat__value">
-                    <AnimatedCounter value={stat.value} suffix={stat.suffix} />
-                  </p>
-                  <p className="site-stat__label">{stat.label}</p>
-                </div>
-              </div>
-            </StaggerItem>
-          ))}
-        </Stagger>
       </section>
 
       <section className="site-section">
@@ -207,7 +249,11 @@ function Home() {
               align="left"
               eyebrow="Featured Programs"
               title="Explore pathways that shape your future"
-              lead="Intermediate, undergraduate, and short courses designed for academic strength and career readiness."
+              lead={
+                loading
+                  ? "Loading live programs from campus database..."
+                  : `${data.courses || featuredPrograms.length} active programs available at Aspira College.`
+              }
               className="!mx-0"
             />
             <SiteButton to="/academics" variant="secondary" className="shrink-0 !rounded-full">
@@ -217,7 +263,7 @@ function Home() {
           </div>
 
           <Stagger className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {PROGRAMS.slice(0, 6).map((program) => (
+            {featuredPrograms.map((program) => (
               <StaggerItem key={program.id}>
                 <article className="site-card group h-full overflow-hidden !p-0">
                   <div className="site-media h-48 !rounded-none !border-0 !shadow-none">
@@ -229,7 +275,7 @@ function Home() {
                     <p className="site-card__text mt-2 line-clamp-2">{program.description}</p>
                     <div className="mt-4 flex items-center justify-between text-xs font-semibold text-slate-500">
                       <span>{program.duration}</span>
-                      <span>{program.eligibility}</span>
+                      <span className="truncate pl-2">{program.eligibility}</span>
                     </div>
                     <div className="mt-5 flex gap-2">
                       <SiteButton to="/admissions" className="!rounded-xl !px-4 !py-2.5 text-xs">
@@ -491,7 +537,7 @@ function Home() {
               <div className="relative px-6 py-14 text-center md:px-12 md:py-20">
                 <p className="site-eyebrow site-eyebrow--light">Begin your journey</p>
                 <h2 className="mt-3 font-display text-3xl font-bold text-white md:text-4xl">
-                  Ready to join Aspira College?
+                  Ready to join {college.name || "Aspira College"}?
                 </h2>
                 <p className="mx-auto mt-4 max-w-2xl text-slate-200">
                   Take the next step toward academic excellence, leadership, and a future filled with

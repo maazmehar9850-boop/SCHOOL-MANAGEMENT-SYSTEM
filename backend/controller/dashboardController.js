@@ -145,9 +145,9 @@ export const getPublicStats = async (_req, res) => {
         .lean(),
       register
         .find({ role: "teacher" })
-        .select("name subject experience")
+        .select("name subject experience bio email phone")
         .sort({ createdAt: -1 })
-        .limit(8)
+        .limit(12)
         .lean(),
       studentsByClass({ status: "Active" }),
     ]);
@@ -191,6 +191,9 @@ export const getPublicStats = async (_req, res) => {
         name: t.name,
         subject: t.subject || "Faculty",
         experience: t.experience || "",
+        bio: t.bio || "",
+        email: t.email || "",
+        phone: t.phone || "",
       })),
       classes: byClass,
     });

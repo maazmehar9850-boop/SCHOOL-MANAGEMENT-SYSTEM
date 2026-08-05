@@ -12,6 +12,7 @@ import { FaFacebookF, FaInstagram, FaLinkedinIn, FaTwitter, FaYoutube } from "re
 import BrandLogo from "./BrandLogo";
 import SiteButton from "./site/SiteButton";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
+import usePublicCampusData from "../hooks/usePublicCampusData";
 
 const navLinks = [
   { to: "/", label: "Home", end: true },
@@ -19,7 +20,7 @@ const navLinks = [
   { to: "/academics", label: "Programs" },
   { to: "/admissions", label: "Admissions" },
   { to: "/faculty", label: "Faculty" },
-  { to: "/campus-life", label: "Campus Life" },
+  { to: "/campus-life", label: "Campus" },
   { to: "/news", label: "News" },
   { to: "/gallery", label: "Gallery" },
   { to: "/contact", label: "Contact" },
@@ -34,7 +35,6 @@ const PAGE_TITLES = {
   "/campus-life": "Campus Life",
   "/news": "News & Events",
   "/gallery": "Gallery",
-  "/testimonials": "Testimonials",
   "/portal": "Portal",
   "/contact": "Contact",
 };
@@ -74,6 +74,8 @@ function SiteLayout() {
   const [scrolled, setScrolled] = useState(false);
   const [email, setEmail] = useState("");
   const { pathname } = useLocation();
+  const { data } = usePublicCampusData();
+  const college = data.college || {};
   useDocumentTitle(PAGE_TITLES[pathname] || "Aspira College");
 
   useEffect(() => {
@@ -95,13 +97,18 @@ function SiteLayout() {
 
   return (
     <div className="site-shell min-h-screen">
-      <header className={`site-nav ${scrolled || menuOpen ? "site-nav--scrolled" : "site-nav--top"}`}>
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 md:gap-3 md:px-6 md:py-3.5">
+      <header className={`site-nav ${scrolled || menuOpen ? "site-nav--scrolled" : ""}`}>
+        <div className="site-nav__bar mx-auto flex max-w-7xl items-center justify-between gap-2 rounded-[1.4rem] px-3 py-2.5 md:gap-3 md:px-5 md:py-3">
           <Link to="/" onClick={() => setMenuOpen(false)} aria-label="Aspira College home" className="min-w-0 shrink">
-            <BrandLogo size={38} light={!scrolled && !menuOpen} subtitle="Gujrat" />
+            <BrandLogo
+              size={38}
+              light={false}
+              name={college.name || "Aspira College"}
+              subtitle={college.campus || "Gujrat"}
+            />
           </Link>
 
-          <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Primary">
+          <nav className="hidden items-center gap-0.5 xl:flex" aria-label="Primary">
             {navLinks.map((link) => (
               <NavLink
                 key={link.to}
@@ -115,21 +122,13 @@ function SiteLayout() {
           </nav>
 
           <div className="flex shrink-0 items-center gap-2">
-            <SiteButton
-              to="/login"
-              className={`!hidden !rounded-full !px-4 !py-2 !text-xs md:!inline-flex md:!px-5 md:!py-2.5 md:!text-sm ${
-                scrolled || menuOpen
-                  ? ""
-                  : "!bg-white/15 !text-white !border-white/35 !shadow-none hover:!bg-white/25"
-              }`}
-              variant={scrolled || menuOpen ? "primary" : "outline"}
-            >
+            <SiteButton to="/login" className="!hidden !rounded-full !px-4 !py-2 !text-xs sm:!inline-flex sm:!px-5 sm:!py-2.5 sm:!text-sm">
               Portal Login
               <ArrowRight size={14} />
             </SiteButton>
             <button
               type="button"
-              className="site-nav__menu-btn rounded-full border p-2.5 backdrop-blur lg:hidden"
+              className="site-nav__menu-btn rounded-full border p-2.5 backdrop-blur xl:hidden"
               onClick={() => setMenuOpen((v) => !v)}
               aria-label="Toggle menu"
               aria-expanded={menuOpen}
@@ -140,8 +139,8 @@ function SiteLayout() {
         </div>
 
         {menuOpen ? (
-          <div className="border-t border-slate-200/80 bg-white px-4 py-3 shadow-lg lg:hidden">
-            <div className="mx-auto flex max-w-7xl flex-col gap-1">
+          <div className="site-nav__mobile mx-auto mt-2 max-w-7xl rounded-[1.25rem] px-3 py-3 xl:hidden">
+            <div className="flex flex-col gap-1">
               {navLinks.map((link) => (
                 <NavLink
                   key={link.to}
@@ -150,7 +149,7 @@ function SiteLayout() {
                   onClick={() => setMenuOpen(false)}
                   className={({ isActive }) =>
                     `rounded-xl px-3 py-2.5 text-sm font-semibold ${
-                      isActive ? "bg-blue-50 text-blue-700" : "text-slate-700 hover:bg-slate-50"
+                      isActive ? "bg-blue-50 text-blue-700" : "text-slate-800 hover:bg-slate-50"
                     }`
                   }
                 >
@@ -173,7 +172,7 @@ function SiteLayout() {
         <div className="mx-auto max-w-7xl px-4 py-14 md:px-8 md:py-16">
           <div className="grid gap-10 lg:grid-cols-12">
             <div className="lg:col-span-4">
-              <BrandLogo size={42} light />
+              <BrandLogo size={42} light name={college.name || "Aspira College"} subtitle={college.campus || "Gujrat"} />
               <p className="mt-4 max-w-sm text-sm leading-relaxed text-slate-400">
                 Aspira College provides an inspiring learning environment where students gain academic
                 excellence, practical knowledge, leadership skills, and career-focused education.
@@ -216,15 +215,15 @@ function SiteLayout() {
               <ul className="mt-4 space-y-3 text-sm text-slate-400">
                 <li className="flex gap-2">
                   <MapPin size={16} className="mt-0.5 shrink-0 text-sky-400" />
-                  Dolat Nagar, Gujrat
+                  {college.campus || "Dolat Nagar, Gujrat"}
                 </li>
                 <li className="flex gap-2">
                   <Phone size={16} className="mt-0.5 shrink-0 text-sky-400" />
-                  0319 8018795
+                  {college.phone || "0319 8018795"}
                 </li>
                 <li className="flex gap-2">
                   <Mail size={16} className="mt-0.5 shrink-0 text-sky-400" />
-                  maazmehar9850@gmail.com
+                  {college.email || "maazmehar9850@gmail.com"}
                 </li>
               </ul>
             </div>
@@ -259,7 +258,10 @@ function SiteLayout() {
           </div>
 
           <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
-            <p>© {new Date().getFullYear()} Aspira College, Dolat Nagar Gujrat. All rights reserved.</p>
+            <p>
+              © {new Date().getFullYear()} {college.name || "Aspira College"},{" "}
+              {college.campus || "Dolat Nagar Gujrat"}. All rights reserved.
+            </p>
             <div className="flex gap-4">
               <Link to="/portal">Portal</Link>
               <Link to="/contact">Contact</Link>

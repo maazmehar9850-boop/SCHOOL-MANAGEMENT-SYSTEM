@@ -1,10 +1,23 @@
 import nodemailer from "nodemailer";
 
-const CONTACT_TO = process.env.CONTACT_EMAIL || "maazmehar9850@gmail.com";
+const DEFAULT_CONTACT_TO = "maazmehar9850@gmail.com";
+
+function getEmailUser() {
+  return String(process.env.EMAIL_USER || "").trim();
+}
+
+function getEmailPass() {
+  // Gmail App Passwords are often copied with spaces — strip them.
+  return String(process.env.EMAIL_PASS || "").replace(/\s+/g, "").trim();
+}
+
+function getContactTo() {
+  return String(process.env.CONTACT_EMAIL || DEFAULT_CONTACT_TO).trim() || DEFAULT_CONTACT_TO;
+}
 
 const createTransporter = () => {
-  const user = process.env.EMAIL_USER;
-  const pass = process.env.EMAIL_PASS;
+  const user = getEmailUser();
+  const pass = getEmailPass();
 
   if (!user || !pass) {
     return null;
@@ -19,7 +32,7 @@ const createTransporter = () => {
   });
 };
 
-export const transporter = createTransporter();
+export const transporter = null;
 
 const sendMail = async (req, res) => {
   try {
@@ -36,7 +49,7 @@ const sendMail = async (req, res) => {
     }
 
     const info = await transporterInstance.sendMail({
-      from: process.env.EMAIL_USER,
+      from: `"Aspira College" <${getEmailUser()}>`,
       to,
       subject,
       text,
@@ -73,12 +86,17 @@ export const sendContactMessage = async (req, res) => {
       return res.status(400).json({ message: "Message is too short" });
     }
 
-    const transporterInstance = createTransporter();
-    if (!transporterInstance) {
+    const user = getEmailUser();
+    const pass = getEmailPass();
+    if (!user || !pass) {
+      console.error("Contact email blocked: EMAIL_USER / EMAIL_PASS missing");
       return res.status(503).json({
-        message: "Email is not configured. Set EMAIL_USER and EMAIL_PASS in environment variables.",
+        message: "Email is not configured. Set EMAIL_USER and EMAIL_PASS in backend/.env",
       });
     }
+
+    const transporterInstance = createTransporter();
+    const contactTo = getContactTo();
 
     const text = [
       "New contact message from Aspira College website",
@@ -93,33 +111,49 @@ export const sendContactMessage = async (req, res) => {
     ].join("\n");
 
     const html = `
-      <div style="font-family:Arial,sans-serif;line-height:1.5;color:#0f172a">
-        <h2 style="margin:0 0 12px">Aspira College — Contact Form</h2>
-        <p><strong>Name:</strong> ${escapeHtml(name)}</p>
-        <p><strong>Email:</strong> ${escapeHtml(email)}</p>
-        <p><strong>Phone:</strong> ${escapeHtml(phone || "—")}</p>
-        <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
+      <div style="font-family:Arial,sans-serif;line-height:1.6;color:#0f172a;max-width:640px">
+        <h2 style="margin:0 0 12px;color:#1d4ed8">Aspira College — Contact Form</h2>
+        <p style="margin:0 0 8px"><strong>Name:</strong> ${escapeHtml(name)}</p>
+        <p style="margin:0 0 8px"><strong>Email:</strong> ${escapeHtml(email)}</p>
+        <p style="margin:0 0 8px"><strong>Phone:</strong> ${escapeHtml(phone || "—")}</p>
+        <p style="margin:0 0 8px"><strong>Subject:</strong> ${escapeHtml(subject)}</p>
         <hr style="border:none;border-top:1px solid #e2e8f0;margin:16px 0" />
-        <p style="white-space:pre-wrap">${escapeHtml(message)}</p>
+        <p style="white-space:pre-wrap;margin:0">${escapeHtml(message)}</p>
       </div>
     `;
 
     const info = await transporterInstance.sendMail({
-      from: `"Aspira College Portal" <${process.env.EMAIL_USER}>`,
-      to: CONTACT_TO,
-      replyTo: email,
+      from: `"Aspira College Contact" <${user}>`,
+      to: contactTo,
+      replyTo: `${name} <${email}>`,
       subject: `[Aspira College] ${subject}`,
       text,
       html,
     });
+
+    console.log(`Contact email sent to ${contactTo} (${info.messageId})`);
 
     return res.status(200).json({
       message: "Message sent successfully. We will contact you soon.",
       messageId: info.messageId,
     });
   } catch (error) {
-    console.error("Contact email failed:", error.message);
-    return res.status(500).json({ message: "Failed to send message. Please try again later." });
+    console.error("Contact email failed:", error?.code || "", error.message);
+
+    const authFailed =
+      error?.code === "EAUTH" ||
+      /invalid login|username and password|badcredentials/i.test(error.message || "");
+
+    if (authFailed) {
+      return res.status(500).json({
+        message:
+          "Gmail login failed. Use EMAIL_USER=maazmehar9850@gmail.com and a 16-digit Gmail App Password in EMAIL_PASS.",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Failed to send message. Please try again later.",
+    });
   }
 };
 

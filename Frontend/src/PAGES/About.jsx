@@ -18,6 +18,7 @@ import SiteButton from "../components/site/SiteButton";
 import { FadeIn, Stagger, StaggerItem } from "../components/site/FadeIn";
 import AnimatedCounter from "../components/site/AnimatedCounter";
 import { IconBadge } from "../components/site/GlassPanel";
+import usePublicCampusData from "../hooks/usePublicCampusData";
 import { IMG } from "../data/siteImages";
 
 const values = [
@@ -37,20 +38,23 @@ const timeline = [
   { year: "2026", title: "Future Ready", text: "Continued investment in faculty excellence, facilities, and student success." },
 ];
 
-const achievements = [
-  { value: 50, suffix: "+", label: "Academic Distinctions" },
-  { value: 120, suffix: "+", label: "University Placements" },
-  { value: 40, suffix: "+", label: "Campus Events Yearly" },
-  { value: 25, suffix: "+", label: "Active Student Clubs" },
-];
-
 function About() {
+  const { data, loading } = usePublicCampusData();
+  const college = data.college || {};
+
+  const achievements = [
+    { value: Number(data.students) || 0, suffix: "+", label: "Students" },
+    { value: Number(data.teachers) || 0, suffix: "+", label: "Faculty Members" },
+    { value: Number(data.courses) || 0, suffix: "+", label: "Active Programs" },
+    { value: Number(data.enrollments) || 0, suffix: "+", label: "Active Enrollments" },
+  ];
+
   return (
     <>
       <PageHero
         eyebrow="About Us"
         title="A college built on excellence, character, and opportunity"
-        lead="Aspira College is dedicated to empowering students with academic strength, practical skills, and the confidence to lead in higher education and professional life."
+        lead={`${college.name || "Aspira College"} is dedicated to empowering students with academic strength, practical skills, and the confidence to lead in higher education and professional life.`}
         image={IMG.about}
         breadcrumbs={[{ label: "About Us" }]}
       />
@@ -59,18 +63,28 @@ function About() {
         <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2 lg:gap-14">
           <FadeIn>
             <p className="site-eyebrow">College Introduction</p>
-            <h2 className="site-section-title mt-3">Learning with purpose at Aspira College</h2>
+            <h2 className="site-section-title mt-3">
+              Learning with purpose at {college.name || "Aspira College"}
+            </h2>
             <p className="site-lead mt-5">
-              Located in Dolat Nagar, Gujrat, Aspira College provides an inspiring environment where students
-              pursue academic excellence, practical knowledge, leadership development, and career-focused education.
+              Located in {college.campus || "Dolat Nagar, Gujrat"}, Aspira College provides an inspiring environment
+              where students pursue academic excellence, practical knowledge, leadership development, and
+              career-focused education.
             </p>
             <p className="mt-4 text-slate-500 leading-relaxed">
-              We combine experienced faculty, modern facilities, and a supportive campus culture so every learner
-              can grow with clarity, discipline, and ambition.
+              Right now the campus portal holds{" "}
+              <strong className="text-slate-800">{loading ? "—" : data.students}</strong> students,{" "}
+              <strong className="text-slate-800">{loading ? "—" : data.teachers}</strong> teachers, and{" "}
+              <strong className="text-slate-800">{loading ? "—" : data.courses}</strong> active courses — all
+              fetched live from the database.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <SiteButton to="/admissions" className="!rounded-full">Apply Now</SiteButton>
-              <SiteButton to="/contact" variant="secondary" className="!rounded-full">Visit Campus</SiteButton>
+              <SiteButton to="/admissions" className="!rounded-full">
+                Apply Now
+              </SiteButton>
+              <SiteButton to="/contact" variant="secondary" className="!rounded-full">
+                Visit Campus
+              </SiteButton>
             </div>
           </FadeIn>
           <FadeIn delay={0.1}>
@@ -207,13 +221,13 @@ function About() {
 
       <section className="site-section">
         <div className="mx-auto max-w-7xl">
-          <SectionHeader eyebrow="Achievements" title="Milestones that reflect our commitment" />
+          <SectionHeader eyebrow="Live Campus Stats" title="Numbers from the Aspira database" />
           <Stagger className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {achievements.map((item) => (
               <StaggerItem key={item.label}>
                 <div className="site-stat text-center !py-8">
                   <p className="site-stat__value">
-                    <AnimatedCounter value={item.value} suffix={item.suffix} />
+                    {loading ? "—" : <AnimatedCounter value={item.value} suffix={item.suffix} />}
                   </p>
                   <p className="site-stat__label">{item.label}</p>
                 </div>
