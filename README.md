@@ -1,93 +1,173 @@
 # School Management System
 
-A modern full-stack school platform for managing students, teachers, courses, attendance, marks, assignments, and academic resources from a single dashboard.
+**Full-stack MERN campus platform** for Aspira College — a public-facing college website plus a role-based academic CMS for admins, teachers, and students.
 
-## Overview
-This project combines a React frontend with an Express and MongoDB backend to support role-based workflows for admins, teachers, and students. It includes authentication, protected routes, file uploads, academic record management, PDF export, and responsive dashboards.
+Built with React, Node.js, Express, and MongoDB. Designed for real campus operations: admissions visibility, student records, attendance, grades, fees, assignments, and resource management — all in one responsive product.
 
-## Highlights
-- Role-based dashboards for `admin`, `teacher`, and `student`
-- Course, syllabus, datesheet, and paper management
-- Attendance and marks management with bulk workflows
-- Assignment creation, submission, and grading
-- Password reset approval flow and profile management
+---
+
+## Project Summary (for portfolio / Fiverr / ChatGPT prompts)
+
+Use this short summary when writing a gig description, Behance case study, or ChatGPT prompt:
+
+> A complete School / College Management System built with the MERN stack. It includes a modern public college website (Home, Academics, Admissions, Gallery, Contact, and more) and a secure multi-role portal for Admin, Teacher, and Student. Core modules cover dashboards & analytics, student/teacher management, courses, enrollments, attendance, marks/results, fee tracking, assignments, academic resources, password-reset approvals, and PDF export. The UI is fully responsive with a premium dark admin workspace and polished public marketing pages.
+
+**Suggested ChatGPT prompt:**
+
+```text
+Using the README of my School Management System (MERN + React + Express + MongoDB), write a professional Fiverr gig description and portfolio project summary. Highlight: public college website + admin/teacher/student dashboards, attendance, grades, fees, assignments, responsive UI, and full-stack delivery. Keep it clear, client-friendly, and high-converting. Do not invent features that are not in the README.
+```
+
+---
+
+## Live Concept
+
+| Surface | Purpose |
+|---|---|
+| **Public website** | Brand, programs, admissions info, campus life, gallery, news, contact |
+| **Admin portal** | Operations dashboard, users, courses, fees, enrollments, academic oversight |
+| **Teacher portal** | Classroom tools, attendance, marks, assignments, resources |
+| **Student portal** | Personal dashboard, results, attendance, fees, submissions |
+
+---
+
+## Key Features
+
+### Public College Website
+- Homepage hero, featured programs, campus highlights, testimonials, FAQs
+- Academics / programs overview
+- Admissions guidance and scholarship sections
+- Faculty and campus life pages
+- Photo gallery with category filters
+- News / portal pages
+- Contact form with campus details and map
+
+### Admin Dashboard & CMS
+- KPI cards and analytics charts
+- Student and teacher management
+- Course and enrollment management
+- Fee management
+- Attendance and marks oversight
+- Assignments and academic resources
+- Password-reset request approvals
+- Quick actions for common workflows
+
+### Teacher Tools
+- Teacher dashboard insights
+- Attendance marking
+- Marks / results entry
+- Assignment creation and grading
+- Student lists and course materials
+
+### Student Experience
+- Student dashboard with progress insights
+- View attendance and results
+- Course / subject access
+- Assignment submissions
+- Fee status
+- Profile management
+
+### Platform Capabilities
+- JWT authentication and role-based protected routes
+- Secure password hashing
+- Input validation on critical flows
+- File uploads for academic resources
 - PDF export for selected academic records
-- Responsive UI with modern motion and glass-style components
+- Responsive desktop + mobile UI
+- Toast notifications and session inactivity handling
+
+---
 
 ## Tech Stack
-| Layer | Tools |
+
+| Layer | Technologies |
 |---|---|
-| Frontend | React, Vite, Tailwind CSS, Framer Motion, React Router, Axios |
-| Backend | Node.js, Express, Mongoose |
-| Database | MongoDB |
-| Authentication | JWT, bcrypt |
-| Validation | express-validator |
-| Uploads | Multer |
+| **Frontend** | React 19, Vite, Tailwind CSS, Framer Motion, React Router, Axios, Lucide / React Icons |
+| **Backend** | Node.js, Express 5, Mongoose |
+| **Database** | MongoDB |
+| **Auth** | JWT, bcrypt |
+| **Validation** | express-validator |
+| **Uploads** | Multer |
+| **Email** | Nodemailer |
+| **Tooling** | Concurrently, Nodemon, Playwright (preview captures) |
+
+---
 
 ## Project Structure
+
 ```text
 School Management System/
-├── Frontend/              # React client
+├── Frontend/                 # React + Vite client
 │   ├── public/
+│   ├── scripts/              # Build, favicon, Fiverr preview capture
 │   └── src/
-│       ├── PAGES/
-│       ├── components/
+│       ├── PAGES/            # Public site + portal screens
+│       ├── components/       # Shared UI, layout, charts
+│       ├── data/             # Site content & images
+│       ├── hooks/
 │       └── utils/
-├── backend/               # Express API
-│   ├── api/               # Vercel serverless entry
+├── backend/                  # Express API
+│   ├── api/                  # Vercel serverless entry
 │   ├── config/
 │   ├── controller/
 │   ├── middleware/
 │   ├── model/
 │   ├── routing/
 │   └── utils/
-├── package.json
+├── fiverr-preview/           # Portfolio / Fiverr gallery PNGs
+├── package.json              # Workspace root scripts
 └── README.md
 ```
 
+---
+
 ## Features by Role
+
 ### Admin
-- View live dashboard statistics
-- Register and manage teachers
-- Manage courses and school-wide records
-- Review password reset requests
-- Monitor enrollments and academic readiness
+- Live dashboard statistics and charts
+- Manage students, teachers, and courses
+- Track enrollments and fees
+- Oversee attendance, marks, assignments, and resources
+- Approve password-reset requests
+- Add teachers and courses quickly from the dashboard
 
 ### Teacher
-- Manage assigned students
-- Enroll students into courses
+- Access teacher dashboard and classroom tools
 - Mark attendance and enter marks
-- Create assignments and grade submissions
-- Upload course materials and resources
+- Create assignments and review submissions
+- Manage assigned students and course resources
 
 ### Student
-- View dashboard insights
-- Check attendance and marks
-- Access courses and resources
-- Submit assignments
-- Update profile information
+- View personal academic dashboard
+- Check attendance, marks, and enrolled subjects
+- Submit assignments and download resources
+- Track fee status and update profile
+
+---
 
 ## Local Setup
-### 1. Clone the repository
+
+### 1. Clone
+
 ```bash
 git clone https://github.com/maazmehar9850-boop/SCHOOL-MANAGEMENT-SYSTEM.git
 cd SCHOOL-MANAGEMENT-SYSTEM
 ```
 
 ### 2. Install dependencies
+
 ```bash
 npm install
 ```
 
-### 3. Configure environment files
-Create real env files from the examples:
+### 3. Environment files
 
 ```bash
 cp backend/.env.example backend/.env
 cp Frontend/.env.example Frontend/.env
 ```
 
-Minimum backend variables:
+**Backend (`backend/.env`):**
 
 ```env
 DATABASE_URL=your_mongodb_connection_string
@@ -99,96 +179,141 @@ EMAIL_USER=
 EMAIL_PASS=
 ```
 
-Frontend variable:
+**Frontend (`Frontend/.env`):**
 
 ```env
 VITE_API_URL=http://localhost:3030/api/v1
 ```
 
-### 4. Seed demo data (optional)
+### 4. Optional demo seed
+
 ```bash
 npm --prefix backend run seed
 ```
 
-### 5. Start the app
+### 5. Run both apps
+
 ```bash
 npm run dev
 ```
 
-Local URLs:
-- Frontend: `http://localhost:5173`
-- Backend API: `http://localhost:3030/api/v1`
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:5173 |
+| Backend API | http://localhost:3030/api/v1 |
 
-## Deployment Notes
-### Frontend on Vercel
-- Root Directory: `Frontend`
-- Install Command: `npm install`
-- Build Command: `npm run build`
-- Output Directory: `dist`
+---
 
-Required env:
+## Demo Accounts (after seed)
 
-```env
-VITE_API_URL=https://your-backend-domain/api/v1
-```
+Use only in local / demo environments:
 
-### Backend on Vercel
-- Root Directory: `backend`
-- Install Command: `npm install`
-- Build Command: leave empty
+| Role | Email | Password |
+|---|---|---|
+| Admin | `admin@gmail.com` | `123456` |
+| Teacher | `teacher@gmail.com` | `123456` |
+| Student | `student@gmail.com` | `123456` |
 
-Required env:
+---
 
-```env
-DATABASE_URL=your_mongodb_connection_string
-JWT_SECRET=your_long_random_secret
-CORS_ORIGIN=https://your-frontend-domain.vercel.app
-FRONTEND_URL=https://your-frontend-domain.vercel.app
-EMAIL_USER=
-EMAIL_PASS=
-```
+## API Overview
 
-## API Modules
-Base URL:
+Base path:
 
 ```text
 /api/v1
 ```
 
-Available module groups:
-- Auth
-- Profile
+Main module groups:
+- Auth & profile
 - Users
-- Dashboard
-- Courses
-- Enrollments
-- Assignments
-- Submissions
-- Attendance
-- Marks
-- Academic Resources
-- Password Reset
+- Dashboard stats
+- Courses & enrollments
+- Assignments & submissions
+- Attendance & marks
+- Fees
+- Academic resources (syllabus, datesheet, papers)
+- Password reset
+- Public campus / contact endpoints
 
-Protected requests use:
+Protected requests:
 
 ```http
 Authorization: Bearer <JWT_TOKEN>
 ```
 
-## Security
-- Passwords are hashed with `bcrypt`
-- JWT-based authentication is used for session control
-- Role-based authorization is enforced on protected routes
-- Input validation runs on both critical auth and data flows
-- File type and size restrictions are applied to uploads
+---
 
-## Notes
-- Do not commit real `.env` files or secrets
-- Vercel file uploads are temporary unless moved to persistent storage such as S3, Cloudinary, or Vercel Blob
+## Deployment
+
+### Frontend (Vercel)
+- **Root Directory:** `Frontend`
+- **Install:** `npm install`
+- **Build:** `npm run build`
+- **Output:** `dist`
+- **Env:** `VITE_API_URL=https://your-backend-domain/api/v1`
+
+### Backend (Vercel)
+- **Root Directory:** `backend`
+- **Install:** `npm install`
+- **Build:** leave empty
+- **Env:** `DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGIN`, `FRONTEND_URL`, email credentials if used
+
+---
+
+## Portfolio Preview Pack
+
+High-resolution Fiverr / Behance style mockups live in:
+
+```text
+fiverr-preview/
+```
+
+Includes:
+- Main project cover (`fiverr-main-preview.png`)
+- Homepage hero
+- Admin dashboard
+- Featured programs, campus life, gallery, and contact form section shots
+
+Regenerate (dev server must be running):
+
+```bash
+npm --prefix Frontend run fiverr:preview
+```
+
+---
+
+## Security Notes
+
+- Passwords hashed with bcrypt
+- JWT authentication for protected routes
+- Role-based access control for admin / teacher / student
+- Validation on critical auth and data endpoints
+- Upload type/size limits via Multer
+- Do **not** commit real `.env` files or secrets
+- Serverless uploads are temporary unless moved to durable storage (S3, Cloudinary, Vercel Blob, etc.)
+
+---
+
+## Ideal Use Cases
+
+- College / school operations portal
+- Full-stack MERN portfolio project
+- Fiverr / Upwork education CMS delivery
+- Campus website + internal ERP-style admin panel in one codebase
+
+---
 
 ## Author
+
 **Maaz Mehar**  
-GitHub: [@maazmehar9850-boop](https://github.com/maazmehar9850-boop)
+Full Stack Developer  
+
+- GitHub: [maazmehar9850-boop](https://github.com/maazmehar9850-boop)
+- Repository: [SCHOOL-MANAGEMENT-SYSTEM](https://github.com/maazmehar9850-boop/SCHOOL-MANAGEMENT-SYSTEM)
+
+---
 
 ## License
-This project is intended for educational and portfolio use.
+
+This project is intended for educational, portfolio, and client-demo use.
