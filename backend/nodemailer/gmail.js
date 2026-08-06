@@ -90,8 +90,11 @@ export const sendContactMessage = async (req, res) => {
     const pass = getEmailPass();
     if (!user || !pass) {
       console.error("Contact email blocked: EMAIL_USER / EMAIL_PASS missing");
+      const onVercel = Boolean(process.env.VERCEL);
       return res.status(503).json({
-        message: "Email is not configured. Set EMAIL_USER and EMAIL_PASS in backend/.env",
+        message: onVercel
+          ? "Email is not configured on the server. Add EMAIL_USER, EMAIL_PASS, and CONTACT_EMAIL in Vercel → Project → Settings → Environment Variables, then redeploy."
+          : "Email is not configured. Set EMAIL_USER and EMAIL_PASS in backend/.env and restart the backend.",
       });
     }
 
