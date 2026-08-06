@@ -1416,10 +1416,12 @@ textarea {
   box-shadow: 0 28px 72px rgba(2, 6, 23, 0.44), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-.page-shell--admin .action-card span,
-.page-shell--admin .action-card h3,
+.page-shell--admin .action-card {
+  color: #f8fafc;
+}
+
 .page-shell--admin .action-card p {
-  color: inherit;
+  color: #94a3b8;
 }
 
 .page-shell--admin .action-card > div > span {
