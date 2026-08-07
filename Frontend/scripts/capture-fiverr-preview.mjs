@@ -1,4 +1,4 @@
-import { chromium } from "playwright";
+﻿import { chromium } from "playwright";
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
@@ -25,7 +25,7 @@ const CAPTURES = [
     route: "/",
     auth: null,
     scrollTo: null,
-    title: "Homepage Hero — Desktop + Mobile",
+    title: "Homepage Hero â€” Desktop + Mobile",
     subtitle: "College website landing experience",
     badge: "WEBSITE",
     sectionPng: "section-homepage.png",
@@ -35,9 +35,9 @@ const CAPTURES = [
     route: "/admin-dashboard",
     auth: "admin",
     scrollTo: ".stat-card__value",
-    title: "Admin Dashboard — Desktop + Mobile",
+    title: "Admin Dashboard â€” Desktop + Mobile",
     subtitle: "Executive overview with charts & KPIs",
-    badge: "LIVE • ADMIN",
+    badge: "LIVE â€¢ ADMIN",
     sectionPng: "section-admin-dashboard.png",
   },
   {
@@ -45,7 +45,7 @@ const CAPTURES = [
     route: "/",
     auth: null,
     scrollTo: "text=Explore pathways that shape your future",
-    title: "Featured Programs — Desktop + Mobile",
+    title: "Featured Programs â€” Desktop + Mobile",
     subtitle: "Homepage module",
     badge: "SECTION",
     sectionPng: "section-featured-programs.png",
@@ -55,7 +55,7 @@ const CAPTURES = [
     route: "/",
     auth: null,
     scrollTo: "text=A vibrant community beyond the classroom",
-    title: "Campus Life — Desktop + Mobile",
+    title: "Campus Life â€” Desktop + Mobile",
     subtitle: "Homepage campus highlights",
     badge: "SECTION",
     sectionPng: "section-campus-life.png",
@@ -65,7 +65,7 @@ const CAPTURES = [
     route: "/gallery",
     auth: null,
     scrollTo: ".site-masonry",
-    title: "Gallery Photos — Desktop + Mobile",
+    title: "Gallery Photos â€” Desktop + Mobile",
     subtitle: "Campus photo showcase",
     badge: "GALLERY",
     sectionPng: "section-gallery.png",
@@ -75,7 +75,7 @@ const CAPTURES = [
     route: "/contact",
     auth: null,
     scrollTo: "form.site-card",
-    title: "Contact Form — Desktop + Mobile",
+    title: "Contact Form â€” Desktop + Mobile",
     subtitle: "Inquiry form and campus details",
     badge: "FORM",
     sectionPng: "section-contact-form.png",
@@ -335,7 +335,7 @@ async function captureViewport(
 
 async function capturePage(browser, pageConfig) {
   console.log(`\nCapturing ${pageConfig.title}`);
-  console.log(`  Desktop: ${pageConfig.route} → ${pageConfig.scrollTo || "top"}`);
+  console.log(`  Desktop: ${pageConfig.route} â†’ ${pageConfig.scrollTo || "top"}`);
   await captureViewport(
     browser,
     pageConfig.route,
@@ -346,7 +346,7 @@ async function capturePage(browser, pageConfig) {
     pageConfig.scrollTo
   );
 
-  console.log(`  Mobile: ${pageConfig.route} → ${pageConfig.scrollTo || "top"}`);
+  console.log(`  Mobile: ${pageConfig.route} â†’ ${pageConfig.scrollTo || "top"}`);
   await captureViewport(
     browser,
     pageConfig.route,
@@ -387,7 +387,7 @@ function buildMainPreviewHtml() {
   const cards = CAPTURES.map(
     (item) => `
       <div class="card">
-        <div class="card-label">${escapeHtml(item.title.replace(" — Desktop + Mobile", ""))} — Desktop + Mobile</div>
+        <div class="card-label">${escapeHtml(item.title.replace(" â€” Desktop + Mobile", ""))} â€” Desktop + Mobile</div>
         <div class="devices">
           <div class="desktop"><img src="assets/${item.key}.png" alt="${escapeHtml(item.key)}" /></div>
           <div class="phone"><img src="assets/${item.key}-mobile.png" alt="${escapeHtml(item.key)} mobile" /></div>
@@ -400,7 +400,7 @@ function buildMainPreviewHtml() {
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>School Management System — Main Preview</title>
+  <title>College Management System - Main Preview</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     ${sharedCss()}
@@ -489,9 +489,9 @@ function buildMainPreviewHtml() {
 </head>
 <body>
   <div class="wrap">
-    <div class="badge">FIVERR • MAIN PREVIEW</div>
-    <h1>School Management System</h1>
-    <p class="subtitle">Full Stack MERN Application • Responsive UI • Admin Dashboard</p>
+    <div class="badge">FIVERR â€¢ MAIN PREVIEW</div>
+    <h1>College Management System</h1>
+    <p class="subtitle">Full Stack MERN Application â€¢ Responsive UI â€¢ Admin Dashboard</p>
 
     <div class="layout">
       <div class="profile">
@@ -508,7 +508,7 @@ function buildMainPreviewHtml() {
       <div>
         <h4>Maaz M</h4>
         <p>Full Stack Developer</p>
-        <small>School Management System • MERN Stack</small>
+        <small>College Management System • MERN Stack</small>
       </div>
       <div class="cta">Live Project Demo</div>
     </div>
@@ -609,8 +609,8 @@ function buildIndexHtml(files) {
   </style>
 </head>
 <body>
-  <h1>School Management System</h1>
-  <p>Premium Fiverr gallery images (1920×1080). Upload these PNGs directly.</p>
+  <h1>College Management System</h1>
+  <p>Premium Fiverr gallery images (1920Ã—1080). Upload these PNGs directly.</p>
   ${files.map((file) => `<a href="${file}" target="_blank">${file}</a>`).join("")}
 </body>
 </html>`;
@@ -675,3 +675,4 @@ main().catch((error) => {
   console.error("Fiverr preview build failed:", error);
   process.exit(1);
 });
+

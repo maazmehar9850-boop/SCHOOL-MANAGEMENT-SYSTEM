@@ -1,4 +1,4 @@
-# School Management System
+﻿# College Management System
 
 **Full-stack MERN campus platform** for Aspira College — a public-facing college website plus a role-based academic CMS for admins, teachers, and students.
 
@@ -10,12 +10,12 @@ Built with React, Node.js, Express, and MongoDB. Designed for real campus operat
 
 Use this short summary when writing a gig description, Behance case study, or ChatGPT prompt:
 
-> A complete School / College Management System built with the MERN stack. It includes a modern public college website (Home, Academics, Admissions, Gallery, Contact, and more) and a secure multi-role portal for Admin, Teacher, and Student. Core modules cover dashboards & analytics, student/teacher management, courses, enrollments, attendance, marks/results, fee tracking, assignments, academic resources, password-reset approvals, and PDF export. The UI is fully responsive with a premium dark admin workspace and polished public marketing pages.
+> A complete College Management System built with the MERN stack. It includes a modern public college website (Home, Academics, Admissions, Gallery, Contact, and more) and a secure multi-role portal for Admin, Teacher, and Student. Core modules cover dashboards & analytics, student/teacher management, courses, enrollments, attendance, marks/results, fee tracking, assignments, academic resources, password-reset approvals, and PDF export. The UI is fully responsive with a premium dark admin workspace and polished public marketing pages.
 
 **Suggested ChatGPT prompt:**
 
 ```text
-Using the README of my School Management System (MERN + React + Express + MongoDB), write a professional Fiverr gig description and portfolio project summary. Highlight: public college website + admin/teacher/student dashboards, attendance, grades, fees, assignments, responsive UI, and full-stack delivery. Keep it clear, client-friendly, and high-converting. Do not invent features that are not in the README.
+Using the README of my College Management System (MERN + React + Express + MongoDB), write a professional Fiverr gig description and portfolio project summary. Highlight: public college website + admin/teacher/student dashboards, attendance, grades, fees, assignments, responsive UI, and full-stack delivery. Keep it clear, client-friendly, and high-converting. Do not invent features that are not in the README.
 ```
 
 ---
@@ -96,7 +96,7 @@ Using the README of my School Management System (MERN + React + Express + MongoD
 ## Project Structure
 
 ```text
-School Management System/
+College Management System/
 ├── Frontend/                 # React + Vite client
 │   ├── public/
 │   ├── scripts/              # Build, favicon, Fiverr preview capture
@@ -150,8 +150,8 @@ School Management System/
 ### 1. Clone
 
 ```bash
-git clone https://github.com/maazmehar9850-boop/SCHOOL-MANAGEMENT-SYSTEM.git
-cd SCHOOL-MANAGEMENT-SYSTEM
+git clone https://github.com/maazmehar9850-boop/COLLEGE-MANAGEMENT-SYSTEM.git
+cd COLLEGE-MANAGEMENT-SYSTEM
 ```
 
 ### 2. Install dependencies
@@ -310,7 +310,7 @@ npm --prefix Frontend run fiverr:preview
 Full Stack Developer  
 
 - GitHub: [maazmehar9850-boop](https://github.com/maazmehar9850-boop)
-- Repository: [SCHOOL-MANAGEMENT-SYSTEM](https://github.com/maazmehar9850-boop/SCHOOL-MANAGEMENT-SYSTEM)
+- Repository: [COLLEGE-MANAGEMENT-SYSTEM](https://github.com/maazmehar9850-boop/COLLEGE-MANAGEMENT-SYSTEM)
 
 ---
 
