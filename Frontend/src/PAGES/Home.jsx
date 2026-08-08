@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowRight,
   Award,
   BookOpen,
   Calendar,
@@ -185,7 +184,6 @@ function Home() {
                 <div className="site-hero__actions">
                   <SiteButton to="/admissions" className="!rounded-full !px-8 !py-3.5 !text-base">
                     Apply Now
-                    <ArrowRight size={18} />
                   </SiteButton>
                   <SiteButton
                     to="/academics"
@@ -258,7 +256,6 @@ function Home() {
             />
             <SiteButton to="/academics" variant="secondary" className="shrink-0 !rounded-full">
               View all programs
-              <ArrowRight size={16} />
             </SiteButton>
           </div>
 
@@ -348,7 +345,6 @@ function Home() {
           <div className="mt-8 text-center">
             <SiteButton to="/campus-life" variant="secondary" className="!rounded-full">
               Explore campus life
-              <ArrowRight size={16} />
             </SiteButton>
           </div>
         </div>
@@ -375,7 +371,6 @@ function Home() {
           <div className="mt-10 text-center">
             <SiteButton to="/admissions" className="!rounded-full !px-8">
               Start your application
-              <ArrowRight size={16} />
             </SiteButton>
           </div>
         </div>
@@ -546,7 +541,6 @@ function Home() {
                 <div className="mt-8 flex flex-wrap justify-center gap-3">
                   <SiteButton to="/admissions" className="!rounded-full !px-8">
                     Apply Now
-                    <ArrowRight size={16} />
                   </SiteButton>
                   <SiteButton to="/contact" variant="outline" className="!rounded-full !px-8">
                     Talk to admissions
