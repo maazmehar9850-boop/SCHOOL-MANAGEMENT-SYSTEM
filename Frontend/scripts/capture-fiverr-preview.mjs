@@ -25,7 +25,7 @@ const CAPTURES = [
     route: "/",
     auth: null,
     scrollTo: null,
-    title: "Homepage Hero â€” Desktop + Mobile",
+    title: "Homepage Hero — Desktop + Mobile",
     subtitle: "College website landing experience",
     badge: "WEBSITE",
     sectionPng: "section-homepage.png",
@@ -35,9 +35,9 @@ const CAPTURES = [
     route: "/admin-dashboard",
     auth: "admin",
     scrollTo: ".stat-card__value",
-    title: "Admin Dashboard â€” Desktop + Mobile",
+    title: "Admin Dashboard — Desktop + Mobile",
     subtitle: "Executive overview with charts & KPIs",
-    badge: "LIVE â€¢ ADMIN",
+    badge: "LIVE • ADMIN",
     sectionPng: "section-admin-dashboard.png",
   },
   {
@@ -45,7 +45,7 @@ const CAPTURES = [
     route: "/",
     auth: null,
     scrollTo: "text=Explore pathways that shape your future",
-    title: "Featured Programs â€” Desktop + Mobile",
+    title: "Featured Programs — Desktop + Mobile",
     subtitle: "Homepage module",
     badge: "SECTION",
     sectionPng: "section-featured-programs.png",
@@ -55,27 +55,27 @@ const CAPTURES = [
     route: "/",
     auth: null,
     scrollTo: "text=A vibrant community beyond the classroom",
-    title: "Campus Life â€” Desktop + Mobile",
+    title: "Campus Life — Desktop + Mobile",
     subtitle: "Homepage campus highlights",
     badge: "SECTION",
     sectionPng: "section-campus-life.png",
   },
   {
-    key: "gallery",
-    route: "/gallery",
+    key: "login",
+    route: "/login",
     auth: null,
-    scrollTo: ".site-masonry",
-    title: "Gallery Photos â€” Desktop + Mobile",
-    subtitle: "Campus photo showcase",
-    badge: "GALLERY",
-    sectionPng: "section-gallery.png",
+    scrollTo: null,
+    title: "Login Page — Desktop + Mobile",
+    subtitle: "Secure portal sign-in for admin, teacher & student",
+    badge: "AUTH",
+    sectionPng: "section-login.png",
   },
   {
     key: "contact-form",
     route: "/contact",
     auth: null,
     scrollTo: "form.site-card",
-    title: "Contact Form â€” Desktop + Mobile",
+    title: "Contact Form — Desktop + Mobile",
     subtitle: "Inquiry form and campus details",
     badge: "FORM",
     sectionPng: "section-contact-form.png",
@@ -281,7 +281,7 @@ async function waitForStablePage(page, scrollTo) {
 
   try {
     await page.waitForSelector(
-      ".stat-card__value, .dashboard-chart, .site-hero, .site-masonry, form.site-card, .site-card",
+      ".stat-card__value, .dashboard-chart, .site-hero, .site-masonry, form.site-card, .site-card, .input-glass, h1",
       {
         timeout: 12000,
         state: "visible",
@@ -335,7 +335,7 @@ async function captureViewport(
 
 async function capturePage(browser, pageConfig) {
   console.log(`\nCapturing ${pageConfig.title}`);
-  console.log(`  Desktop: ${pageConfig.route} â†’ ${pageConfig.scrollTo || "top"}`);
+  console.log(`  Desktop: ${pageConfig.route} → ${pageConfig.scrollTo || "top"}`);
   await captureViewport(
     browser,
     pageConfig.route,
@@ -346,7 +346,7 @@ async function capturePage(browser, pageConfig) {
     pageConfig.scrollTo
   );
 
-  console.log(`  Mobile: ${pageConfig.route} â†’ ${pageConfig.scrollTo || "top"}`);
+  console.log(`  Mobile: ${pageConfig.route} → ${pageConfig.scrollTo || "top"}`);
   await captureViewport(
     browser,
     pageConfig.route,
@@ -387,7 +387,7 @@ function buildMainPreviewHtml() {
   const cards = CAPTURES.map(
     (item) => `
       <div class="card">
-        <div class="card-label">${escapeHtml(item.title.replace(" â€” Desktop + Mobile", ""))} â€” Desktop + Mobile</div>
+        <div class="card-label">${escapeHtml(item.title.replace(" — Desktop + Mobile", ""))} — Desktop + Mobile</div>
         <div class="devices">
           <div class="desktop"><img src="assets/${item.key}.png" alt="${escapeHtml(item.key)}" /></div>
           <div class="phone"><img src="assets/${item.key}-mobile.png" alt="${escapeHtml(item.key)} mobile" /></div>
@@ -489,9 +489,9 @@ function buildMainPreviewHtml() {
 </head>
 <body>
   <div class="wrap">
-    <div class="badge">FIVERR â€¢ MAIN PREVIEW</div>
+    <div class="badge">FIVERR • MAIN PREVIEW</div>
     <h1>College Management System</h1>
-    <p class="subtitle">Full Stack MERN Application â€¢ Responsive UI â€¢ Admin Dashboard</p>
+    <p class="subtitle">Full Stack MERN Application • Responsive UI • Admin Dashboard</p>
 
     <div class="layout">
       <div class="profile">
@@ -599,7 +599,7 @@ function buildIndexHtml(files) {
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>SchoolMS Fiverr Preview Pack</title>
+  <title>College Management System — Fiverr Preview Pack</title>
   <style>
     body { font-family: Inter, system-ui, sans-serif; background: #0b1220; color: #e2e8f0; padding: 36px; max-width: 920px; margin: 0 auto; }
     h1 { margin-bottom: 8px; }
@@ -610,7 +610,7 @@ function buildIndexHtml(files) {
 </head>
 <body>
   <h1>College Management System</h1>
-  <p>Premium Fiverr gallery images (1920Ã—1080). Upload these PNGs directly.</p>
+  <p>Premium Fiverr gallery images (1920×1080). Upload these PNGs directly.</p>
   ${files.map((file) => `<a href="${file}" target="_blank">${file}</a>`).join("")}
 </body>
 </html>`;
@@ -635,16 +635,31 @@ async function main() {
     throw new Error("Missing fiverr-preview/assets/profile.png");
   }
 
-  console.log("Step 1: Capture live app screenshots");
-  console.log(`App: ${BASE_URL}`);
+  const onlyKey = process.env.CAPTURE_ONLY?.trim() || null;
+  const skipLive = process.env.SKIP_LIVE_CAPTURE === "1";
+  const captures = onlyKey
+    ? CAPTURES.filter((item) => item.key === onlyKey)
+    : CAPTURES;
+
+  if (onlyKey && captures.length === 0) {
+    throw new Error(`Unknown CAPTURE_ONLY key: ${onlyKey}`);
+  }
 
   const browser = await chromium.launch({
     headless: true,
     executablePath: resolveBrowserExecutable(),
   });
 
-  for (const pageConfig of CAPTURES) {
-    await capturePage(browser, pageConfig);
+  if (!skipLive) {
+    console.log("Step 1: Capture live app screenshots");
+    console.log(`App: ${BASE_URL}`);
+    if (onlyKey) console.log(`Only: ${onlyKey}`);
+
+    for (const pageConfig of captures) {
+      await capturePage(browser, pageConfig);
+    }
+  } else {
+    console.log("Step 1: Skipped live captures (SKIP_LIVE_CAPTURE=1)");
   }
 
   console.log("\nStep 2: Build Fiverr presentation PNGs");

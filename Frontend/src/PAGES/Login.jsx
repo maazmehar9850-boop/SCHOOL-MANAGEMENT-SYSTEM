@@ -37,6 +37,12 @@ function Login() {
 
   useEffect(() => {
     resetAuthRedirectState();
+    // Keep fields empty — browsers often autofill saved student credentials after paint.
+    setForm({ email: "", Password: "" });
+    const clearAutofill = window.setTimeout(() => {
+      setForm({ email: "", Password: "" });
+    }, 150);
+    return () => window.clearTimeout(clearAutofill);
   }, []);
 
   const handleChange = (e) => {
@@ -214,6 +220,7 @@ function Login() {
               variants={container}
               initial="hidden"
               animate="show"
+              autoComplete="off"
             >
               <motion.label variants={item} className="block space-y-2">
                 <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
@@ -234,11 +241,15 @@ function Login() {
                     name="email"
                     value={form.email}
                     onChange={handleChange}
-                    onFocus={() => setFocused("email")}
+                    onFocus={(e) => {
+                      e.target.removeAttribute("readOnly");
+                      setFocused("email");
+                    }}
                     onBlur={() => setFocused(null)}
                     className="input-glass"
                     placeholder="you@aspiracollege.com"
-                    autoComplete="email"
+                    autoComplete="off"
+                    readOnly
                     required
                   />
                 </motion.div>
@@ -263,11 +274,15 @@ function Login() {
                     name="Password"
                     value={form.Password}
                     onChange={handleChange}
-                    onFocus={() => setFocused("password")}
+                    onFocus={(e) => {
+                      e.target.removeAttribute("readOnly");
+                      setFocused("password");
+                    }}
                     onBlur={() => setFocused(null)}
                     className="input-glass"
                     placeholder="Enter your password"
-                    autoComplete="current-password"
+                    autoComplete="new-password"
+                    readOnly
                     required
                   />
                   <button

@@ -6,17 +6,9 @@ Built with React, Node.js, Express, and MongoDB. Designed for real campus operat
 
 ---
 
-## Project Summary (for portfolio / Fiverr / ChatGPT prompts)
-
-Use this short summary when writing a gig description, Behance case study, or ChatGPT prompt:
+## Project Summary (for portfolio / Fiverr)
 
 > A complete College Management System built with the MERN stack. It includes a modern public college website (Home, Academics, Admissions, Gallery, Contact, and more) and a secure multi-role portal for Admin, Teacher, and Student. Core modules cover dashboards & analytics, student/teacher management, courses, enrollments, attendance, marks/results, fee tracking, assignments, academic resources, password-reset approvals, and PDF export. The UI is fully responsive with a premium dark admin workspace and polished public marketing pages.
-
-**Suggested ChatGPT prompt:**
-
-```text
-Using the README of my College Management System (MERN + React + Express + MongoDB), write a professional Fiverr gig description and portfolio project summary. Highlight: public college website + admin/teacher/student dashboards, attendance, grades, fees, assignments, responsive UI, and full-stack delivery. Keep it clear, client-friendly, and high-converting. Do not invent features that are not in the README.
-```
 
 ---
 
@@ -273,7 +265,7 @@ Includes:
 - Main project cover (`fiverr-main-preview.png`)
 - Homepage hero
 - Admin dashboard
-- Featured programs, campus life, gallery, and contact form section shots
+- Featured programs, campus life, login, and contact form section shots
 
 Regenerate (dev server must be running):
 
